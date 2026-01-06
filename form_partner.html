@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="css/responsive.css" media="screen">
+
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <link rel="icon" type="image/x-icon" href="img/favicon.png">
+
+    
+
+
+
+    <!--Google fonts-->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins: ital, wght@0,100; 0,200; 0,300; 0,400; 0,500; 0,600; 0,700;0,800;0,900;1,100;1,200; 1,300; 1,400;1,500; 1,600;1,700;1,800; 1,900&display=swap" rel="stylesheet">
+
+    <!--/Google fonts-->
+
+
+
+    <!--Bootstrap icons-->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!--/Bootstrap icons-->
+
+
+
+    <!--Scripts-->
+
+    <script src="js/i18n.js" defer></script>
+    <script src="js/script.js" defer></script>
+
+    <script src="js/btn-menu-mob.js" defer></script>
+
+    <!--/Scripts-->
+
+
+
+    <title data-i18n="partner.title">F91 - Soluções Operacionais | Seja um parceiro</title>
+
+
+
+    <!-- Style of the page -->
+
+    <style>
+
+        body {
+
+            font-family: 'Poppins', sans-serif;
+
+            background-color: #001a3b;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            height: 100vh;
+
+            margin: 0;
+
+        }
+
+        .container {
+
+            background: transparent;
+
+            padding: 20px 30px;
+
+            border-radius: 25px;
+
+            border: 1.5px solid #c0d000;
+
+            box-shadow: 0 0 50px #000f26;
+
+            max-width: 450px;
+
+            width: 100%;
+
+            justify-content: center;  
+
+            align-content: center;
+
+            text-align: center;
+
+        }
+
+        /* Responsive container */
+
+        @media screen and (max-width: 900px){
+
+            .container {
+
+                box-shadow: none;
+
+                border: none; 
+
+            }
+
+        }
+
+
+
+
+
+        .form-step {
+
+            display: none;
+
+        }
+
+        .form-step.active {
+
+            display: block;
+
+        }
+
+        .form-step h2 {
+
+            text-align: center;
+
+            margin-bottom: 20px;
+
+            color: #fff;
+
+        }
+
+        .form-group {
+
+            margin-bottom: 20px;
+
+        }
+
+        .form-group label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #ffffff;
+
+        }
+
+        .form-group input,
+
+        .form-group select {
+
+            width: 100%;
+
+            padding: 10px;
+
+            border: 1px solid #ddd;
+
+            background-color: transparent;
+
+            color: #fff;
+
+            border-radius: 25px;
+
+            font-size: 18px;
+
+            margin-bottom: 10px;
+
+        }
+
+
+
+        .btnpic{
+
+            display: inline;
+
+            width: 35%;
+
+            padding: 10px;
+
+            background: transparent;
+
+            color: #c0d000;
+
+            border: #c0d000 solid 1px;
+
+            border-radius: 12px;
+
+            font-size: 12px;
+
+            font-weight: 400;
+
+            cursor: pointer;
+
+            margin-top: 5px;
+
+            margin-bottom: 15px;
+
+        }
+
+        .btnpic:hover {
+
+            background: #a8b800;
+
+            box-shadow: 0 0 10px #c0d000;
+
+            font-size: 12px;
+
+            font-weight: 600;
+
+            color: #fff;
+
+        }
+
+        .btnpic:disabled {
+
+            background: #ddd;
+
+            cursor: not-allowed;
+
+        }
+
+        .btn {
+
+            display: inline;
+
+            width: 48%;
+
+            padding: 10px;
+
+            background: transparent;
+
+            color: #c0d000;
+
+            border: #c0d000 solid 1px;
+
+            border-radius: 12px;
+
+            font-size: 20px;
+
+            font-weight: 400;
+
+            cursor: pointer;
+
+            margin-top: -3px;
+
+        }
+
+        .btn:hover {
+
+            background: #a8b800;
+
+            box-shadow: 0 0 10px #c0d000;
+
+            font-size: 20px;
+
+            font-weight: 600;
+
+            color: #fff;
+
+        }
+
+        .btn:disabled {
+
+            background: #ddd;
+
+            cursor: not-allowed;
+
+        }
+
+        .progress-bar {
+
+            height: 5px;
+
+            background: #c0d000;
+
+            border-radius: 5px;
+
+            margin-bottom: 20px;
+
+            width: 0;
+
+        }
+
+        #free-trial button{
+
+            width: 180px;
+
+            height: 30px;
+
+            margin-right: 25px;
+
+            margin-bottom: 2px;
+
+            font-size: 18px;
+
+            background-color: transparent;
+
+            border: 1px solid #ffffff;
+
+            border-radius: 25px;
+
+            color: #fff;
+
+            cursor: pointer;
+
+            transition: .5s;
+
+        }
+
+        #free-trial button:hover{
+
+            background-color: #c0d000;
+
+            border: none;
+
+        }
+
+
+
+        #rodappe{
+
+            text-align: center;
+
+            padding: 10px;
+
+            background-color: transparent;
+
+            color: #acacac;
+
+            font-size: 14px;
+
+            position:fixed;
+
+            bottom: 0;
+
+            width: 100%;
+
+        }
+
+        #gender{
+
+            background-color: #001840;
+
+            cursor: pointer;
+
+            transition: .2s;
+
+        }
+
+        .help-textarea{
+            background-color: transparent;
+
+            width: 100%;
+
+            height: 50px;
+
+            font-size: 20px;
+
+            font-weight: 350;
+
+            border-radius: 15px;
+
+            padding: 10px;
+
+            color: #fff;
+
+            border: 1px solid #002050;
+
+        }
+
+        #source{
+
+            background-color: #001840;
+
+            color: #fff;
+
+        }
+
+
+
+        #inputfile{
+
+            position: relative;
+
+            margin-bottom: 20px;
+
+            width: 120px;
+
+            height: 120px;
+
+            overflow: hidden;
+
+            border-radius: 50%;
+
+            border: 4px solid #c0d000;
+
+            background-color: transparent;
+
+            display: inline-block;
+
+            position: relative;
+
+            justify-content: center;
+
+            margin: 0px auto;
+
+            text-align: center;
+
+        }
+
+
+
+        #inputfile input[type=file] {
+
+            position: absolute;
+
+            top: 0;
+
+            left: 0;
+
+            width: 100%;
+
+            height: 100%;
+
+            opacity: 0;
+
+            cursor: pointer;
+
+        }
+
+        #inputfile img{
+
+            width: 100%;
+
+            height: auto;
+
+            border-radius: 50%;
+
+            display: flex;
+
+        }
+
+       
+
+
+
+        /* btn Enviar */
+
+        .btn-next{
+
+            display: inline;
+
+            width: 48%;
+
+            padding: 10px;
+
+            background: #c0d000;
+
+            color: #fff;
+
+            border: #c0d000 solid 1px;
+
+            border-radius: 12px;
+
+            font-size: 20px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            margin-top: -3px;
+
+            transition: .3s;
+
+        }
+
+        .btn-next:hover{
+
+            transform: scale(1.1);
+
+        }
+
+        #formMessage{
+
+            margin-top: 10px;
+
+        }
+
+
+
+    </style>
+
+    <!-- /Style of the page -->
+
+</head>
+
+<body style="background-color: #001840; font-family: Arial, sans-serif; margin: 0; padding: 0;">
+
+
+
+    <header id="header">
+
+
+
+        <div class="interface">
+
+
+
+            <section class="logo">
+
+                <a href="index.html"><img class="logo-white" src="img/logo.png" alt="F91"></a>
+
+                <a href="index.html"><img class="logo-color" src="img/logo.png" alt="F91"></a>
+
+            </section> 
+
+
+
+            <section class="menu-desktop">
+
+                <nav>
+
+                    <ul><li><a href="index.html#about" data-i18n="global.nav.about">Quem sou eu</a></li>
+
+                        <li><a href="index.html#what" data-i18n="global.nav.what">O que faço</a></li>
+
+                        <li><a href="index.html#how" data-i18n="global.nav.how">Como faço</a></li>
+                        <li><a href="index.html#contact" data-i18n="global.nav.contact">Fala comigo!</a></li>
+
+                        <li><a href="blog.html" data-i18n="global.nav.blog">Blog</a></li>
+
+                        <!-- <li><a href="#blog">Blog</a></li> -->
+                        <li class="lang-switcher" aria-label="Seletor de idioma">
+                            <button type="button" class="lang-toggle" data-lang-toggle aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-globe2"></i>
+                                <span class="lang-current" data-lang-current>PT</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <ul class="lang-dropdown" data-lang-menu role="menu">
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="pt" role="menuitem">Português</button></li>
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="en" role="menuitem">English</button></li>
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="es" role="menuitem">Español</button></li>
+                            </ul>
+                        </li>
+
+                    </ul>
+
+                </nav>
+
+            </section>
+
+
+
+            <section class="btn-contato">
+
+                <a href="index.html#contact">
+
+                    <button data-i18n="global.cta.free_trial">Teste GRÁTIS!</button>
+
+                </a>
+
+            </section>
+
+
+
+            <div class="btn-menu-mob" id="btn-menu-mob">
+
+                <div class="line-menumob-1"></div>
+
+                <div class="line-menumob-2"></div>
+
+                <div class="line-menumob-3"></div>
+
+            </div>
+
+
+
+            <section class="menu-mobile" id="menu-mobile">
+
+                <nav>
+
+                    <ul><li><a href="index.html#about" data-i18n="global.nav.about">Quem sou eu</a></li>
+
+                        <li><a href="index.html#what" data-i18n="global.nav.what">O que faço</a></li>
+
+                        <li><a href="index.html#how" data-i18n="global.nav.how">Como faço</a></li>
+                        <li><a href="index.html#contact" data-i18n="global.nav.contact">Fala comigo!</a></li>
+
+                        <li><a href="blog.html" data-i18n="global.nav.blog">Blog</a></li>
+
+                        <!-- <li><a href="#blog">Blog</a></li> -->
+                        <li class="lang-switcher" aria-label="Seletor de idioma">
+                            <button type="button" class="lang-btn" data-lang-switch="pt" aria-label="Português" title="Português">PT</button>
+                            <button type="button" class="lang-btn" data-lang-switch="en" aria-label="English" title="English">EN</button>
+                            <button type="button" class="lang-btn" data-lang-switch="es" aria-label="Español" title="Español">ES</button>
+                        </li>
+
+                    </ul>
+
+                </nav>
+
+            </section>
+
+
+
+
+
+        </div>
+
+
+
+    </header>
+
+    
+
+<!-- Content -->
+
+<div class="container">
+
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <form id="customerForm" method="POST" enctype="multipart/form-data">
+
+        <div class="form-step active" data-step="1">
+
+            <h2 data-i18n="partner.step.name.title">Qual é o seu nome completo?</h2>
+
+            <div class="form-group">
+
+                <input type="text" id="name" name="nome" placeholder="Nome completo" data-i18n="form.full_name" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="2">
+
+            <h2 data-i18n="partner.step.birth.title">Qual é a sua data de nascimento?</h2>
+
+            <div class="form-group">
+
+                <input type="date" id="birthdate" name="data_nascimento" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="3">
+
+            <h2 data-i18n="partner.step.cpf.title">Qual é o seu CPF?</h2>
+
+            <div class="form-group">
+
+                <input type="text" id="cpf" name="cpf" placeholder="Digite apenas números" data-i18n="global.form.only_numbers" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="4">
+
+            <h2 data-i18n="partner.step.rg.title">Qual é o seu RG?</h2>
+
+            <div class="form-group">
+
+                <input type="text" id="rg" name="rg" placeholder="Digite apenas números" data-i18n="global.form.only_numbers" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="5">
+
+            <h2 data-i18n="partner.step.sex.title">Qual é o seu sexo?</h2>
+
+            <div class="form-group">
+
+                <select id="gender" name="sexo" required>
+
+                    <option value="" data-i18n="global.form.select">Selecione</option>
+
+                    <option value="male" data-i18n="global.gender.male">Masculino</option>
+
+                    <option value="female" data-i18n="global.gender.female">Feminino</option>
+
+                    <option value="other" data-i18n="global.gender.other">Outro</option>
+
+                </select>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="6">
+
+            <h2 data-i18n="partner.step.email.title">Qual é o seu e-mail?</h2>
+
+            <div class="form-group">
+
+                <input type="email" id="email" name="email" placeholder="E-mail" data-i18n="form.email" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="7">
+
+            <h2 data-i18n="partner.step.whatsapp.title">Qual é o seu WhatsApp?</h2>
+
+            <div class="form-group">
+
+                <input type="tel" id="whatsapp" name="whatsapp" placeholder="Número do WhatsApp" data-i18n="partner.whatsapp_number" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="8">
+
+            <h2 data-i18n="partner.step.linkedin.title">Linkedin</h2>
+
+            <div class="form-group">
+
+                <input type="url" id="linkedin" name="linkedin" placeholder="Se não tiver, deixe em branco" data-i18n="partner.optional_blank" data-i18n-attr="placeholder">
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="9">
+
+            <h2 data-i18n="partner.step.site.title">Site/portfolio</h2>
+
+            <div class="form-group">
+
+                <input type="url" id="site" name="site" placeholder="Se não tiver, deixe em branco" data-i18n="partner.optional_blank" data-i18n-attr="placeholder">
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="10">
+
+            <h2 data-i18n="partner.step.education.title">Escolaridade</h2>
+
+            <div class="form-group">
+
+                <select id="source" name="escolaridade" required>
+
+                    <option value="" data-i18n="global.form.select">Selecione</option>
+
+                    <option value="Ensino médio completo" data-i18n="partner.education.high_school">Ensino médio completo</option>
+
+                    <option value="Superior trancado" data-i18n="partner.education.college_paused">Superior trancado</option>
+
+                    <option value="Superior cursando" data-i18n="partner.education.college_in_progress">Superior cursando</option>
+
+                    <option value="Superior Completo" data-i18n="partner.education.college_complete">Superior Completo</option>
+
+                    <option value="Pós/MBA trancado" data-i18n="partner.education.postgrad_paused">Pós/MBA trancado</option>
+
+                    <option value="Pós/MBA cursando" data-i18n="partner.education.postgrad_in_progress">Pós/MBA cursando</option>
+
+                    <option value="Pós/MBA completo" data-i18n="partner.education.postgrad_complete">Pós/MBA completo</option>
+
+                </select>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="11">
+
+            <h2 data-i18n="partner.step.course.title">Curso</h2>
+
+            <div class="form-group">
+
+                <input type="text" id="course" name="curso" placeholder="Referente a pergunta anterior" data-i18n="partner.related_previous" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="12">
+
+            <h2 data-i18n="partner.step.occupation.title">Ocupação atual</h2>
+
+            <div class="form-group">
+
+                <input type="text" id="occupation" name="ocupacao" placeholder="Ocupação atual" data-i18n="partner.occupation_placeholder" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="13">
+
+            <h2 data-i18n="partner.step.company.title">Empresa</h2>
+
+            <div class="form-group">
+
+                <input type="text" id="company" name="empresa" placeholder="Se não tiver, deixe em branco" data-i18n="partner.optional_blank" data-i18n-attr="placeholder">
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="14">
+
+            <h2 data-i18n="partner.step.skills.title">Principais habilidades</h2>
+
+            <div class="form-group">
+
+                <textarea id="habilidades" class="help-textarea" name="habilidades" rows="4" placeholder="Descreva suas principais habilidades" data-i18n="partner.skills_desc" data-i18n-attr="placeholder" required></textarea>
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="15">
+
+            <h2 data-i18n="partner.step.summary.title">Breve resumo</h2>
+
+            <div class="form-group">
+
+                <textarea id="resumo" class="help-textarea" name="resumo" rows="4" placeholder="Faça um breve resumo sobre você" data-i18n="partner.summary_desc" data-i18n-attr="placeholder" required></textarea>
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="16">
+
+            <h2 data-i18n="partner.step.photo.title">Envie uma foto de perfil</h2>
+
+            <div class="form-group" id="inputfile">
+
+                <input type="file" accept="image/*" id="profilePicture" name="foto_perfil" onchange="previewImage()">
+                <img id="profileImage" src="img/User-Profile.png" alt="Profile Picture Preview" data-i18n="partner.photo_preview_alt" data-i18n-attr="alt">
+
+            </div><br>
+
+            <button class="btnpic" type="button" onclick="document.getElementById('profilePicture').click()" data-i18n="partner.button.select_photo">Selecionar foto</button><br>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="submit" class="btn" data-i18n="partner.button.finish">Finalizar</button>
+
+        </div>
+
+    </form>
+
+    <div id="formMessage"></div>
+
+</div>
+
+<!-- /Content -->  
+
+
+
+<!--Footer 1-->
+
+<footer class="footer1" id="rodape">
+
+    &copy; <span id="anoAtual"></span> F91 - Soluções Operacionais.
+
+</footer>
+
+<!-- /Footer1 -->
+
+
+
+<!--Footer 2-->
+
+    <footer id="footer">
+
+        <div class="interface">
+
+            <section class="top-footer">
+
+
+
+                <a href="https://www.linkedin.com/company/yailup" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-linkedin"></i></button></a>
+
+                <a href="https://www.instagram.com/yailup/" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-instagram"></i></button></a>
+
+                <a href="https://www.youtube.com/channel/UCnPAEcSoKhVrN--XwGxcVJg" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-youtube"></i></button></a>
+
+            </section>
+
+
+
+            <section class="middle-footer">
+
+                <h1 id="footer-text">&copy; <span id="anoAtualz"></span> F91 - Soluções Operacionais.</h1>
+
+                <h2>Filipe Oliveira MEI - CNPJ 40.664.197/0001-88</h2>
+
+
+
+                <p>
+
+                    <a href="terms.html" class="terms" data-i18n="global.footer.terms">Termos e Condições</a> <i class="bi bi-dot terms"></i>
+
+                    <a href="policy.html" class="terms" data-i18n="global.footer.policy">Política de Privacidade</a> <i class="bi bi-dot terms"></i>
+
+                    <a href="form_partner.html" class="terms" data-i18n="global.footer.partner">Seja um Parceiro</a>
+
+                </p>
+
+            </section>
+
+        </div>
+
+    </footer>
+
+<!--/Footer2-->
+
+
+
+
+
+<!-- Scripts -->
+
+<script>
+
+let currentStep = 1;
+
+const formSteps = document.querySelectorAll('.form-step');
+
+const progressBar = document.getElementById('progress-bar');
+
+
+
+function prevStep() {
+
+    const currentStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+
+    currentStepElement.classList.remove("active");
+
+    currentStep -= 1;
+
+    const prevStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+
+    prevStepElement.classList.add("active");
+
+}
+
+
+
+function nextStep() {
+
+    if (currentStep < formSteps.length) {
+
+        formSteps[currentStep - 1].classList.remove('active');
+
+        formSteps[currentStep].classList.add('active');
+
+        currentStep++;
+
+        updateProgressBar();
+
+    }
+
+}
+
+
+
+function updateProgressBar() {
+
+    progressBar.style.width = ((currentStep - 1) / (formSteps.length - 1)) * 100 + '%';
+
+}
+
+
+
+updateProgressBar();
+
+
+
+document.getElementById("customerForm").addEventListener("submit", function(event){
+
+    event.preventDefault(); // Evita o redirecionamento padr?o do formulário
+
+    var form = this;
+    var formMessage = document.getElementById("formMessage");
+    var formData = new FormData(form);
+
+    // Enviar os dados via AJAX
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "php/finish.php", true); // Arquivo PHP que processa o envio
+
+    xhr.onload = function() {
+        var successMessage = window.I18N ? window.I18N.t('global.form.response.success') : 'Formulário enviado com sucesso!';
+        var errorMessage = window.I18N ? window.I18N.t('global.form.response.error') : 'Erro ao enviar o formulário. Tente novamente.';
+        var status = 'error';
+
+        if (xhr.responseText) {
+            try {
+                var response = JSON.parse(xhr.responseText);
+                status = response.status || status;
+            } catch (e) {
+                // Mantém o status padrão
+            }
+        }
+
+        if (xhr.status === 200 && status === "success") {
+            formMessage.innerHTML = '<p style="color: #c0d000;">' + successMessage + '</p>';
+            form.reset();
+            formSteps.forEach(function(step, index) {
+                step.classList.toggle('active', index === 0);
+            });
+            currentStep = 1;
+            updateProgressBar();
+        } else {
+            formMessage.innerHTML = '<p style="color: #ff6c6c;">' + errorMessage + '</p>';
+        }
+    };
+
+    xhr.onerror = function() {
+        var connectionMessage = window.I18N ? window.I18N.t('global.form.response.connection') : 'Erro de conexão com o servidor.';
+        formMessage.innerHTML = '<p style="color: #ff6c6c;">' + connectionMessage + '</p>';
+    };
+
+    xhr.send(formData); // Envia os dados do formulário
+});
+
+
+
+function previewImage() {
+    var fileInput = document.getElementById('profilePicture');
+    var profileImage = document.getElementById('profileImage');
+    var profileText = document.getElementById('profileText');
+
+    if (!fileInput || !profileImage || !fileInput.files.length) {
+        return;
+    }
+
+    var file = fileInput.files[0];
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+        profileImage.src = e.target.result;
+        if (profileText) {
+            profileText.style.display = 'none';
+        }
+        profileImage.style.display = 'block';
+    };
+
+    reader.readAsDataURL(file);
+}
+
+
+
+</script>
+
+<!-- /Scripts -->
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

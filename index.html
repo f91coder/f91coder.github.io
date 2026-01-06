@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="F91 - Soluções Operacionais: soluções sob medida para PMEs aumentarem eficiência, produtividade e reduzirem custos." data-i18n="index.meta.description" data-i18n-attr="content">
+    <link rel="stylesheet" href="css/swiper-bundle.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/responsive.css" media="screen">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="img/favicon.png">
+
+    <!-- Json manifest for mobile icon App -->
+    <link rel="manifest" href="js/manifest.json">
+    <meta name="theme-color" content="#002050">
+    <!-- /Json manifest for mobile icon App -->
+
+    <!--Google fonts-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css?family=Poppins: ital, wght@0,100; 0,200; 0,300; 0,400; 0,500; 0,600; 0,700;0,800;0,900;1,100;1,200; 1,300; 1,400;1,500; 1,600;1,700;1,800; 1,900&display=swap" rel="stylesheet">
+    <!--/Google fonts-->
+
+    <!--Bootstrap icons-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!--/Bootstrap icons-->
+
+    <!--Scripts-->
+    <script src="js/swiper-bundle.min.js" defer></script>
+    <script src="js/i18n.js" defer></script>
+    <script src="js/script.js" defer></script>
+    <script src="js/btn-menu-mob.js" defer></script>
+    <!--/Scripts-->
+
+    <title data-i18n="index.title">F91 - Soluções Operacionais | Seu Negócio + Eficiente e Produtivo!</title>
+</head>
+
+<body>
+
+    <header id="header">
+
+        <div class="interface">
+
+            <section class="logo">
+                <a href="index.html"><img class="logo-white" src="img/logo.png" alt="F91"></a>
+                <a href="index.html"><img class="logo-color" src="img/logo_.png" alt="F91"></a>
+            </section> 
+
+            <section class="menu-desktop">
+
+                <nav>
+                    <ul><li><a href="#about" data-i18n="global.nav.about">Quem sou eu</a></li>
+                        <li><a href="#what" data-i18n="global.nav.what">O que faço</a></li>
+                        <li><a href="#how" data-i18n="global.nav.how">Como faço</a></li>
+                        <li><a href="#contact" data-i18n="global.nav.contact">Fala comigo!</a></li>
+                        <li><a href="blog.html" data-i18n="global.nav.blog">Blog</a></li>
+                        <li class="lang-switcher" aria-label="Seletor de idioma">
+                            <button type="button" class="lang-toggle" data-lang-toggle aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-globe2"></i>
+                                <span class="lang-current" data-lang-current>PT</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <ul class="lang-dropdown" data-lang-menu role="menu">
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="pt" role="menuitem">Português</button></li>
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="en" role="menuitem">English</button></li>
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="es" role="menuitem">Español</button></li>
+                            </ul>
+                        </li>
+                        <!-- <li><a href="#blog">Blog</a></li> -->
+                    </ul>
+                </nav>
+            </section>
+
+            <section class="btn-contato">
+                <a href="index.html#contact">
+                    <button data-i18n="global.cta.free_trial">Teste GRÁTIS!</button>
+                </a>
+            </section>
+
+            <div class="btn-menu-mob" id="btn-menu-mob">
+                <div class="line-menumob-1"></div>
+                <div class="line-menumob-2"></div>
+                <div class="line-menumob-3"></div>
+            </div>
+
+            <section class="menu-mobile" id="menu-mobile">
+                <nav>
+                    <ul><li><a href="#about" data-i18n="global.nav.about">Quem sou eu</a></li>
+                        <li><a href="#what" data-i18n="global.nav.what">O que faço</a></li>
+                        <li><a href="#how" data-i18n="global.nav.how">Como faço</a></li>
+                        <li><a href="#contact" data-i18n="global.nav.contact">Fala comigo!</a></li>
+                        <li><a href="blog.html" data-i18n="global.nav.blog">Blog</a></li>
+                
+                        <!-- <li><a href="#blog">Blog</a></li> -->
+                        <li class="lang-switcher" aria-label="Seletor de idioma">
+                            <button type="button" class="lang-btn" data-lang-switch="pt" aria-label="Português" title="Português">PT</button>
+                            <button type="button" class="lang-btn" data-lang-switch="en" aria-label="English" title="English">EN</button>
+                            <button type="button" class="lang-btn" data-lang-switch="es" aria-label="Español" title="Español">ES</button>
+                        </li>
+                    </ul>
+                </nav>
+            </section>
+
+        </div>          
+    </header>
+
+    <section class="hero-site" id="home">
+
+        <div class="interface">
+
+            <div class="txt-hero">
+
+                <h1 data-i18n-html="index.hero.title">seu negócio mais<br> <strong>Eficiente</strong> e <strong>Produtivo!</strong></h1>
+                <p data-i18n-html="index.hero.subtitle">Conheça nossas soluções operacionais <strong>sob medida</strong> para seu negócio alcançar o <strong id="maxpot">MÁXIMO POTENCIAL!</strong></p><br>
+
+                <div class="video-heroz">
+
+                    <iframe 
+
+                        src="https://www.youtube.com/embed/9ICaItcXYMs?rel=0&showinfo=0"
+                        title="Vídeo institucional da F91" data-i18n="index.hero.video_title" data-i18n-attr="title"
+                        frameborder="0"
+
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+
+                        allowfullscreen>
+
+                    </iframe>
+
+                </div>
+
+                <a href="index.html#contact">
+                    <button data-i18n-html="index.hero.cta">QUERO UM TESTE GRÁTIS! <i class="bi bi-arrow-right"></i></button>
+                </a>
+            </div>
+
+            <div class="video-hero">
+
+                <div class="video-wrapper" onclick="loadVideo(this)">
+                    <img src="https://img.youtube.com/vi/9ICaItcXYMs/hqdefault.jpg" alt="Vídeo thumbnail" data-i18n="index.hero.video_thumb_alt" data-i18n-attr="alt">
+                    <div class="play-button"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div id="scroll-cta" onclick="scrollDown()">
+            <i class="bi bi-mouse"></i>
+        </div>
+
+    </section>
+
+    <section class="about" id="about">
+            <div class="interface">
+                <h2 data-i18n-html="index.about.title">Quem <span>sou eu?</span></h2>
+                <section class="teambox" style="margin-bottom: -45px; zoom: 90%">
+                    <div class="team-intro">
+                        <div class="team-card team-card--solo">
+                            <div class="team-image">
+                                <img src="img/team-1.png" alt="Foto de Filipe Oliveira" data-i18n="index.team.member1.alt" data-i18n-attr="alt">
+                            </div>
+
+                            <div class="team-detail">
+                                <h3>Filipe Oliveira <a class="team-icons" href="https://www.linkedin.com/in/filipeoliveirame/" target="_blank" rel="noopener noreferrer"><i class="bi bi-linkedin"></i></a></h3>
+                                <p data-i18n-html="index.team.member1.role">Gestão de Operações</p>
+                            </div>
+                        </div>
+
+                        <div class="team-bubble" data-i18n-html="index.team.intro">Olá, eu sou o Filipe, muito prazer! Meu objetivo aqui é <strong>promover inovação operacional</strong> por meio de <strong>serviços de apoio administrativo</strong> focado em atender PMEs que visam melhorar suas entregas e executar tarefas de forma mais otimizada, explorando a <strong>máxima eficiência</strong> e <strong>produtividade</strong>. Para isso, busco utilizar meu know-how e experiência, sempre fechando parcerias estratégicas para desenvolver a melhor solução low-cost para o cliente obter sua melhor performance e competitividade.</div>
+                    </div>
+                
+                    
+
+                    <div class="profile-actions" aria-label="Acessos rápidos">
+                        <button type="button" class="profile-action" data-modal-target="modal-ventures">
+                            <span class="action-icon"><i class="bi bi-buildings"></i></span>
+                            <span class="action-label" data-i18n="index.actions.ventures">Empreendimentos</span>
+                        </button>
+                    <button type="button" class="profile-action" data-modal-target="modal-recommendations">
+                        <span class="action-icon"><i class="bi bi-chat-quote"></i></span>
+                        <span class="action-label" data-i18n="index.actions.recommendations">Recomendações</span>
+                    </button>
+                </div>
+</section>
+
+        </div>
+    </section>
+
+    <div class="modal" id="modal-ventures" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-overlay" data-modal-close></div>
+        <div class="modal-card" role="document">
+            <button type="button" class="modal-close" data-modal-close>
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+                <span class="sr-only" data-i18n="index.modal.close">Fechar</span>
+            </button>
+            <h3 class="modal-title" data-i18n="index.modal.ventures.title">Empreendimentos</h3>
+            <p class="modal-desc" data-i18n="index.modal.ventures.desc">Aqui estão as startups em que estou envolvido atualmente.</p>
+            <div class="ventures-list">
+                <article class="venture-card">
+                    <div class="venture-title">
+                        <span class="venture-name">SellaStay</span>
+                        <a class="venture-link" href="https://www.sellastay.com" target="_blank" rel="noopener noreferrer">sellastay.com</a>
+                    </div>
+                    <p data-i18n="index.modal.ventures.item1.desc">SellaStay: startup no setor hoteleiro, um SaaS de gestão de negociação de grupos e eventos.</p>
+                </article>
+                <article class="venture-card">
+                    <div class="venture-title">
+                        <span class="venture-name">Sync Softwares</span>
+                        <span class="venture-role" data-i18n="index.modal.ventures.item2.role">Growth partner</span>
+                    </div>
+                    <p data-i18n="index.modal.ventures.item2.desc">Sync Softwares: apoio em crescimento e estratégia de expansão.</p>
+                </article>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal-recommendations" role="dialog" aria-modal="true" aria-hidden="true">
+        <div class="modal-overlay" data-modal-close></div>
+        <div class="modal-card" role="document">
+            <button type="button" class="modal-close" data-modal-close>
+                <i class="bi bi-x-lg" aria-hidden="true"></i>
+                <span class="sr-only" data-i18n="index.modal.close">Fechar</span>
+            </button>
+            <h3 class="modal-title" data-i18n="index.modal.recommendations.title">Recomendações</h3>
+            <p class="modal-desc" data-i18n="index.modal.recommendations.desc">Alguns testemunhos de pessoas que já trabalharam comigo.</p>
+            <div class="recommendations-swiper swiper" data-recommendations-swiper>
+                <div class="swiper-wrapper">
+                    <div class="swiper-slide">
+                        <article class="recommendation-card">
+                            <img class="recommendation-avatar" src="img/user.png" alt="Foto de perfil" data-i18n="index.modal.recommendations.avatar" data-i18n-attr="alt">
+                            <div class="recommendation-meta">
+                                <p class="recommendation-text" data-i18n="index.modal.recommendations.item1.text">Filipe entregou resultados acima do esperado e sempre com muita clareza.</p>
+                                <p class="recommendation-name" data-i18n="index.modal.recommendations.item1.name">Marina Costa</p>
+                                <p class="recommendation-role" data-i18n="index.modal.recommendations.item1.role">COO, Empresa X</p>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="swiper-slide">
+                        <article class="recommendation-card">
+                            <img class="recommendation-avatar" src="img/user.png" alt="Foto de perfil" data-i18n="index.modal.recommendations.avatar" data-i18n-attr="alt">
+                            <div class="recommendation-meta">
+                                <p class="recommendation-text" data-i18n="index.modal.recommendations.item2.text">Excelente parceiro estratégico, organizado e comprometido com qualidade.</p>
+                                <p class="recommendation-name" data-i18n="index.modal.recommendations.item2.name">Lucas Pereira</p>
+                                <p class="recommendation-role" data-i18n="index.modal.recommendations.item2.role">Sócio, Startup Y</p>
+                            </div>
+                        </article>
+                    </div>
+                    <div class="swiper-slide">
+                        <article class="recommendation-card">
+                            <img class="recommendation-avatar" src="img/user.png" alt="Foto de perfil" data-i18n="index.modal.recommendations.avatar" data-i18n-attr="alt">
+                            <div class="recommendation-meta">
+                                <p class="recommendation-text" data-i18n="index.modal.recommendations.item3.text">Visão analítica e execução rápida. Recomendo sem reservas.</p>
+                                <p class="recommendation-name" data-i18n="index.modal.recommendations.item3.name">Ana Rodrigues</p>
+                                <p class="recommendation-role" data-i18n="index.modal.recommendations.item3.role">Gerente de Operações</p>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+                <div class="recommendations-pagination swiper-pagination"></div>
+                <div class="swiper-button-prev recommendations-prev" aria-label="Anterior" data-i18n="index.modal.recommendations.prev" data-i18n-attr="aria-label"></div>
+                <div class="swiper-button-next recommendations-next" aria-label="Próximo" data-i18n="index.modal.recommendations.next" data-i18n-attr="aria-label"></div>
+            </div>
+        </div>
+    </div>
+
+<section class="what-we-do" id="what">
+
+        <div class="interface">
+
+            <h1 data-i18n-html="index.what.title">O que<span> faço?</span></h1>
+            <h2 data-i18n-html="index.what.subtitle">Te ajudamos a encontrar a <span>melhor solução custo-benefício</span> para o seu negócio atingir o <strong>máximo potencial</strong>, podendo <strong>economizar até 40% do custo operacional!</strong> Na prática, funciona assim:</h2>
+
+            <div class="whatstep">
+
+                <div class="wstep basic">
+                    <div class="highlight" data-i18n-html="index.what.step1.title"><strong style="font-size: 18px;">1. </strong> Diagnóstico</div><br>
+                    <div class="features">
+                        <p data-i18n-html="index.what.step1.desc">Realizamos um diagnóstico completo do seu negócio em até <strong>5 dias</strong> e te entregamos um <strong>Relatório Geral</strong> com todas as soluções sugeridas para implementação.</p>
+                    </div>
+                </div>
+
+                <div class="wstep basic">
+                    <div class="highlight" data-i18n-html="index.what.step2.title"><strong style="font-size: 18px;">2. </strong> Solução</div><br>
+                    
+                    <div class="features">
+                        <p data-i18n-html="index.what.step2.desc">Desenvolvemos a melhor solução <strong>sob medida</strong> de acordo com a sua necessidade e objetivo, utilizando uma metodologia inteligente e colaborativa de criação.</p>
+                    </div>
+                </div>
+
+                <div class="wstep basic">
+                    <div class="highlight" data-i18n-html="index.what.step3.title"><strong style="font-size: 18px;">3. </strong> Implementação</div><br>
+
+                    <div class="features">
+                        <p data-i18n-html="index.what.step3.desc"><strong>Definimos juntos</strong> os detalhes do serviço e implementamos a solução desevolvida, oferecendo <strong>garantia e suporte</strong> durante 1 ano por um valor que cabe no seu bolso.</p>
+                    </div>
+                </div>
+
+            </div>              
+
+            <h2 data-i18n-html="index.what.solutions_title">Confira baixo <span>as principais soluções</span> que geralmente desenvolvemos:</h2><br>
+
+            <article class="itens-container"> <!--Service 1 -->
+
+                <div class="img-itens">
+
+                    <img src="img/what-1.png" alt="1">
+
+                </div>
+
+                <div class="txt-itens">
+
+                    <h3 data-i18n-html="index.what.service1.title"><span>Gestão de </span>Dados <span>e</span> CRM</h3>
+                    <p data-i18n-html="index.what.service1.desc">Gerencie seus dados com facilidade. Entre os principais serviços estão a inserção de dados, implementação de sistema, atualização e organização de dados, contagem e controle de estoque, banco de dados e aprimoramento de planilhas <strong>Excel</strong> e <strong>Google Sheets</strong>.</p>
+                    <a href="learn-1.html"><button class="learn-more" data-i18n="global.cta.learn_more">Saiba mais</button></a>
+                </div>
+
+            </article>
+
+
+
+            <article class="itens-container"> <!--Service 2 -->
+
+                <div class="img-itens">
+                    <img src="img/what-2.png" alt="1">
+                </div>
+
+                <div class="txt-itens">
+
+                    <h3 data-i18n-html="index.what.service2.title">Automatização<span> de Processos</span></h3>
+                    <p data-i18n-html="index.what.service2.desc">Automatizamos processos administrativos e tarefas repetitivas para aumentar a eficiência e reduzir erros. Inclui faturamento, gestão de dados, gestão financeira, relatórios automatizados e etc.</p>
+                    <a href="learn-2.html"><button class="learn-more" data-i18n="global.cta.learn_more">Saiba mais</button></a>
+                </div>           
+
+            </article>
+
+
+
+            <article class="itens-container"> <!--Service 3 -->
+
+                <div class="img-itens">
+                    <img src="img/what-3.png" alt="1">
+                </div>
+
+                <div class="txt-itens">
+
+                    <h3 data-i18n-html="index.what.service3.title">Suporte<span> ao Cliente</span></h3>
+                    <p data-i18n-html="index.what.service3.desc">Implementamos chatbots e sistemas de helpdesk para melhorar o atendimento ao cliente, oferecendo respostas <strong>rápidas</strong> e <strong>eficientes </strong>às suas dúvidas.</p>
+                    <a href="learn-more.html"><button class="learn-more" data-i18n="global.cta.learn_more">Saiba mais</button></a>
+                </div>
+
+            </article>
+
+            <article class="itens-container"> <!--Service 4 -->
+
+                <div class="img-itens">
+                    <img src="img/what-4.png" alt="1">
+                </div>
+
+                <div class="txt-itens">
+
+                    <h3 data-i18n-html="index.what.service4.title"><span>Design </span>Gráfico <span>e</span> Web</h3>
+                    <p data-i18n-html="index.what.service4.desc">Oferecemos serviços de <strong>Design Gráfico</strong> e <strong>Design Web</strong>, especializados na criação de landing pages, sites completos e responsivos. Criamos identidades visuais, logotipos, materiais de marketing e outras soluções gráficas.</p>
+                    <a href="learn-more.html"><button class="learn-more" data-i18n="global.cta.learn_more">Saiba mais</button></a>
+                </div>
+
+            </article>
+
+            <article class="itens-container"> <!--Service 5 -->
+
+                <div class="img-itens">
+                    <img src="img/what-5.png" alt="1">
+                </div>
+
+                <div class="txt-itens">
+
+                    <h3 data-i18n-html="index.what.service5.title">Treinamento<span> de colaboradores</span></h3>
+                    <p data-i18n-html="index.what.service5.desc">Oferecemos diversos treinamentos com <strong>metodologia prática</strong> para que sua equipe esteja 100% alinhada com as novidades tecnológicas do mercado e possa desempenhar melhores resultados na operação.</p>
+                    <a href="learn-more.html"><button class="learn-more" data-i18n="global.cta.learn_more">Saiba mais</button></a>
+                </div>
+
+            </article>
+
+        </div>
+
+    </section>
+
+    <section class="como" id="how">
+
+        <div class="interface">
+
+            <div class="txt-como">
+                <h3 data-i18n-html="index.how.title">Como <span>faço?</span></h3>
+            </div>
+
+            <div class="instrucoes">
+
+                <article class="instru-box">
+
+                    <div class="img-instru-box">
+                        <img src="img/how-1.png" alt="">
+                    </div>
+
+                    <div class="txt-instru-box">
+
+                        <h4 data-i18n-html="index.how.step1.title"><strong>1. </strong>Entender <span>as necessidades</span></h4>
+                        <p data-i18n-html="index.how.step1.desc">Conversaremos com você para <strong>compreender profundamente</strong> suas necessidades, desafios e objetivos, observaremos suas operações e faremos perguntas-chave para entender melhor as "dores" do seu negócio.</p>
+
+                    </div>
+
+                </article>
+
+                <article class="instru-box">
+
+                    <div class="img-instru-box">
+                        <img src="img/how-2.png" alt="">
+                    </div>
+
+                    <div class="txt-instru-box">
+
+                        <h4 data-i18n-html="index.how.step2.title"><strong>2. </strong>Identificar <span> os problemas</span></h4>
+                        <p data-i18n-html="index.how.step2.desc">Analisaremos as informações coletadas na 1ª fase e trabalharemos juntos para <strong>definir o problema central</strong> que precisa ser resolvido.</p>
+
+                    </div>
+
+                </article>
+
+                <article class="instru-box">
+
+                    <div class="img-instru-box">
+                        <img src="img/how-3.png" alt="">
+                    </div>
+
+                    <div class="txt-instru-box">
+
+                        <h4 data-i18n-html="index.how.step3.title"><strong>3. </strong><span>Gerar</span> ideias criativas</h4>
+                        <p data-i18n-html="index.how.step3.desc">Realizaremos sessões de <i>brainstorming</i>, onde discutiremos e exploraremos as diversas possibilidades para <strong>solucionar o problema</strong> definido.</p>
+
+                    </div>
+
+                </article>
+
+                <article class="instru-box">
+
+                    <div class="img-instru-box">
+                        <img src="img/how-4.png" alt="">
+                    </div>
+
+                    <div class="txt-instru-box">
+
+                        <h4 data-i18n-html="index.how.step4.title"><strong>4. </strong><span>Criar versões</span> aplicáveis</h4> 
+                        <p data-i18n-html="index.how.step4.desc">Criaremos versões simples e funcionais das melhores ideias e desenvolvemos <strong>protótipos</strong> (modelos ou esboços) das soluções propostas, para que possamos <strong>visualizá-las</strong> e <strong>entender melhor</strong> como funcionariam na prática.</p>
+
+                    </div>
+
+                </article>
+
+                <article class="instru-box">
+
+                    <div class="img-instru-box">
+                        <img src="img/how-5.png" alt="">
+                    </div>
+
+                    <div class="txt-instru-box">
+
+                        <h4 data-i18n-html="index.how.step5.title"><strong>5. </strong>Validar <span>e</span> aperfeiçoar <span>as soluções</span></h4> 
+                        <p data-i18n-html="index.how.step5.desc"><strong>Testaremos</strong> os protótipos com você e, possivelmente, com outros usuários, <strong>coletaremos feedback</strong> e faremos ajustes para melhorar a solução.</p>
+
+                    </div>
+
+                </article>
+
+                <p data-i18n="index.how.note">Essas etapas são cíclicas, o que significa que podemos revisitar e refinar cada etapa conforme necessário até encontrarmos a solução ideal que atenda às suas necessidades e expectativas.</p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <section class="portfolio" id="portfolio">
+
+        <div class="interface">
+           <h3 id="fivedays" data-i18n-html="index.portfolio.title">Em até <strong>5 dias</strong> entregamos um <strong>relatório geral</strong> do seu negócio com um mapeamento completo de todas as intervenções necessárias e também como implementá-las para que o seu negócio alcance o <strong>MÁXIMO POTENCIAL!</strong></h3>           
+           <h2><img src="img/1_diag.png" alt="Diagnóstico"> <i class="bi bi-plus plusicon"></i>  <img src="img/2_flux.png" alt="Fluxo"> <i class="bi bi-plus plusicon"></i> <img src="img/3_action.png" alt="Ação"> <i class="bi bi-plus plusicon"></i> <img src="img/4_result.png" alt="Resultado"> <i class="bi bi-arrow-right plusicon"></i> <img id="reportimg" src="img/report.png" alt="Relatório"></h2>
+           <p data-i18n-html="index.portfolio.cta">Que tal <strong>testar gratuitamente</strong> nosso serviço e obter o <b>Relatório Geral</b> do seu negócio?</p>
+           <a href="index.html#contact"><button data-i18n="global.cta.free_trial_long">QUERO UM TESTE GRÁTIS!</button></a>
+        </div>
+
+    </section>
+
+    <section class="contato" id="contact">
+
+        <div class="interface">
+
+            <article class="txt-contato">
+
+                <h3 data-i18n-html="index.contact.title"><strong>Fale comigo!</strong></h3>
+                <p data-i18n-html="index.contact.desc">Estamos disponíveis de <strong>segunda</strong> à <strong>sexta</strong>, das <strong>9h</strong> às <strong>18h</strong>. Ao lado, <strong>preencha o formulário</strong> que em menos de 24 horas entramos em contato com você.</p>
+
+            </article>
+
+            <article class="icons-contato">
+
+                <form class="freetrialform" id="contactForm" method="post">
+
+                    <div class="form-group">
+                        <i class="bi bi-person icon"></i>
+                        <input type="text" id="nome" name="nome" placeholder="Seu Nome" data-i18n="global.form.contact_name" data-i18n-attr="placeholder" required>
+                    </div>
+
+                    <div class="form-group">
+                        <i class="bi bi-envelope-at icon"></i>
+                        <input type="email" id="email" name="email" placeholder="Seu Email" data-i18n="global.form.contact_email" data-i18n-attr="placeholder" required>
+                    </div>
+
+                    <div class="form-group">
+
+                        <i class="bi bi-whatsapp icon"></i>
+                        <input type="tel" id="phone" name="phone" placeholder="Seu Telefone/WhatsApp" data-i18n="global.form.contact_phone" data-i18n-attr="placeholder" required>
+
+                    </div>
+
+                    <div class="form-group">
+                        <i class="bi bi-buildings icon"></i>
+                        <input type="text" id="business_name" name="business_name" placeholder="Nome da Empresa" data-i18n="global.form.contact_company" data-i18n-attr="placeholder" required>
+                    </div>
+
+                    <button type="submit" class="btn-contato" id="btn-contato" data-i18n-html="global.form.submit"><i class="bi bi-arrow-return-right"></i>Enviar</button>
+
+                </form>
+
+            </article>
+
+            <div id="formMessage"></div>
+
+        </div>
+
+    </section>
+
+    <!--Footer 1-->
+    <footer class="footer1" id="rodape">
+        &copy; <span id="anoAtual"></span> F91 - Soluções Operacionais.
+    </footer>
+    <!-- /Footer1 -->
+
+    <!--Footer 2-->
+    <footer id="footer">
+
+        <div class="interface">
+
+            <section class="top-footer">
+
+                <a href="https://www.linkedin.com/company/yailup" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-linkedin"></i></button></a>
+                <a href="https://www.instagram.com/yailup/" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-instagram"></i></button></a>
+                <a href="https://www.youtube.com/channel/UCnPAEcSoKhVrN--XwGxcVJg" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-youtube"></i></button></a>
+
+            </section>
+
+            <section class="middle-footer">
+
+                <h1 id="footer-text">&copy; <span id="anoAtualz"></span> F91 - Soluções Operacionais.</h1>
+                <h2>CNPJ 40.664.197/0001-88</h2>
+
+                <p>
+                    <a href="terms.html" class="terms" data-i18n="global.footer.terms">Termos e Condições</a> <i class="bi bi-dot terms"></i>
+                    <a href="policy.html" class="terms" data-i18n="global.footer.policy">Política de Privacidade</a> <i class="bi bi-dot terms"></i>
+                    <a href="form_partner.html" class="terms" data-i18n="global.footer.partner">Seja um Parceiro</a>
+                </p>
+
+            </section>
+
+        </div>
+
+    </footer>
+    <!--/Footer2-->
+
+    <!-- WhatsApp icon -->
+    <a href="https://wa.me/5521992942010" target="_blank" rel="noopener noreferrer" class="whatsapp-icon">
+        <i class="bi bi-whatsapp"></i>
+    </a>
+    <!-- /WhatsApp icon -->
+
+    <script>
+
+        document.getElementById("contactForm").addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            var formData = new FormData(this);
+            var successMessage = window.I18N ? window.I18N.t('global.form.response.success') : 'Formulário enviado com sucesso!';
+            var errorMessage = window.I18N ? window.I18N.t('global.form.response.error') : 'Erro ao enviar o formulário. Tente novamente.';
+            var parseErrorMessage = window.I18N ? window.I18N.t('global.form.response.parse_error') : 'Erro inesperado ao interpretar a resposta do servidor.';
+            var connectionErrorMessage = window.I18N ? window.I18N.t('global.form.response.connection') : 'Erro de conexão com o servidor.';
+
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("POST", "php/send.php", true);
+
+            xhr.onload = function() {
+
+                console.log("Resposta do servidor:", xhr.responseText); // Log para depuração
+
+                try {
+
+                    var response = JSON.parse(xhr.responseText);
+
+                    if (xhr.status === 200 && response.status === "success") {
+
+                        document.getElementById("formMessage").innerHTML = '<p style="color: #c0d000;">' + successMessage + '</p>';
+                        document.getElementById("contactForm").reset();
+
+                    } else {
+
+                        document.getElementById("formMessage").innerHTML = '<p style="color: #ff6c6c;">' + errorMessage + '</p>';
+                    }
+
+                } catch (e) {
+                    console.error("Erro ao interpretar JSON:", e); // Log do erro
+                    document.getElementById("formMessage").innerHTML = '<p style="color: #ff6c6c;">' + parseErrorMessage + '</p>';
+                }
+            };
+
+            xhr.onerror = function() {
+
+                document.getElementById("formMessage").innerHTML = '<p style="color: #ff6c6c;">' + connectionErrorMessage + '</p>';
+
+            };
+
+            xhr.send(formData);
+
+        });
+    </script>
+
+</body>
+</html>
