@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="css/responsive.css" media="screen">
+
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <link rel="icon" type="image/x-icon" href="img/favicon.png">
+
+    <!-- Json manifest for mobile icon App -->
+    <link rel="manifest" href="js/manifest.json">
+    <meta name="theme-color" content="#002050">
+    <!-- /Json manifest for mobile icon App -->
+
+
+
+    <!--Google fonts-->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins: ital, wght@0,100; 0,200; 0,300; 0,400; 0,500; 0,600; 0,700;0,800;0,900;1,100;1,200; 1,300; 1,400;1,500; 1,600;1,700;1,800; 1,900&display=swap" rel="stylesheet">
+
+    <!--/Google fonts-->
+
+
+
+    <!--Bootstrap icons-->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!--/Bootstrap icons-->
+
+
+
+    <!--Scripts-->
+
+    <script src="js/i18n.js" defer></script>
+    <script src="js/script.js" defer></script>
+
+    <script src="js/btn-menu-mob.js" defer></script>
+
+    <!--/Scripts-->
+
+
+
+    <title data-i18n="blog.title">F91 - Soluções Operacionais | Blog</title>
+
+
+
+    <style>
+
+        body{
+
+            background-image: linear-gradient(rgb(255, 255, 255), rgba(255, 255, 255, 0.103)), url("img/bg-new.png");
+
+            background-repeat: no-repeat;
+
+            background-size: cover;
+
+            background-position: center;
+
+            background-attachment: fixed;
+
+            margin: 0;
+
+        }
+
+         main {
+
+            max-width: 1090px;
+
+            margin: 20px auto;
+
+            padding: 20px;
+
+            margin-bottom: 150px;
+
+        }
+
+
+
+        h2 {
+
+            color: #c0d000;
+
+            margin-bottom: 15px;
+
+        }
+
+
+
+        p, li {
+
+            line-height: 1.6;
+
+            margin-bottom: 10px;
+
+            text-align: justify;
+
+        }
+
+
+
+        ul {
+
+            margin-left: 20px;
+
+        }
+
+        .main ul, p{
+
+            color: #002050;
+
+        }
+
+        .menunav{
+
+            color: #002050;
+
+        }
+
+        #trailbtn{
+
+            color: #c0d000;
+
+        }#trailbtn:hover{
+
+            color: #fff;
+
+        }
+
+        #mei{
+
+            color: #fff;
+
+        }
+
+        #termstittle{
+
+            font-size: 25px;
+
+            text-align: start;
+
+            margin-bottom: 1px;
+
+        }
+
+        #datez{
+
+            font-size: 12px;
+
+
+
+        }
+
+    
+        .blog-hero{
+            padding: 110px 0 20px;
+            text-align: center;
+        }
+        .blog-badge{
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(0, 32, 80, 0.2);
+            color: #002050;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            background: rgba(192, 208, 0, 0.2);
+            margin-bottom: 14px;
+        }
+        .blog-title{
+            color: #002050;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .blog-subtitle{
+            color: #002050;
+            max-width: 760px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+        .blog-grid{
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+        .blog-card{
+            background: rgba(255, 255, 255, 0.88);
+            border: 1px solid rgba(0, 32, 80, 0.12);
+            border-radius: 22px;
+            padding: 22px;
+            box-shadow: 0 18px 35px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .blog-card-head{
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .blog-icon{
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(192, 208, 0, 0.18);
+            color: #002050;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .blog-meta{
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        .blog-tag{
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #002050;
+        }
+        .blog-date{
+            font-size: 12px;
+            color: #5f5f5f;
+        }
+        .blog-card-title{
+            font-size: 20px;
+            font-weight: 700;
+            color: #002050;
+        }
+        .blog-card-excerpt{
+            font-size: 14px;
+            color: #002050;
+        }
+        .blog-card-footer{
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #5f5f5f;
+        }
+        .blog-readmore{
+            color: #002050;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .blog-readmore:hover{
+            color: #c0d000;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+
+
+    <header id="header">
+
+
+
+        <div class="interface">
+
+
+
+            <section class="logo">
+
+                <a href="index.html"><img class="logo-white" src="img/logo_.png" alt="F91"></a>
+
+                <a href="index.html"><img class="logo-color" src="img/logo_.png" alt="F91"></a>
+
+            </section> 
+
+
+
+            <section class="menu-desktop">
+
+                <nav>
+
+                    <ul><li><a class="menunav" href="#about" data-i18n="global.nav.about">Quem sou eu</a></li>
+                        <li><a class="menunav" href="#what" data-i18n="global.nav.what">O que faço</a></li>
+                        <li><a class="menunav" href="#how" data-i18n="global.nav.how">Como faço</a></li>
+                        <li><a class="menunav" href="#contact" data-i18n="global.nav.contact">Fala comigo!</a></li>
+
+                        <li><a class="menunav" href="blog.html" data-i18n="global.nav.blog">Blog</a></li>
+
+                        <!-- <li><a class="menunav" href="#blog">Blog</a></li> -->
+                        <li class="lang-switcher" aria-label="Seletor de idioma">
+                            <button type="button" class="lang-toggle" data-lang-toggle aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-globe2"></i>
+                                <span class="lang-current" data-lang-current>PT</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <ul class="lang-dropdown" data-lang-menu role="menu">
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="pt" role="menuitem">Português</button></li>
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="en" role="menuitem">English</button></li>
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="es" role="menuitem">Español</button></li>
+                            </ul>
+                        </li>
+
+                    </ul>
+
+                </nav>
+
+            </section>
+
+
+
+            <section class="btn-contato">
+
+                <a href="index.html#contact">
+
+                    <button id="trailbtn" data-i18n="global.cta.free_trial">Teste GRÁTIS!</button>
+
+                </a>
+
+            </section>
+
+
+
+            <div class="btn-menu-mob" id="btn-menu-mob">
+
+                <div class="line-menumob-1"></div>
+
+                <div class="line-menumob-2"></div>
+
+                <div class="line-menumob-3"></div>
+
+            </div>
+
+
+
+            <section class="menu-mobile" id="menu-mobile">
+
+                <nav>
+
+                    <ul><li><a href="#about" data-i18n="global.nav.about">Quem sou eu</a></li>
+
+                        <li><a href="#what" data-i18n="global.nav.what">O que faço</a></li>
+
+                        <li><a href="#how" data-i18n="global.nav.how">Como faço</a></li>
+                        <li><a href="#contact" data-i18n="global.nav.contact">Fala comigo!</a></li>
+
+                        <li><a href="blog.html" data-i18n="global.nav.blog">Blog</a></li>
+
+                        <!-- <li><a href="#blog">Blog</a></li> -->
+                        <li class="lang-switcher" aria-label="Seletor de idioma">
+                            <button type="button" class="lang-btn" data-lang-switch="pt" aria-label="Português" title="Português">PT</button>
+                            <button type="button" class="lang-btn" data-lang-switch="en" aria-label="English" title="English">EN</button>
+                            <button type="button" class="lang-btn" data-lang-switch="es" aria-label="Español" title="Español">ES</button>
+                        </li>
+
+                    </ul>
+
+                </nav>
+
+            </section>
+
+
+
+
+
+        </div>
+
+
+
+    </header>
+
+
+
+    
+    <section class="blog-hero" id="blog">
+        <div class="interface">
+            <span class="blog-badge" data-i18n="blog.hero.badge">Atualiza&ccedil;&otilde;es do Blog</span>
+            <h2 class="blog-title" data-i18n="blog.hero.title">Novos conte&uacute;dos para converter mais leads</h2>
+            <p class="blog-subtitle" data-i18n="blog.hero.subtitle">Confira os 3 artigos mais recentes da F91.</p>
+        </div>
+    </section>
+
+    <main class="main">
+        <div class="blog-grid">
+            <article class="blog-card">
+                <div class="blog-card-head">
+                    <div class="blog-icon"><i class="bi bi-bullseye"></i></div>
+                    <div class="blog-meta">
+                        <span class="blog-tag" data-i18n="blog.article1.category">Convers&atilde;o</span>
+                        <span class="blog-date" data-i18n="blog.article1.date">18 Dez 2025</span>
+                    </div>
+                </div>
+                <h3 class="blog-card-title" data-i18n="blog.article1.title">5 Estrat&eacute;gias para Converter Mais Leads</h3>
+                <p class="blog-card-excerpt" data-i18n="blog.article1.excerpt">Ajustes simples de posicionamento, prova social e CTA para aumentar a taxa de resposta.</p>
+                <div class="blog-card-footer">
+                    <span class="blog-readtime" data-i18n="blog.article1.read">Leitura: 6 min</span>
+                    <a class="blog-readmore" href="#" data-i18n="blog.read_more">Leia mais</a>
+                </div>
+            </article>
+
+            <article class="blog-card">
+                <div class="blog-card-head">
+                    <div class="blog-icon"><i class="bi bi-gear"></i></div>
+                    <div class="blog-meta">
+                        <span class="blog-tag" data-i18n="blog.article2.category">Automatiza&ccedil;&atilde;o</span>
+                        <span class="blog-date" data-i18n="blog.article2.date">12 Dez 2025</span>
+                    </div>
+                </div>
+                <h3 class="blog-card-title" data-i18n="blog.article2.title">Como Automatizar seu Processo de Prospec&ccedil;&atilde;o</h3>
+                <p class="blog-card-excerpt" data-i18n="blog.article2.excerpt">Cad&ecirc;ncias inteligentes, gatilhos e scoring para reduzir trabalho manual.</p>
+                <div class="blog-card-footer">
+                    <span class="blog-readtime" data-i18n="blog.article2.read">Leitura: 7 min</span>
+                    <a class="blog-readmore" href="#" data-i18n="blog.read_more">Leia mais</a>
+                </div>
+            </article>
+
+            <article class="blog-card">
+                <div class="blog-card-head">
+                    <div class="blog-icon"><i class="bi bi-envelope"></i></div>
+                    <div class="blog-meta">
+                        <span class="blog-tag" data-i18n="blog.article3.category">Nutri&ccedil;&atilde;o</span>
+                        <span class="blog-date" data-i18n="blog.article3.date">05 Dez 2025</span>
+                    </div>
+                </div>
+                <h3 class="blog-card-title" data-i18n="blog.article3.title">Dicas de E-mail para Nutrir Leads Frios</h3>
+                <p class="blog-card-excerpt" data-i18n="blog.article3.excerpt">Assuntos objetivos e conte&uacute;do &uacute;til para reaquecer contatos.</p>
+                <div class="blog-card-footer">
+                    <span class="blog-readtime" data-i18n="blog.article3.read">Leitura: 5 min</span>
+                    <a class="blog-readmore" href="#" data-i18n="blog.read_more">Leia mais</a>
+                </div>
+            </article>
+        </div>
+    </main>
+
+
+
+
+<!--Footer 1-->
+
+<footer class="footer1" id="rodape">
+
+    &copy; <span id="anoAtual"></span> F91 - Soluções Operacionais.
+
+</footer>
+
+<!-- /Footer1 -->
+
+
+
+<!--Footer 2-->
+
+    <footer id="footer">
+
+        <div class="interface">
+
+            <section class="top-footer">
+
+
+
+                <a href="https://www.linkedin.com/company/yailup" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-linkedin"></i></button></a>
+
+                <a href="https://www.instagram.com/yailup/" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-instagram"></i></button></a>
+
+                <a href="https://www.youtube.com/channel/UCnPAEcSoKhVrN--XwGxcVJg" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-youtube"></i></button></a>
+
+            </section>
+
+
+
+            <section class="middle-footer">
+
+                <h1 id="footer-text">&copy; <span id="anoAtualz"></span> F91 - Soluções Operacionais.</h1>
+
+                <h2>CNPJ 40.664.197/0001-88</h2>
+
+
+
+                <p>
+
+                    <a href="terms.html" class="terms" data-i18n="global.footer.terms">Termos e Condições</a> <i class="bi bi-dot terms"></i>
+
+                    <a href="policy.html" class="terms" data-i18n="global.footer.policy">Política de Privacidade</a> <i class="bi bi-dot terms"></i>
+
+                    <a href="form_partner.html" class="terms" data-i18n="global.footer.partner">Seja um Parceiro</a>
+
+                </p>
+
+            </section>
+
+        </div>
+
+    </footer>
+
+<!--/Footer2-->
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SellaStay | Investor Pitch Deck</title>
+    <link rel="icon" type="image/x-icon" href="favicon.png">
+    
+    <!-- Libraries -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Font: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Configuration -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        apple: { gray: '#F5F5F7', darkGray: '#1C1C1E' },
+                        brand: { 
+                            primary: '#173162',   // Azul Profundo
+                            secondary: '#f58b3f', // Laranja Vibrante
+                            tertiary: '#5a3869',  // Roxo
+                            quaternary: '#9f3d5f', // Vinho
+                            bgLight: '#F0F4F8',
+                            bgDark: '#0B1120'
+                        }
+                    },
+                    animation: { 'fade-in-up': 'fadeInUp 0.8s ease-out forwards' },
+                    keyframes: { fadeInUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } } }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Poppins', sans-serif; -webkit-font-smoothing: antialiased; }
+        
+        .glass { 
+            background: rgba(255, 255, 255, 0.75); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border: 1px solid rgba(255, 255, 255, 0.4); 
+        }
+        .dark .glass { 
+            background: rgba(23, 49, 98, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+        }
+
+        .chart-container { position: relative; width: 100%; height: 320px; }
+        .sunburst-container { height: 500px; width: 100%; display: flex; align-items: center; justify-content: center; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #173162; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #f58b3f; }
+
+        #main-content { transition: filter 0.5s ease, opacity 0.5s ease; }
+        #main-content.locked { 
+            filter: blur(12px) grayscale(0.5); pointer-events: none; user-select: none; overflow: hidden; height: 100vh; position: fixed; width: 100%; z-index: 0;
+        }
+
+        .text-gradient { background-clip: text; -webkit-background-clip: text; color: transparent; background-image: linear-gradient(to right, #173162, #f58b3f); }
+        .dark .text-gradient { background-image: linear-gradient(to right, #60a5fa, #f58b3f); }
+        
+        button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid #f58b3f; outline-offset: 2px; }
+        .linkedin-icon { fill: currentColor; transition: fill 0.3s ease; }
+        a:hover .linkedin-icon { fill: #0077b5; }
+
+        .hand-underline { position: relative; display: inline-block; line-height: 1.2; padding-bottom: 4px; }
+        .hand-underline::after { content: ""; position: absolute; left: 0; bottom: -6px; width: 100%; height: 12px; background-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 9" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2.00025 7.00005C50.6033 2.13886 123.633 -2.72108 198.001 3.50005" stroke="%23F58B3F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>'); background-size: 100% 100%; background-repeat: no-repeat; transform: rotate(-1deg); }
+
+        /* Tooltip Custom Styles */
+        .tooltip-content {
+            visibility: hidden; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(10px) translateX(-50%); position: absolute; bottom: 100%; left: 50%;
+            margin-bottom: 12px; width: 280px; z-index: 50; pointer-events: none;
+        }
+        .group:hover .tooltip-content { visibility: visible; opacity: 1; transform: translateY(0) translateX(-50%); }
+        .tooltip-arrow { 
+            position: absolute; 
+            top: 100%; 
+            left: 50%; 
+            margin-left: -6px; 
+            width: 0; 
+            height: 0; 
+            border-style: solid; 
+            border-width: 6px 6px 0 6px; 
+            border-left-color: transparent; 
+            border-right-color: transparent; 
+            border-bottom-color: transparent; 
+            background: transparent !important;
+        }
+
+        /* Icon contrast in dark mode */
+        .dark .text-brand-primary { color: #f58b3f !important; }
+        .timeline-tooltip { width: 320px; }
+
+        /* Full Height Section Utility */
+        .full-screen-section {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding-top: 5rem; /* Account for sticky header */
+            padding-bottom: 5rem;
+        }
+    </style>
+</head>
+<body class="bg-brand-bgLight dark:bg-brand-bgDark text-slate-900 dark:text-slate-100 transition-colors duration-500">
+
+    <!-- GATE -->
+    <div id="access-gate" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-brand-primary/90 backdrop-blur-md transition-opacity duration-500">
+        <div class="glass w-full max-w-md p-8 rounded-3xl shadow-2xl relative overflow-hidden transform transition-all">
+            <div class="absolute -top-24 -right-24 w-48 h-48 bg-brand-secondary/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="text-center mb-8 relative z-10">
+                <div class="mx-auto w-16 h-16 bg-white dark:bg-white/10 rounded-2xl flex items-center justify-center shadow-lg mb-4 ring-1 ring-black/5">
+                    <i data-lucide="lock" class="w-8 h-8 text-brand-primary dark:text-brand-secondary"></i>
+                </div>
+                <h2 class="text-2xl font-bold tracking-tight text-brand-primary dark:text-white" data-i18n="gate_title">SellaStay Pitch Deck</h2>
+                <p class="text-sm text-slate-600 dark:text-slate-300 mt-2" data-i18n="gate_subtitle">Protected Content.</p>
+            </div>
+            <form id="gate-form" class="space-y-5 relative z-10">
+                <div><label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1 ml-1" data-i18n="gate_label_pass">Access Code</label><div class="relative"><input type="password" id="investor-pass" required class="w-full px-4 py-3 rounded-xl bg-white/70 dark:bg-black/20 border border-slate-200 dark:border-white/10 focus:ring-2 focus:ring-brand-secondary focus:outline-none transition-all placeholder-slate-400 text-sm"><button type="button" id="toggle-pass" class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-brand-primary transition-colors"><i data-lucide="eye" class="w-4 h-4"></i></button></div></div>
+                <div class="flex items-start gap-2 text-xs text-slate-600 dark:text-slate-300">
+                    <input type="checkbox" id="terms-check" class="mt-1 h-4 w-4 rounded border-slate-300 text-brand-primary focus:ring-brand-secondary">
+                    <label for="terms-check" class="leading-snug">Li e concordo com os <button type="button" id="open-terms" class="underline font-semibold text-brand-primary dark:text-brand-secondary hover:text-brand-tertiary">Termos</button> de confidencialidade.</label>
+                </div>
+                <div id="gate-error" class="hidden text-red-500 text-xs font-semibold text-center bg-red-100 dark:bg-red-900/20 py-2 rounded-lg"></div>
+                <button type="submit" id="unlock-btn" class="w-full py-3.5 bg-brand-primary hover:bg-sky-800 text-white font-bold rounded-xl shadow-lg transition-all transform flex items-center justify-center gap-2"><span data-i18n="gate_btn">Unlock</span> <i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <!-- CONTENT -->
+    <!-- TERMS MODAL (fora do main-content para não herdar pointer-events:none) -->
+    <div style="z-index: 99999999999999999999;" id="terms-modal" class="fixed inset-0 bg-black/80 z-[9998] items-center justify-center px-4 hidden">
+        <div class="glass max-w-3xl w-full rounded-2xl shadow-2xl border border-white/30 dark:border-white/10 overflow-hidden">
+            <div class="flex items-center justify-between px-6 py-4 border-b border-white/30 dark:border-white/10">
+                <h3 class="text-lg font-semibold text-slate-900 dark:text-white">Termos de Confidencialidade</h3>
+                <button type="button" id="close-terms" class="text-slate-500 hover:text-brand-primary dark:hover:text-brand-secondary transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-6 space-y-4 text-sm text-slate-700 dark:text-slate-200 max-h-[60vh] overflow-y-auto">
+                <p><strong>Confidencialidade:</strong> Todo o conteúdo deste Pitch Deck é confidencial, exclusivo para avaliação e não pode ser compartilhado, reproduzido ou distribuído sem autorização expressa.</p>
+                <p><strong>Proibição de cópia e captura:</strong> Não é permitido copiar texto, imagens ou gráficos, realizar prints de tela ou gravações.</p>
+                <p><strong>Proibição de inspeção:</strong> Não é permitida a inspeção do código-fonte, engenharia reversa ou uso de ferramentas de desenvolvimento para extrair informações.</p>
+                <p><strong>Uso limitado:</strong> O acesso é pessoal e intransferível. Qualquer uso indevido poderá resultar em bloqueio imediato e medidas legais.</p>
+                <p><strong>Rastreamento:</strong> Tentativas de violação de segurança podem ser registradas junto com IP, navegador e data/hora do acesso.</p>
+            </div>
+            <div class="px-6 py-4 border-t border-white/30 dark:border-white/10 flex justify-end">
+                <button type="button" id="accept-terms" class="px-4 py-2 bg-brand-primary hover:bg-brand-tertiary text-white rounded-lg font-semibold transition-colors">Concordo</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="main-content" class="locked">
+        <nav class="sticky top-0 z-50 glass border-b border-gray-200/50 dark:border-white/10 transition-colors duration-300">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <img src="logoheader.png" alt="SellaStay" class="h-10 w-auto object-contain block dark:hidden transition-all duration-300">
+                        <img src="logoheader_.png" alt="SellaStay" class="h-10 w-auto object-contain hidden dark:block transition-all duration-300">
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="hidden lg:flex gap-6 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300" id="nav-menu">
+                            <a href="#market" class="hover:text-brand-secondary transition-colors" data-i18n="nav_market">Market</a>
+                            <a href="#problem" class="hover:text-brand-secondary transition-colors" data-i18n="nav_problem">Problem</a>
+                            <a href="#solution" class="hover:text-brand-secondary transition-colors" data-i18n="nav_solution">Solution</a>
+                            <a href="#competition" class="hover:text-brand-secondary transition-colors" data-i18n="nav_comp">Competition</a>
+                            <a href="#financials" class="hover:text-brand-secondary transition-colors" data-i18n="nav_fin">Financials</a>
+                            <a href="#team" class="hover:text-brand-secondary transition-colors" data-i18n="nav_team">Team</a>
+                        </div>
+                        <div class="h-6 w-px bg-slate-200 dark:bg-white/20"></div>
+                        <button id="theme-toggle" class="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors"><i data-lucide="moon" class="w-5 h-5 hidden dark:block"></i><i data-lucide="sun" class="w-5 h-5 block dark:hidden"></i></button>
+                        <div class="relative">
+                            <button onclick="toggleLangMenu(event)" id="lang-btn" class="flex items-center gap-1 text-xs font-bold uppercase tracking-wider px-3 py-1.5 rounded-lg border border-slate-200 dark:border-white/20 hover:border-brand-secondary transition-colors bg-white/50 dark:bg-white/10"><span id="current-lang-display">PT</span> <i data-lucide="chevron-down" class="w-3 h-3"></i></button>
+                            <div id="lang-menu" class="absolute right-0 mt-2 w-32 bg-white dark:bg-brand-bgDark rounded-xl shadow-xl border border-slate-100 dark:border-white/10 overflow-hidden hidden animate-fade-in-up z-50">
+                                <button data-lang="en" class="block w-full text-left px-4 py-3 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">English</button>
+                                <button data-lang="pt" class="block w-full text-left px-4 py-3 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">Português</button>
+                                <button data-lang="es" class="block w-full text-left px-4 py-3 text-sm hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">Español</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <header id="hero" class="relative full-screen-section overflow-hidden">
+            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-brand-primary/20 dark:bg-brand-primary/15 rounded-full blur-[120px] -z-10"></div>
+            <div class="max-w-6xl mx-auto px-4 text-center animate-fade-in-up">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-primary/10 text-brand-primary dark:text-brand-secondary text-[10px] font-bold uppercase tracking-wide mb-6 border border-brand-primary/20">
+                    <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-secondary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-brand-secondary"></span></span>
+                    <span data-i18n="hero_badge">Live Pitch Deck 2025</span>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight text-slate-900 dark:text-white">
+                    <span data-i18n="hero_title_1">A melhor gestão de negociações</span> <br>
+                    <span class="text-gradient" data-i18n="hero_title_highlight">de Grupos e Eventos para hotelaria</span>
+                </h1>
+                <p class="text-lg md:text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-light leading-relaxed mb-12" data-i18n="hero_subtitle">Otimize suas negociações de hospedagem em grupo e eventos com um sistema inteligente que integra PMS, E-mail e WhatsApp com diversos recursos e automatizações.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div class="glass p-6 rounded-2xl border-t-4 border-brand-primary hover:-translate-y-1 transition-all duration-300 group"><div class="text-4xl font-bold mb-1 text-slate-900 dark:text-white">$29.8B</div><div class="text-xs font-bold uppercase tracking-wider text-slate-500" data-i18n="stat_1">TAM 2032</div></div>
+                    <div class="glass p-6 rounded-2xl border-t-4 border-brand-secondary hover:-translate-y-1 transition-all duration-300 group"><div class="text-4xl font-bold mb-1 text-slate-900 dark:text-white">30%</div><div class="text-xs font-bold uppercase tracking-wider text-slate-500" data-i18n="stat_3">Manual Hotels</div></div>
+                    <div class="glass p-6 rounded-2xl border-t-4 border-brand-tertiary hover:-translate-y-1 transition-all duration-300 group"><div class="text-4xl font-bold mb-1 text-slate-900 dark:text-white">R$ 305B</div><div class="text-xs font-bold uppercase tracking-wider text-slate-500" data-i18n="stat_2">SP Events Market</div></div>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- 1. MARKET (Moved Here) -->
+            <section id="market" class="full-screen-section scroll-mt-0">
+                <div class="text-center mb-8">
+                     <span class="text-brand-secondary font-bold tracking-wider uppercase text-base block" data-i18n="nav_market">Market</span>
+                     <h2 class="text-3xl md:text-4xl font-bold mt-2 text-slate-900 dark:text-white" data-i18n="market_title">Market Size & Opportunity</h2>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+                    <div class="glass p-6 rounded-3xl flex flex-col lg:col-span-2 h-full"><h3 class="text-sm font-bold uppercase text-slate-400 mb-4 tracking-wider" data-i18n="chart_1_title">Global SaaS</h3><div class="chart-container flex-grow"><canvas id="marketGrowthChart"></canvas></div></div>
+                    <div class="glass p-6 rounded-3xl flex flex-col lg:col-span-2 h-full"><h3 class="text-sm font-bold uppercase text-slate-400 mb-4 tracking-wider" data-i18n="chart_2_title">Brazil Opportunity</h3><div class="chart-container sunburst-container flex-grow"><div id="plotlySunburst" style="height: 100%; width: 100%;"></div></div></div>
+                    <div class="glass p-6 rounded-3xl flex flex-col justify-between h-full lg:col-span-2">
+                        <div class="flex items-center gap-3 text-brand-primary dark:text-brand-secondary mb-3"><i data-lucide="briefcase" class="w-6 h-6"></i><p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-300" data-i18n="impact_title">Impacto de Grupos/Eventos</p></div>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <span data-i18n="impact_body_prefix">Grupos e Eventos representam entre</span>
+                            <strong>30% - 60%</strong>
+                            <span data-i18n="impact_body_suffix">da receita total de um hotel.</span>
+                        </p>
+                    </div>
+                    <div class="glass p-6 rounded-3xl flex flex-col justify-between h-full lg:col-span-2">
+                        <div class="flex items-center gap-3 text-brand-primary dark:text-brand-secondary mb-3"><i data-lucide="trending-up" class="w-6 h-6"></i><p class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-300" data-i18n="demand_title">Projeção de Demanda</p></div>
+                        <p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                            <span data-i18n="demand_body_prefix">Estima-se um aumento de</span>
+                            <strong>20-30%</strong>
+                            <span data-i18n="demand_body_suffix">na demanda por reservas em Grupo e/ou Eventos para os próximos 5 anos.</span>
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. PROBLEM -->
+            <section id="problem" class="full-screen-section scroll-mt-0">
+                <div class="text-center mb-8">
+                    <span class="text-brand-secondary font-bold tracking-wider uppercase text-base block" data-i18n="tag_problem">THE <span class="line-through decoration-brand-secondary decoration-2 opacity-50">PROBLEM</span> OPPORTUNITY</span>
+                </div>
+                <div class="mb-12">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center items-end">
+                        <div class="flex flex-col items-center group"><img src="opt1.png" alt="Spreadsheets" class="h-28 w-auto object-contain mb-4 opacity-80 group-hover:opacity-100 transition-opacity transform group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden w-24 h-24 bg-slate-100 dark:bg-white/10 rounded-full items-center justify-center mb-4 text-brand-primary"><i data-lucide="file-spreadsheet" class="w-10 h-10"></i></div><p class="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 group-hover:text-brand-secondary transition-colors" data-i18n="pain_img_1">Excesso de Planilhas</p></div>
+                        <div class="flex flex-col items-center group"><img src="opt2.png" alt="Manual" class="h-28 w-auto object-contain mb-4 opacity-80 group-hover:opacity-100 transition-opacity transform group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden w-24 h-24 bg-slate-100 dark:bg-white/10 rounded-full items-center justify-center mb-4 text-brand-primary"><i data-lucide="clipboard-list" class="w-10 h-10"></i></div><p class="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 group-hover:text-brand-secondary transition-colors" data-i18n="pain_img_2">Tarefas Manuais</p></div>
+                        <div class="flex flex-col items-center group"><img src="opt3.png" alt="Slow" class="h-28 w-auto object-contain mb-4 opacity-80 group-hover:opacity-100 transition-opacity transform group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden w-24 h-24 bg-slate-100 dark:bg-white/10 rounded-full items-center justify-center mb-4 text-brand-primary"><i data-lucide="hourglass" class="w-10 h-10"></i></div><p class="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 group-hover:text-brand-secondary transition-colors" data-i18n="pain_img_3">Lentidão</p></div>
+                        <div class="flex flex-col items-center group"><img src="opt4.png" alt="No Integration" class="h-28 w-auto object-contain mb-4 opacity-80 group-hover:opacity-100 transition-opacity transform group-hover:scale-105" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"><div class="hidden w-24 h-24 bg-slate-100 dark:bg-white/10 rounded-full items-center justify-center mb-4 text-brand-primary"><i data-lucide="layers" class="w-10 h-10"></i></div><p class="text-xs font-bold uppercase tracking-wide text-slate-500 dark:text-slate-400 group-hover:text-brand-secondary transition-colors" data-i18n="pain_img_4">Sem Integração</p></div>
+                    </div>
+                </div>
+
+                <div class="mb-12 text-center px-4">
+                    <p class="text-xl md:text-2xl lg:text-3xl text-slate-700 dark:text-slate-200 leading-relaxed font-light" id="highlight-phrase" data-i18n="highlight_phrase"></p>
+                    <p class="mt-4 text-[10px] md:text-xs text-slate-400 italic" data-i18n="highlight_footer">*Principais dificuldades...</p>
+                </div>
+
+                <div class="text-center mb-6"><h2 class="text-3xl md:text-4xl font-bold mt-2 text-slate-900 dark:text-white" data-i18n="problem_title">The "Excel" Bottleneck</h2></div>
+                <div class="glass rounded-3xl p-1 bg-white dark:bg-white/5 shadow-xl">
+                    <div class="grid md:grid-cols-2 gap-12 p-8 md:p-12 items-center">
+                        <div class="space-y-6">
+                            <p class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed" data-i18n="problem_desc">30% of hotels rely on manual spreadsheets.</p>
+                            <ul class="space-y-4">
+                                <li class="flex items-center gap-3"><div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg text-brand-quaternary"><i data-lucide="x-octagon" class="w-5 h-5"></i></div><span class="font-medium" data-i18n="pain_1">Frequent Overbooking</span></li>
+                                <li class="flex items-center gap-3"><div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg text-brand-quaternary"><i data-lucide="clock" class="w-5 h-5"></i></div><span class="font-medium" data-i18n="pain_2">72h+ Proposal Time</span></li>
+                                <li class="flex items-center gap-3"><div class="p-2 bg-red-100 dark:bg-red-900/30 rounded-lg text-brand-quaternary"><i data-lucide="file-warning" class="w-5 h-5"></i></div><span class="font-medium" data-i18n="pain_3">Contract Errors</span></li>
+                            </ul>
+                        </div>
+                        <div class="chart-container"><canvas id="maturityChart"></canvas></div>
+                    </div>
+                </div>
+
+<!-- Survey live stats -->
+                <div class="mt-10">
+                    <h3 class="text-xl md:text-2xl font-semibold text-slate-900 dark:text-white text-center mb-2" data-i18n="survey_title">Dados em tempo real da pesquisa</h3>
+                    <p class="text-center text-sm text-slate-500 dark:text-slate-400 mb-4">
+                        <span data-i18n="survey_source_label">Fonte:</span>
+                        <a href="https://www.sellastay.com/survey.html" target="_blank" rel="noopener noreferrer" class="font-semibold text-brand-primary dark:text-brand-secondary underline">
+                            <span data-i18n="survey_source_text">SellaStay survey</span>
+                        </a>
+                    </p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="survey-stats">
+                        <div class="glass p-5 rounded-2xl border border-white/30 dark:border-white/10 shadow-lg flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-brand-primary/10 text-brand-primary dark:bg-brand-secondary/15 dark:text-brand-secondary flex items-center justify-center">
+                                <i data-lucide="users" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300 mb-1" data-i18n="survey_total">Total de respostas</p>
+                                <div class="text-3xl font-extrabold text-brand-primary dark:text-brand-secondary" id="stat-total-resp">--</div>
+                            </div>
+                        </div>
+                        <div class="glass p-5 rounded-2xl border border-white/30 dark:border-white/10 shadow-lg flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 dark:bg-amber-900/20 dark:text-amber-300 flex items-center justify-center">
+                                <i data-lucide="sparkles" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300 mb-1" data-i18n="survey_interest">Interesse em testar</p>
+                                <div class="text-3xl font-extrabold text-brand-primary dark:text-brand-secondary" id="stat-interest">--%</div>
+                            </div>
+                        </div>
+                        <div class="glass p-5 rounded-2xl border border-white/30 dark:border-white/10 shadow-lg flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-300 flex items-center justify-center">
+                                <i data-lucide="rocket" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300 mb-1" data-i18n="survey_pilot">Hotéis piloto</p>
+                                <div class="text-3xl font-extrabold text-brand-primary dark:text-brand-secondary" id="stat-pilot">--%</div>
+                            </div>
+                        </div>
+                        <div class="glass p-5 rounded-2xl border border-white/30 dark:border-white/10 shadow-lg flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-indigo-100 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-300 flex items-center justify-center">
+                                <i data-lucide="building-2" class="w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <p class="text-[11px] font-bold uppercase tracking-wide text-slate-500 dark:text-slate-300 mb-1" data-i18n="survey_chains">Redes hoteleiras</p>
+                                <div class="text-3xl font-extrabold text-brand-primary dark:text-brand-secondary" id="stat-chains">--</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. SOLUTION -->
+            <section id="solution" class="full-screen-section scroll-mt-0">
+                <div class="text-center mb-10"><span class="text-brand-secondary font-bold tracking-wider uppercase text-base block" data-i18n="tag_solution">The Solution</span><h2 class="text-3xl md:text-4xl font-bold mt-2 text-slate-900 dark:text-white" data-i18n="solution_title">SellaStay - Group & Event Negotiation Management</h2></div>
+                
+                <div class="grid md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+                    <!-- Cards 1-12... omitted for brevity, keeping same structure as V25 -->
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="clipboard-list" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_1">Task Manager</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_1">Lists, workflows & multi-user.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_1"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <!-- (Include all 12 cards here as in V25) -->
+                    <!-- Simulating rest for space, ensure all 12 are copied from V25 -->
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="bell" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_2">Smart Reminders</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_2">Notifications.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_2"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="kanban" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_3">Kanban</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_3">Collab.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_3"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="calculator" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_4">Calculator</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_4">Auto-tax.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_4"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="bot" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_5">AI Chatbot</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_5">Assistant.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_5"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="mail" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_6">Email</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_6">Centralized.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_6"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="zap" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_7">Automations</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_7">+60% prod.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_7"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="map-pin" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_8">Event Map</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_8">Track demand.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_8"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="radar" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_9">Radar</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_9">Rates.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_9"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="database" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_10">PMS</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_10">Live sync.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_10"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="users" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_11">Marketplace</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_11">Verified pros.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_11"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                    <div class="glass p-6 rounded-2xl hover:border-brand-secondary/50 transition-all duration-300 group relative"><div class="w-10 h-10 bg-brand-primary/10 rounded-lg flex items-center justify-center text-brand-primary mb-3"><i data-lucide="trending-up" class="w-5 h-5"></i></div><h3 class="font-bold text-base mb-1" data-i18n="sol_title_12">RM Assistant</h3><p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="sol_desc_12">Pricing.</p><div class="tooltip-content bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed"><span data-i18n="sol_tooltip_12"></span><div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div></div></div>
+                </div>
+
+                <div class="glass rounded-3xl p-4 border border-slate-200 dark:border-white/10 shadow-2xl relative overflow-hidden">
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="monitor" class="w-6 h-6 text-brand-primary dark:text-brand-secondary"></i>
+                                <p class="text-slate-700 dark:text-slate-200 font-semibold" data-i18n="sol_preview">SellaStay Dashboard UI</p>
+                            </div>
+                            <div class="inline-flex bg-slate-100 dark:bg-slate-800 rounded-full p-1">
+                                <button id="mode-desktop" class="px-3 py-1 text-xs font-semibold rounded-full bg-white dark:bg-slate-700 text-brand-primary dark:text-white shadow" type="button">Desktop</button>
+                                <button id="mode-mobile" class="px-3 py-1 text-xs font-semibold rounded-full text-slate-600 dark:text-slate-300" type="button">Mobile</button>
+                            </div>
+                        </div>
+                        <div class="flex justify-center">
+                            <div id="frame-wrapper" class="w-full">
+                                <iframe id="dashboard-frame" src="home.html" class="w-full h-[620px] rounded-2xl border border-slate-200 dark:border-white/10 shadow-lg bg-white dark:bg-slate-900"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ROADMAP TIMELINE (ALIGNED) -->
+                <div class="mt-16 relative px-4">
+                    <div class="absolute top-[10px] left-0 w-full h-0.5 bg-slate-200 dark:bg-white/10 -translate-y-1/2 rounded hidden md:block"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+                        <!-- v1.0 -->
+                        <div class="flex flex-col items-center group relative cursor-help">
+                             <div class="w-5 h-5 rounded-full bg-brand-secondary z-10 ring-4 ring-white dark:ring-black shadow-lg"></div>
+                             <p class="mt-4 font-bold text-brand-primary dark:text-white" data-i18n="tl_date_1">2 Jan 2026</p>
+                             <p class="text-xs font-mono text-slate-400 mb-2">v1.0</p>
+                             <div class="tooltip-content timeline-tooltip bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed">
+                                 <strong class="block mb-1 border-b border-white/20 pb-1" data-i18n="tl_title">Recursos Disponíveis:</strong>
+                                 <span data-i18n="tl_desc_1">Gestor de Tarefas, Lembretes, Kanban, Calculadora.</span>
+                                 <div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div>
+                             </div>
+                        </div>
+                        <!-- v2.0 -->
+                        <div class="flex flex-col items-center group relative cursor-help">
+                             <div class="w-5 h-5 rounded-full bg-brand-tertiary z-10 ring-4 ring-white dark:ring-black shadow-lg"></div>
+                             <p class="mt-4 font-bold text-brand-primary dark:text-white" data-i18n="tl_date_2">6 Apr 2026</p>
+                             <p class="text-xs font-mono text-slate-400 mb-2">v2.0</p>
+                             <div class="tooltip-content timeline-tooltip bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed">
+                                 <strong class="block mb-1 border-b border-white/20 pb-1" data-i18n="tl_title">Recursos Disponíveis:</strong>
+                                 <span data-i18n="tl_desc_2">IA Chatbot, Email, Automações, Mapa de Eventos.</span>
+                                 <div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div>
+                             </div>
+                        </div>
+                        <!-- v3.0 -->
+                         <div class="flex flex-col items-center group relative cursor-help">
+                             <div class="w-5 h-5 rounded-full bg-brand-primary z-10 ring-4 ring-white dark:ring-black shadow-lg"></div>
+                             <p class="mt-4 font-bold text-brand-primary dark:text-white" data-i18n="tl_date_3">1 Jul 2026</p>
+                             <p class="text-xs font-mono text-slate-400 mb-2">v3.0</p>
+                             <div class="tooltip-content timeline-tooltip bg-brand-primary dark:bg-white text-white dark:text-brand-primary p-4 rounded-xl shadow-2xl text-xs font-light leading-relaxed">
+                                 <strong class="block mb-1 border-b border-white/20 pb-1" data-i18n="tl_title">Recursos Disponíveis:</strong>
+                                 <span data-i18n="tl_desc_3">Radar, Integração PMS, Marketplace, Assistente RM.</span>
+                                 <div class="tooltip-arrow border-t-brand-primary dark:border-t-white"></div>
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. COMPETITION -->
+            <section id="competition" class="full-screen-section scroll-mt-0">
+                <div class="text-center mb-12"><h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white" data-i18n="comp_title">Competitive Landscape</h2></div>
+                <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                    <div class="glass p-6 rounded-3xl"><h3 class="text-sm font-bold uppercase text-slate-400 mb-4 text-center" data-i18n="comp_map">Market Positioning</h3><div class="chart-container"><canvas id="competitorMap"></canvas></div></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="glass p-5 rounded-2xl border-l-4 border-brand-secondary"><h4 class="font-bold text-brand-secondary mb-2" data-i18n="swot_s">Strengths</h4><ul class="text-xs space-y-1 text-slate-500 dark:text-slate-400"><li data-i18n="swot_s1">Focused</li><li data-i18n="swot_s2">Affordable</li><li data-i18n="swot_s3">Local Payments</li></ul></div>
+                        <div class="glass p-5 rounded-2xl border-l-4 border-brand-quaternary"><h4 class="font-bold text-brand-quaternary mb-2" data-i18n="swot_w">Weaknesses</h4><ul class="text-xs space-y-1 text-slate-500 dark:text-slate-400"><li data-i18n="swot_w1">Brand Awareness</li><li data-i18n="swot_w2">Integration</li></ul></div>
+                        <div class="glass p-5 rounded-2xl border-l-4 border-brand-primary"><h4 class="font-bold text-brand-primary mb-2" data-i18n="swot_o">Opportunities</h4><ul class="text-xs space-y-1 text-slate-500 dark:text-slate-400"><li data-i18n="swot_o1">30% Underserved</li><li data-i18n="swot_o2">Bleisure</li><li data-i18n="swot_o3">Latam</li></ul></div>
+                        <div class="glass p-5 rounded-2xl border-l-4 border-yellow-500"><h4 class="font-bold text-yellow-500 mb-2" data-i18n="swot_t">Threats</h4><ul class="text-xs space-y-1 text-slate-500 dark:text-slate-400"><li data-i18n="swot_t1">Big PMS</li><li data-i18n="swot_t2">Downturns</li></ul></div>
+                    </div>
+                </div>
+                <div class="glass rounded-3xl overflow-hidden border border-slate-200 dark:border-white/10">
+                    <div class="overflow-x-auto"><table class="w-full text-sm text-left whitespace-nowrap"><thead class="bg-slate-50 dark:bg-white/5 text-xs uppercase font-bold text-slate-500"><tr><th class="p-4" data-i18n="comp_feat">Feature</th><th class="p-4 text-brand-primary dark:text-brand-secondary font-extrabold">SellaStay</th><th class="p-4">EVNT</th><th class="p-4" data-i18n="comp_trad">Traditional</th><th class="p-4" data-i18n="comp_man">Manual</th></tr></thead><tbody class="divide-y divide-slate-200 dark:divide-white/10"><tr><td class="p-4 font-medium" data-i18n="comp_f1">Automation</td><td class="p-4 text-brand-primary dark:text-brand-secondary font-bold" data-i18n="val_high">High</td><td class="p-4">High</td><td class="p-4" data-i18n="val_low">Low</td><td class="p-4" data-i18n="val_none">None</td></tr><tr><td class="p-4 font-medium" data-i18n="comp_f3">Cost</td><td class="p-4 text-brand-primary dark:text-brand-secondary font-bold">$$</td><td class="p-4">$$$</td><td class="p-4">$$$$</td><td class="p-4">$</td></tr><tr><td class="p-4 font-medium">Focus</td><td class="p-4 text-brand-primary dark:text-brand-secondary font-bold">Internal OS</td><td class="p-4">Marketplace</td><td class="p-4">Generalist</td><td class="p-4">None</td></tr></tbody></table></div>
+                </div>
+            </section>
+
+            <!-- 5. FINANCIALS -->
+            <section id="financials" class="full-screen-section scroll-mt-0">
+                <div class="text-center mb-12 pt-12"><span class="text-brand-secondary font-bold tracking-wider uppercase text-base block" data-i18n="tag_fin">Unit Economics</span><h2 class="text-3xl md:text-4xl font-bold mt-2 text-slate-900 dark:text-white" data-i18n="fin_title">Financial Health</h2></div>
+                <div class="grid md:grid-cols-3 gap-6 mb-12">
+                    <div class="glass p-6 rounded-2xl text-center border-t-4 border-brand-primary"><div class="text-sm text-slate-500 uppercase tracking-wide" data-i18n="fin_price">Pricing</div><div class="text-3xl font-bold my-2 text-brand-primary dark:text-white">R$ 299<span class="text-sm font-normal">,90</span></div><div class="text-xs text-slate-400" data-i18n="fin_price_sub">or $99.90 USD</div></div>
+                    <div class="glass p-6 rounded-2xl text-center border-t-4 border-brand-quaternary"><div class="text-sm text-slate-500 uppercase tracking-wide" data-i18n="fin_burn">Burn</div><div class="text-3xl font-bold my-2 text-brand-quaternary">R$ ~18k</div><div class="text-xs text-slate-400" data-i18n="fin_burn_sub">Lean</div></div>
+                    <div class="glass p-6 rounded-2xl text-center border-t-4 border-green-500"><div class="text-sm text-slate-500 uppercase tracking-wide" data-i18n="fin_break">Breakeven</div><div class="text-3xl font-bold my-2 text-green-500" data-i18n="fin_break_val">~75 Clients</div><div class="text-xs text-slate-400" data-i18n="fin_break_sub">Target</div></div>
+                </div>
+
+                <!-- NEW FINANCIAL BREAKDOWN DROPDOWN -->
+                <div class="glass rounded-xl mb-12 overflow-hidden border border-slate-200 dark:border-white/10">
+                    <button onclick="document.getElementById('fin-details').classList.toggle('hidden')" class="w-full p-4 flex justify-between items-center text-sm font-bold uppercase tracking-wider text-slate-500 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors">
+                        <span data-i18n="fin_details_btn">View Financial Breakdown (Transparency)</span>
+                        <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                    </button>
+                    <div id="fin-details" class="hidden p-6 bg-slate-50/50 dark:bg-white/5 border-t border-slate-200 dark:border-white/10 text-sm text-slate-600 dark:text-slate-300">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div>
+                                <h4 class="font-bold text-brand-primary dark:text-white mb-2">Monthly Burn Calculation (R$ 18k)</h4>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li><strong>Labor (R$ 12.5k):</strong> 2 Founders (R$ 5k ea) + 1 Sales/Ops Assistant (R$ 2.5k).</li>
+                                    <li><strong>OpEx (R$ 5.5k):</strong> Cloud Infra, SaaS Tools, Legal/Admin, Marketing CAC.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-brand-primary dark:text-white mb-2">Breakeven Logic</h4>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li><strong>Ticket:</strong> R$ 299.90/mo</li>
+                                    <li><strong>Variable Costs:</strong> Avg 20% Commission (10% Internal / 30% External Partners).</li>
+                                    <li><strong>Contribution Margin:</strong> ~R$ 240.00/client.</li>
+                                    <li><strong>Target:</strong> R$ 18,000 / R$ 240 = <strong>75 Clients</strong>.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="glass p-8 rounded-3xl"><h3 class="text-sm font-bold uppercase text-slate-400 mb-4" data-i18n="chart_proj">Growth Projection</h3><div class="chart-container"><canvas id="projectionChart"></canvas></div></div>
+                    <div class="glass p-8 rounded-3xl flex flex-col items-center justify-center"><h3 class="text-sm font-bold uppercase text-slate-400 mb-4 text-center" data-i18n="chart_cap">Cap Table</h3><div class="w-full max-w-[280px] chart-container" style="height: 250px;"><canvas id="capTableChart"></canvas></div><p class="text-center text-xs text-slate-500 mt-4 italic" data-i18n="cap_note">35% Filipe | 35% Abner | 20% Investors | 10% Mentors.</p></div>
+                </div>
+            </section>
+
+            <!-- 6. TEAM -->
+            <section id="team" class="full-screen-section scroll-mt-0">
+                <div class="text-center mb-16 pt-12"><h2 class="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white" data-i18n="team_title">The Dream Team</h2></div>
+                <div class="mb-12">
+                    <h3 class="text-sm font-bold uppercase text-brand-primary dark:text-brand-secondary mb-6 tracking-wider text-center" data-i18n="team_exec">Founders</h3>
+                    <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+                        <!-- Filipe -->
+                        <div class="glass p-6 rounded-3xl text-center group hover:-translate-y-2 transition-transform duration-300 border border-transparent hover:border-brand-primary/20 relative h-full">
+                            <a href="https://www.linkedin.com/in/filipeoliveirame/" target="_blank" rel="noopener noreferrer" class="absolute top-4 right-4 text-slate-400 hover:text-[#0077b5] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="linkedin-icon"><path d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM8.339 18.337H5.667v-8.59h2.672v8.59zM7.003 8.574a1.548 1.548 0 1 1 0-3.096 1.548 1.548 0 0 1 0 3.096zm11.335 9.763h-2.669V14.16c0-.996-.018-2.277-1.388-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248h-2.667v-8.59h2.56v1.174h.037c.355-.675 1.227-1.387 2.524-1.387 2.704 0 3.203 1.778 3.203 4.092v4.71z"></path></svg></a>
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQGhy6GLqyBfnQ/profile-displayphoto-crop_800_800/B4DZsecHCDJIAI-/0/1765742244382?e=1767225600&v=beta&t=HdVFMW94A1nWepBxSyyPiki6lx-Vdd2CUQrRwY3Szr0" alt="Filipe Oliveira" class="w-24 h-24 mx-auto rounded-full object-cover mb-4 ring-4 ring-white dark:ring-white/10 shadow-lg">
+                            <h4 class="font-bold text-lg text-slate-900 dark:text-white">Filipe Oliveira</h4>
+                            <p class="text-brand-primary dark:text-brand-secondary text-sm font-bold mb-2">Co-Founder | Operations</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3" data-i18n="bio_filipe">Operational strategy & Market fit.</p>
+                        </div>
+                        <!-- Abner -->
+                        <div class="glass p-6 rounded-3xl text-center group hover:-translate-y-2 transition-transform duration-300 border border-transparent hover:border-brand-primary/20 relative h-full">
+                            <a href="https://www.linkedin.com/in/abner-knofel-848a12127/" target="_blank" rel="noopener noreferrer" class="absolute top-4 right-4 text-slate-400 hover:text-[#0077b5] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" class="linkedin-icon"><path d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM8.339 18.337H5.667v-8.59h2.672v8.59zM7.003 8.574a1.548 1.548 0 1 1 0-3.096 1.548 1.548 0 0 1 0 3.096zm11.335 9.763h-2.669V14.16c0-.996-.018-2.277-1.388-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248h-2.667v-8.59h2.56v1.174h.037c.355-.675 1.227-1.387 2.524-1.387 2.704 0 3.203 1.778 3.203 4.092v4.71z"></path></svg></a>
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQG5605UcC26dA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1689442542888?e=1767225600&v=beta&t=VIu4z5j6C00Ctw3tUvx2N4eoQiqB0cu1PI7pxjtuPtM" alt="Abner Knofel" class="w-24 h-24 mx-auto rounded-full object-cover mb-4 ring-4 ring-white dark:ring-white/10 shadow-lg">
+                            <h4 class="font-bold text-lg text-slate-900 dark:text-white">Abner Knofel</h4>
+                            <p class="text-brand-primary dark:text-brand-secondary text-sm font-bold mb-2">Co-Founder | Technology</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-3" data-i18n="bio_abner">Product architecture & Development.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- HIRING GRID -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto mt-8">
+                        <div class="glass p-4 rounded-2xl flex items-center gap-3 border border-dashed border-slate-300 dark:border-white/20 h-full"><div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center shrink-0 text-slate-400"><i data-lucide="user-plus" class="w-5 h-5"></i></div><div><h4 class="font-bold text-sm text-slate-500 dark:text-slate-300" data-i18n="team_open">Vaga</h4><p class="text-[10px] text-brand-secondary font-bold uppercase tracking-wide" data-i18n="role_sales">Assistente de Vendas</p></div></div>
+                        <div class="glass p-4 rounded-2xl flex items-center gap-3 border border-dashed border-slate-300 dark:border-white/20 h-full"><div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center shrink-0 text-slate-400"><i data-lucide="user-plus" class="w-5 h-5"></i></div><div><h4 class="font-bold text-sm text-slate-500 dark:text-slate-300" data-i18n="team_open">Vaga</h4><p class="text-[10px] text-brand-secondary font-bold uppercase tracking-wide" data-i18n="role_cs">Sucesso do Cliente</p></div></div>
+                        <div class="glass p-4 rounded-2xl flex items-center gap-3 border border-dashed border-slate-300 dark:border-white/20 h-full"><div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center shrink-0 text-slate-400"><i data-lucide="user-plus" class="w-5 h-5"></i></div><div><h4 class="font-bold text-sm text-slate-500 dark:text-slate-300" data-i18n="team_open">Vaga</h4><p class="text-[10px] text-brand-secondary font-bold uppercase tracking-wide" data-i18n="role_dev1">Dev Junior 1</p></div></div>
+                        <div class="glass p-4 rounded-2xl flex items-center gap-3 border border-dashed border-slate-300 dark:border-white/20 h-full"><div class="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center shrink-0 text-slate-400"><i data-lucide="user-plus" class="w-5 h-5"></i></div><div><h4 class="font-bold text-sm text-slate-500 dark:text-slate-300" data-i18n="team_open">Vaga</h4><p class="text-[10px] text-brand-secondary font-bold uppercase tracking-wide" data-i18n="role_dev2">Dev Junior 2</p></div></div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 class="text-sm font-bold uppercase text-slate-400 mb-6 tracking-wider text-center" data-i18n="team_mentor">Mentorship Board</h3>
+                    <!-- 4 Columns for 4 Mentors -->
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-6xl mx-auto">
+                        <!-- Gabriela -->
+                        <div class="glass p-4 rounded-2xl flex flex-col items-center text-center gap-3 relative h-full justify-center">
+                            <a href="https://www.linkedin.com/in/gabrielaborgestrotta/" target="_blank" rel="noopener noreferrer" class="absolute top-3 right-3 text-slate-400 hover:text-[#0077b5] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="linkedin-icon"><path d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM8.339 18.337H5.667v-8.59h2.672v8.59zM7.003 8.574a1.548 1.548 0 1 1 0-3.096 1.548 1.548 0 0 1 0 3.096zm11.335 9.763h-2.669V14.16c0-.996-.018-2.277-1.388-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248h-2.667v-8.59h2.56v1.174h.037c.355-.675 1.227-1.387 2.524-1.387 2.704 0 3.203 1.778 3.203 4.092v4.71z"></path></svg></a>
+                            <img src="https://media.licdn.com/dms/image/v2/D4E03AQGM2vLTgU6l5A/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1718203351336?e=1767225600&v=beta&t=iGrv4s_EJ7Ul8yRhp-SeFK83agDX_Y3x_myLtnQOwxI" alt="Gabriela Borges" class="w-16 h-16 rounded-full object-cover shadow-sm">
+                            <div><h4 class="font-bold text-sm">Gabriela Borges</h4><p class="text-xs text-slate-500" data-i18n="role_gabriela">Hospitality Expert</p><p class="text-[10px] text-brand-primary font-semibold mt-0.5" data-i18n="comp_gabriela">Senac RJ</p></div>
+                        </div>
+                        <!-- Su Jung -->
+                        <div class="glass p-4 rounded-2xl flex flex-col items-center text-center gap-3 relative h-full justify-center">
+                            <a href="https://www.linkedin.com/in/sujungko/" target="_blank" rel="noopener noreferrer" class="absolute top-3 right-3 text-slate-400 hover:text-[#0077b5] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" class="linkedin-icon"><path d="M20 3H4a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM8.339 18.337H5.667v-8.59h2.672v8.59zM7.003 8.574a1.548 1.548 0 1 1 0-3.096 1.548 1.548 0 0 1 0 3.096zm11.335 9.763h-2.669V14.16c0-.996-.018-2.277-1.388-2.277-1.39 0-1.601 1.086-1.601 2.207v4.248h-2.667v-8.59h2.56v1.174h.037c.355-.675 1.227-1.387 2.524-1.387 2.704 0 3.203 1.778 3.203 4.092v4.71z"></path></svg></a>
+                            <img src="https://media.licdn.com/dms/image/v2/D4D03AQFwxm463xoz6Q/profile-displayphoto-shrink_800_800/B4DZYx78ZZGwAc-/0/1744594522588?e=1767225600&v=beta&t=8lfM_dw9Gx6ZWMLNh8AL3wlFSCePhjNQiM3XPIMrEPU" alt="Su Jung Ko" class="w-16 h-16 rounded-full object-cover shadow-sm">
+                            <div><h4 class="font-bold text-sm">Su Jung Ko</h4><p class="text-xs text-slate-500" data-i18n="role_su">Global Partnerships</p><p class="text-[10px] text-brand-primary font-semibold mt-0.5" data-i18n="comp_su">Brazil-Korea Conference</p></div>
+                        </div>
+                        <!-- Tech Advisor (New) -->
+                        <div class="glass p-4 rounded-2xl flex flex-col items-center text-center gap-3 border border-dashed border-slate-300 dark:border-white/20 relative h-full justify-center">
+                            <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center shrink-0 text-slate-400"><i data-lucide="user-plus" class="w-6 h-6"></i></div>
+                            <div><h4 class="font-bold text-sm text-slate-400" data-i18n="team_open">Vaga</h4><p class="text-xs text-slate-500" data-i18n="role_tech_advisor">Conselheiro Tecnológico</p></div>
+                        </div>
+                        <!-- Strat Advisor -->
+                        <div class="glass p-4 rounded-2xl flex flex-col items-center text-center gap-3 border border-dashed border-slate-300 dark:border-white/20 relative h-full justify-center">
+                            <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center shrink-0 text-slate-400"><i data-lucide="user-plus" class="w-6 h-6"></i></div>
+                            <div><h4 class="font-bold text-sm text-slate-400" data-i18n="team_open">Vaga</h4><p class="text-xs text-slate-500" data-i18n="role_open">Conselheiro Estratégico</p></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. SOURCES (16 LINKS) -->
+            <section id="sources" class="glass rounded-3xl p-8 md:p-12 border border-slate-200 dark:border-white/10">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="p-3 bg-brand-primary/10 rounded-xl text-brand-primary"><i data-lucide="database" class="w-6 h-6"></i></div>
+                    <h3 class="text-2xl font-bold text-slate-900 dark:text-white" data-i18n="sources_title">Auditable Sources</h3>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4 text-sm">
+                    <!-- 1-8 -->
+                    <a href="https://www.fortunebusinessinsights.com/hospitality-management-software-market-105658" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">1. Fortune Business Insights</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s1">Market to hit $29.8B by 2032.</p>
+                    </a>
+                    <a href="https://str.com/press/us-hotel-results-week-ending-28-september-2024" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">2. STR Data</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s2">Validates Group revenue share.</p>
+                    </a>
+                    <a href="https://www.amexglobalbusinesstravel.com/the-atlas/meetings-forecast/" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">3. Amex GBT Forecast</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s3">Predicts higher budgets.</p>
+                    </a>
+                    <a href="https://www.kalibrilabs.com/" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">4. Kalibri Labs</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s4">Revenue mix analysis.</p>
+                    </a>
+                    <a href="https://www.cbre.com/insights/reports/us-hotels-state-of-the-union" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">5. CBRE Outlook</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s5">Group demand recovery.</p>
+                    </a>
+                    <a href="https://www.jll.com.br/pt/trends-and-insights/research/reimagining-the-convention-hotel-model" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">6. JLL Research</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s6">Convention hotel dependency.</p>
+                    </a>
+                    <a href="https://fohb.com.br/pesquisas-e-dados/" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-green-500/5 hover:border-green-500/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-green-500">7. FOHB (Brasil)</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s7">Brazilian hotel data.</p>
+                    </a>
+                    <a href="https://ubrafe.org.br/" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-green-500/5 hover:border-green-500/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-green-500">8. UBRAFE</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s8">SP Events: R$ 305B impact.</p>
+                    </a>
+                    <!-- 9-16 -->
+                    <a href="https://www.gov.br/turismo/pt-br" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-green-500/5 hover:border-green-500/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-green-500">9. Gov.br (MTur)</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s9">R$ 8.4B investment forecast.</p>
+                    </a>
+                    <a href="https://abih.com.br/" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-green-500/5 hover:border-green-500/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-green-500">10. ABIH Nacional</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s10">Occupancy data.</p>
+                    </a>
+                    <a href="https://www.baguete.com.br/noticias/20/07/2023/hsystem-cresce-30-com-pms-hoteleiro" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-green-500/5 hover:border-green-500/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-green-500">11. Baguete (Tech)</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s11">Local tech demand.</p>
+                    </a>
+                    <a href="https://www.panrotas.com.br/" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-green-500/5 hover:border-green-500/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-green-500">12. Panrotas</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s12">B2B tourism news.</p>
+                    </a>
+                    <a href="https://www.grandviewresearch.com/industry-analysis/hotel-property-management-software-market" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">13. Grand View</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s13">Cloud PMS adoption.</p>
+                    </a>
+                    <a href="https://skift.com/topics/bleisure-travel/" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">14. Skift</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s14">Bleisure trends.</p>
+                    </a>
+                    <a href="https://www.cvent.com/en/blog/hospitality/hotel-group-business-trends" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">15. Cvent Report</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s15">Planner sourcing habits.</p>
+                    </a>
+                    <a href="https://www.statista.com/outlook/mmo/travel-tourism/online-travel-market/worldwide" target="_blank" rel="noopener noreferrer" class="flex flex-col p-4 rounded-xl bg-white/50 dark:bg-white/5 hover:bg-brand-primary/5 hover:border-brand-primary/30 border border-transparent transition-all group">
+                        <div class="flex justify-between items-start mb-1"><strong class="text-slate-800 dark:text-slate-200 group-hover:text-brand-primary">16. Statista</strong><i data-lucide="external-link" class="w-3 h-3 text-slate-400"></i></div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400" data-i18n="s16">Online market growth.</p>
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <footer class="border-t border-slate-200 dark:border-white/10 py-12 text-center text-sm text-slate-500">
+            <p>&copy; 2025 SellaStay. Confidential & Proprietary.</p>
+        </footer>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        let currentLang = 'pt';
+        let isDark = false;
+        let chartInstances = {};
+        let surveyLoaded = false;
+        let dashboardMode = 'desktop';
+
+        // --- I18N DICTIONARY ---
+        const translations = {
+            en: {
+                gate_title: "SellaStay Pitch Deck", gate_subtitle: "Confidential material. Please, identify yourself.", gate_label_pass: "Access Code", gate_btn: "Unlock Pitch Deck", gate_error: "Incorrect Code.",
+                nav_problem: "Problem", nav_solution: "Solution", nav_market: "Market", nav_comp: "Competition", nav_fin: "Financials", nav_team: "Team",
+                hero_badge: "Live Pitch Deck 2025", hero_title_1: "Best group & event negotiation", hero_title_highlight: "management for hospitality", hero_title_2: "Sales", hero_subtitle: "Optimize group stays and event negotiations with an intelligent system that integrates PMS, Email, and WhatsApp with multiple features and automations.",
+                stat_1: "TAM 2032", stat_2: "SP Events Market", stat_3: "Manual Hotels",
+                problem_title: "The Excel Bottleneck", problem_desc: "30% of hotels rely on manual spreadsheets to manage their most profitable segment (Groups). This leads to chaos.", pain_1: "Frequent Overbooking", pain_2: "72h+ Proposal Time", pain_3: "Contract Errors",
+                pain_img_1: "Spreadsheet Overload", pain_img_2: "Manual Task Overload", pain_img_3: "Slow Proposals", pain_img_4: "No Integration",
+                highlight_phrase: `MANY HOTELS <strong>STILL OPERATE</strong> THIS CONTROL WITH <strong>MANUAL AND OUTDATED</strong> TOOLS WITH LITTLE OR <span class="text-brand-secondary font-bold text-4xl hand-underline">NO AUTOMATION*</span>.`,
+                highlight_footer: "*Key difficulties and challenges faced by hoteliers, according to proprietary research conducted between August and December 2025.",
+                tag_problem: 'THE <span class="line-through decoration-brand-secondary decoration-2 opacity-50">PROBLEM</span> OPPORTUNITY', tag_solution: "The Solution", solution_title: "SellaStay: Automation Engine", 
+                sol_title_1: "Task Manager", sol_desc_1: "Lists, workflows & multi-user.",
+                sol_tooltip_1: "Complete task manager with lists, workflows, and multi-user integration to manage negotiations from request to contract.",
+                sol_title_2: "Smart Reminders", sol_desc_2: "Notifications via Email & WhatsApp.",
+                sol_tooltip_2: "Automatic reminders for events, tasks, and payments via platform, email, and WhatsApp.",
+                sol_title_3: "Interactive Kanban", sol_desc_3: "Team collaboration & history.",
+                sol_tooltip_3: "Real-time collaboration on the same task with complete history tracking.",
+                sol_title_4: "Smart Calculator", sol_desc_4: "Auto-tax & custom PDF proposal.",
+                sol_tooltip_4: "Automatic calculation of taxes, F&B, and equipment, generating a custom proposal PDF.",
+                sol_title_5: "AI Chatbot", sol_desc_5: "Assistant for quick answers.",
+                sol_tooltip_5: "AI Assistant for help, suggestions, and quick answers during processes.",
+                sol_title_6: "Email Integration", sol_desc_6: "Centralized follow-up.",
+                sol_tooltip_6: "Easy proposal sending and complete follow-up management integrated with your email.",
+                sol_title_7: "Automations", sol_desc_7: "+60% productivity gain.",
+                sol_tooltip_7: "Configurable automation of repetitive tasks to increase productivity by up to 60%.",
+                sol_title_8: "Event Map", sol_desc_8: "Track demand drivers.",
+                sol_tooltip_8: "Mapping of local events that impact demand and rate fluctuation.",
+                sol_title_9: "Comp Set Radar", sol_desc_9: "Real-time rate monitoring.",
+                sol_tooltip_9: "Real-time monitoring of competitor rack rates via AI.",
+                sol_title_10: "PMS Integration", sol_desc_10: "Live availability sync.",
+                sol_tooltip_10: "Automatic synchronization of room and venue availability with your PMS.",
+                sol_title_11: "Service Marketplace", sol_desc_11: "Verified professionals.",
+                sol_tooltip_11: "Hiring of qualified and verified professionals without bureaucracy.",
+                sol_title_12: "RM Assistant", sol_desc_12: "Pricing & fluctuation system for RM precision.",
+                sol_tooltip_12: "Pricing and fluctuation system that assists in rate precision.",
+                sol_preview: "SellaStay Dashboard UI",
+                impact_title: "Group/Event Impact",
+                impact_body_prefix: "Groups and Events represent between",
+                impact_body_suffix: "of a hotel's total revenue.",
+                demand_title: "Demand Projection",
+                demand_body_prefix: "Demand for Group/Event bookings is expected to grow",
+                demand_body_suffix: "over the next 5 years.",
+                survey_title: "Real-time survey data",
+                survey_total: "Total responses",
+                survey_interest: "Interest in testing",
+                survey_pilot: "Pilot hotels",
+                survey_chains: "Hotel chains",
+                survey_source_label: "Source:",
+                survey_source_text: "SellaStay survey",
+                tl_title: "Available Features:",
+                tl_date_1: "Jan 2, 2026", tl_desc_1: "Task Manager, Smart Reminders, Kanban, Calculator.",
+                tl_date_2: "Apr 6, 2026", tl_desc_2: "AI Chatbot, Email, Automations, Event Map.",
+                tl_date_3: "Jul 1, 2026", tl_desc_3: "Radar, PMS Integration, Marketplace, RM Assistant.",
+                chart_1_title: "Global SaaS Projection", chart_2_title: "Brazil Opportunity", sunburst_desc: "Brazil is ~50% of Latam.",
+                market_title: "Market Size & Opportunity",
+                comp_title: "Competitive Landscape", comp_map: "Market Positioning", swot_s: "Strengths", swot_s1: "Focused on Groups", swot_s2: "Affordable (SaaS)", swot_s3: "Local Payments", swot_w: "Weaknesses", swot_w1: "Brand Awareness", swot_w2: "Initial Integrations", swot_o: "Opportunities", swot_o1: "30% Underserved Market", swot_o2: "Bleisure Trend", swot_o3: "Latam Expansion", swot_t: "Threats", swot_t1: "Big PMS acquiring niche tools", swot_t2: "Economic downturns",
+                comp_feat: "Feature", comp_trad: "Traditional PMS", comp_man: "Excel / Manual", val_high: "High", val_low: "Low/Complex", val_none: "None", val_min: "Minutes", val_wks: "Weeks", val_inst: "Instant", val_mod: "Modern", val_leg: "Legacy", val_chao: "Chaotic",
+                tag_fin: "Unit Economics", fin_title: "Financial Health", fin_price: "Pricing (Entry)", fin_price_sub: "or $99.90 USD Global", fin_burn: "Monthly Burn", fin_burn_sub: "Lean Team Structure", fin_break: "Breakeven", fin_break_val: "Month 8-10", fin_break_sub: "~75 Clients needed",
+                fin_details_btn: "View Financial Breakdown (Transparency)",
+                chart_proj: "Growth Projection (12 Mo)", chart_cap: "Cap Table (Post-Investment)", cap_note: "35% Filipe | 35% Abner | 20% Investors | 10% Mentors.",
+                team_title: "The Dream Team", team_exec: "Founders", team_mentor: "Mentorship Board", team_open: "Open Spot",
+                bio_filipe: "Operational strategy & Market fit.", bio_abner: "Product architecture & Development.", role_gabriela: "Hospitality Expert", role_su: "Global Partnerships", role_open: "Strategic Advisor",
+                role_sales: "Sales Assistant", role_cs: "Customer Success", role_dev1: "Junior Dev 1", role_dev2: "Junior Dev 2", role_tech_advisor: "Technology Advisor",
+                comp_gabriela: "Senac RJ", comp_su: "Brazil-Korea Conference",
+                sources_title: "Auditable Sources", s1:"Market to hit $29.8B by 2032.", s2:"Validates Group revenue share.", s3:"Predicts higher budgets.", s4:"Revenue mix analysis.", s5:"Confirms group demand.", s6:"Convention hotel dependency.", s7:"Brazilian hotel data.", s8:"SP Events: R$ 305B.", s9:"R$ 8.4B investment forecast.", s10:"Occupancy data.", s11:"Local tech demand.", s12:"B2B tourism news.", s13:"Cloud PMS adoption.", s14:"Bleisure trends.", s15:"Planner sourcing habits.", s16:"Online market growth.",
+                c_mkt:"Market ($B)", c_mat1:"PMS", c_mat2:"Manual", c_proj1:"Revenue", c_proj2:"Cost", c_cap1:"Filipe", c_cap2:"Abner", c_cap3: "Investors", c_cap4:"Mentors", c_sun: ["Global", "ROW", "Latam", "Other", "Brazil", "R$1.5B"]
+            },
+            pt: {
+                gate_title: "SellaStay Pitch Deck", gate_subtitle: "Material Confidencial. Favor, identifique-se.", gate_label_pass: "Código de acesso", gate_btn: "Liberar Pitch Deck", gate_error: "Código incorreto.",
+                nav_problem: "Problema", nav_solution: "Solução", nav_market: "Mercado", nav_comp: "Concorrência", nav_fin: "Financeiro", nav_team: "Time",
+                hero_badge: "Pitch Deck 2025", hero_title_1: "A melhor gestão de negociações", hero_title_highlight: "de Grupos e Eventos para hotelaria", hero_title_2: "Hoteleiros", hero_subtitle: "Otimize suas negociações de hospedagem em grupo e eventos com um sistema inteligente que integra PMS, E-mail e WhatsApp com diversos recursos e automatizações.",
+                stat_1: "TAM 2032", stat_2: "Mercado Eventos SP", stat_3: "Hotéis no Excel",
+                problem_title: "Gargalo do Excel", problem_desc: "30% dos hotéis dependem de planilhas. Isso gera caos.", pain_1: "Overbooking Frequente", pain_2: "Propostas em 72h+", pain_3: "Erros em Contratos",
+                pain_img_1: "Excesso de Planilhas", pain_img_2: "Tarefas Manuais", pain_img_3: "Lentidão no Envio", pain_img_4: "Sem Integração",
+                highlight_phrase: `MUITOS HOTÉIS <strong>AINDA OPERAM</strong> ESSE CONTROLE COM FERRAMENTAS <strong>MANUAIS E ANTIGUAS</strong> COM POUQUÍSSIMA OU <span class="text-brand-secondary font-bold text-4xl hand-underline">NENHUMA AUTOMAÇÃO*</span>.`,
+                highlight_footer: "*Principais dificuldades e desafios enfretados por hoteleiros, segundo pesquisa própria realizada entre agosto e dezembro de 2025.",
+                tag_problem: "O <span class=\"line-through decoration-brand-secondary decoration-2 opacity-50\">PROBLEMA</span> A OPORTUNIDADE", tag_solution: "A Solução", 
+                solution_title: "SellaStay - Gestão de Negociações de Grupos e Eventos", 
+                sol_title_1: "Gestor de Tarefas", sol_desc_1: "Listas, fluxos e multi-usuários.",
+                sol_tooltip_1: "Gestor de tarefas completo com lista, fluxograma e multi-usuários para gerenciar negociações do início ao fim.",
+                sol_title_2: "Lembretes Inteligentes", sol_desc_2: "Notificações via E-mail e WhatsApp.",
+                sol_tooltip_2: "Lembretes automáticos para eventos, tarefas e pagamentos via plataforma, e-mail e WhatsApp.",
+                sol_title_3: "Kanban Interativo", sol_desc_3: "Colaboração e histórico.",
+                sol_tooltip_3: "Colaboração em tempo real na mesma tarefa com histórico completo registrado.",
+                sol_title_4: "Calculadora Inteligente", sol_desc_4: "Cálculo auto de impostos e PDF.",
+                sol_tooltip_4: "Cálculo automático de impostos, A&B e equipamentos, gerando PDF personalizado da proposta.",
+                sol_title_5: "IA Chatbot", sol_desc_5: "Assistente para respostas rápidas.",
+                sol_tooltip_5: "Assistente de IA para ajuda, sugestões e respostas rápidas durante os processos.",
+                sol_title_6: "Integração E-mail", sol_desc_6: "Gestão centralizada de follow-up.",
+                sol_tooltip_6: "Envio facilitado de propostas e gestão completa de follow-up integrado ao seu e-mail.",
+                sol_title_7: "Automatizações", sol_desc_7: "+60% de produtividade.",
+                sol_tooltip_7: "Automação de tarefas repetitivas configuráveis para aumentar a produtividade em até 60%.",
+                sol_title_8: "Mapa de Eventos", sol_desc_8: "Monitore a demanda local.",
+                sol_tooltip_8: "Mapeamento de eventos locais que impactam a demanda e flutuação de tarifa.",
+                sol_title_9: "Radar Concorrência", sol_desc_9: "Tarifas em tempo real.",
+                sol_tooltip_9: "Monitoramento em tempo real da tarifa balcão dos concorrentes via IA.",
+                sol_title_10: "Integração PMS", sol_desc_10: "Sincronização de disponibilidade.",
+                sol_tooltip_10: "Sincronização automática de disponibilidade de quartos e salas com seu PMS.",
+                sol_title_11: "Marketplace de Serviços", sol_desc_11: "Profissionais verificados.",
+                sol_tooltip_11: "Contratação de profissionais qualificados e verificados sem burocracia.",
+                sol_title_12: "Assistente de RM", sol_desc_12: "Precificação e flutuação com automação.",
+                sol_tooltip_12: "Sistema de precificação e flutuação que auxilia na precisão das tarifas.",
+                sol_preview: "Painel SellaStay (Preview)",
+                impact_title: "Impacto de Grupos/Eventos",
+                impact_body_prefix: "Grupos e Eventos representam entre",
+                impact_body_suffix: "da receita total de um hotel.",
+                demand_title: "Projeção de Demanda",
+                demand_body_prefix: "Estima-se um aumento de",
+                demand_body_suffix: "na demanda por reservas em Grupo e/ou Eventos para os próximos 5 anos.",
+                survey_title: "Dados em tempo real da pesquisa",
+                survey_total: "Total de respostas",
+                survey_interest: "Interesse em testar",
+                survey_pilot: "Hotéis piloto",
+                survey_chains: "Redes hoteleiras",
+                survey_source_label: "Fonte:",
+                survey_source_text: "SellaStay survey",
+                tl_title: "Recursos Disponíveis:",
+                tl_date_1: "2 Jan 2026", tl_desc_1: "Gestor de Tarefas, Lembretes, Kanban, Calculadora.",
+                tl_date_2: "6 Abr 2026", tl_desc_2: "IA Chatbot, Email, Automações, Mapa de Eventos.",
+                tl_date_3: "1 Jul 2026", tl_desc_3: "Radar, PMS, Marketplace, Assistente RM.",
+                chart_1_title: "Projeção Global SaaS", chart_2_title: "Oportunidade Brasil", sunburst_desc: "Brasil representa ~50% Latam.",
+                market_title: "Tamanho do Mercado",
+                comp_title: "Cenário Competitivo", comp_map: "Posicionamento", swot_s: "Forças", swot_s1: "Foco em Grupos", swot_s2: "Acessível (SaaS)", swot_s3: "Pagamentos Locais", swot_w: "Fraquezas", swot_w1: "Brand Awareness", swot_w2: "Integrações Iniciais", swot_o: "Oportunidades", swot_o1: "30% Mercado Desassistido", swot_o2: "Tendência Bleisure", swot_o3: "Expansão Latam", swot_t: "Ameaças", swot_t1: "Grandes PMS comprando nichos", swot_t2: "Crises Econômicas",
+                comp_feat: "Recurso", comp_trad: "PMS Tradicional", comp_man: "Excel / Manual", val_high: "Alta", val_low: "Baixa/Complexa", val_none: "Nenhuma", val_min: "Minutos", val_wks: "Semanas", val_inst: "Instantâneo", val_mod: "Moderno", val_leg: "Legado", val_chao: "Caótico",
+                tag_fin: "Economia Unitária", fin_title: "Saúde Financeira", fin_price: "Preço (Entrada)", fin_price_sub: "ou $99.90 USD Global", fin_burn: "Burn Mensal", fin_burn_sub: "Estrutura Enxuta", fin_break: "Breakeven", fin_break_val: "Mês 8-10", fin_break_sub: "~75 Clientes necess.",
+                fin_details_btn: "Ver Detalhes Financeiros (Transparência)",
+                chart_proj: "Projeção Crescimento (12 Meses)", chart_cap: "Cap Table (Pós-Invest)", cap_note: "35% Filipe | 35% Abner | 20% Investidores | 10% Mentores.",
+                team_title: "Dream Team", team_exec: "Founders", team_mentor: "Mentores", team_open: "Vaga",
+                bio_filipe: "Estratégia Operacional e Market Fit.", bio_abner: "Arquitetura de Produto e Dev.", role_gabriela: "Especialista Hotelaria", role_su: "Parcerias Globais", role_open: "Conselheiro Estratégico",
+                role_sales: "Assistente de Vendas", role_cs: "Sucesso do Cliente", role_dev1: "Dev Junior 1", role_dev2: "Dev Junior 2", role_tech_advisor: "Conselheiro Tecnológico",
+                comp_gabriela: "Senac RJ", comp_su: "Brazil-Korea Conference",
+                sources_title: "Fontes Auditáveis", s1:"Mercado $29,8B em 2032.", s2:"Valida share receita Grupos.", s3:"Prevê orçamentos maiores.", s4:"Análise mix receita.", s5:"Confirma demanda grupos.", s6:"Dependência hotéis convenção.", s7:"Dados hotelaria BR.", s8:"Eventos SP: R$ 305B.", s9:"Previsão R$ 8,4B investimentos.", s10:"Dados ocupação.", s11:"Demanda tech local.", s12:"Notícias B2B.", s13:"Adoção PMS Cloud.", s14:"Tendência Bleisure.", s15:"Hábitos de compra.", s16:"Crescimento online.",
+                survey_title: "Dados em tempo real da pesquisa",
+                survey_total: "Total de respostas",
+                survey_interest: "Interesse em testar",
+                survey_pilot: "Hotéis piloto",
+                survey_chains: "Redes hoteleiras",
+                survey_source_label: "Fonte:",
+                survey_source_text: "SellaStay survey",
+                c_mkt:"Mercado ($B)", c_mat1:"PMS", c_mat2:"Manual", c_proj1:"Receita", c_proj2:"Custo", c_cap1:"Filipe", c_cap2:"Abner", c_cap3: "Investidores", c_cap4:"Mentores", c_sun: ["Global", "Resto", "Latam", "Outros", "Brasil", "R$1.5B"]
+            },
+            es: {
+                gate_title: "SellaStay Pitch Deck", gate_subtitle: "Material Confidencial. Por favor, identifíquese.", gate_label_pass: "Código de acceso", gate_btn: "Desbloquear", gate_error: "Código incorrecto.",
+                nav_problem: "Problema", nav_solution: "Solución", nav_market: "Mercado", nav_comp: "Competencia", nav_fin: "Finanzas", nav_team: "Equipo",
+                hero_badge: "Pitch Deck 2025", hero_title_1: "El S.O. Moderno para", hero_title_highlight: "Ventas de Grupos", hero_title_2: "Hoteleros", hero_subtitle: "Reemplace Excel manual con un SaaS inteligente que automatiza negociación, contratos y pagos.",
+                stat_1: "TAM 2032", stat_2: "Mercado Eventos SP", stat_3: "Hoteles en Excel",
+                problem_title: "Cuello de Botella Excel", problem_desc: "30% de hoteles dependen de planillas. Caos total.", pain_1: "Sobreventa Frecuente", pain_2: "Propuestas en 72h+", pain_3: "Errores Contratos",
+                pain_img_1: "Excesso de Hojas", pain_img_2: "Tareas Manuales", pain_img_3: "Propuestas Lentas", pain_img_4: "Sin Integración",
+                highlight_phrase: `MUCHOS HOTELES <strong>AÚN OPERAN</strong> ESTE CONTROL CON HERRAMIENTAS <strong>MANUALES Y ANTIGUAS</strong> CON MUY POCA O <span class="text-brand-secondary font-bold text-4xl hand-underline">NINGUNA AUTOMATIZACIÓN*</span>.`,
+                highlight_footer: "*Principales dificultades y desafíos enfrentados por hoteleros, según investigación propia realizada entre agosto y diciembre de 2025.",
+                tag_problem: "EL <span class=\"line-through decoration-brand-secondary decoration-2 opacity-50\">PROBLEMA</span> LA OPORTUNIDAD", tag_solution: "La Solución", 
+                solution_title: "SellaStay - Gestión de Negociaciones de Grupos y Eventos", 
+                sol_title_1: "Gestor de Tareas", sol_desc_1: "Listas, flujos y multi-usuario.",
+                sol_tooltip_1: "Gestor de tareas completo con listas, flujos de trabajo y multiusuario para gestionar negociaciones desde la solicitud hasta el contrato.",
+                sol_title_2: "Recordatorios", sol_desc_2: "Notificaciones vía Email y WhatsApp.",
+                sol_tooltip_2: "Recordatorios automáticos para eventos, tareas y pagos vía plataforma, correo electrónico y WhatsApp.",
+                sol_title_3: "Kanban Interactivo", sol_desc_3: "Colaboración e historial.",
+                sol_tooltip_3: "Colaboración en tiempo real en la misma tarea con registro histórico completo.",
+                sol_title_4: "Calculadora Inteligente", sol_desc_4: "Cálculo auto impuestos y PDF.",
+                sol_tooltip_4: "Cálculo automático de impuestos, A&B y equipos, generando un PDF de propuesta personalizado.",
+                sol_title_5: "Chatbot IA", sol_desc_5: "Asistente para respuestas rápidas.",
+                sol_tooltip_5: "Asistente de IA para ayuda, sugerencias y respuestas rápidas durante los procesos.",
+                sol_title_6: "Integración Email", sol_desc_6: "Gestión centralizada.",
+                sol_tooltip_6: "Envío fácil de propuestas y gestión completa de seguimiento integrado con su correo electrónico.",
+                sol_title_7: "Automatizaciones", sol_desc_7: "+60% productividad.",
+                sol_tooltip_7: "Automatización de tareas repetitivas configurables para aumentar la productividad hasta un 60%.",
+                sol_title_8: "Mapa de Eventos", sol_desc_8: "Monitoreo de demanda local.",
+                sol_tooltip_8: "Mapeo de eventos locales que impactan la demanda y fluctuación de tarifas.",
+                sol_title_9: "Radar Competencia", sol_desc_9: "Tarifas en tiempo real.",
+                sol_tooltip_9: "Monitoreo en tiempo real de las tarifas de mostrador de la competencia vía IA.",
+                sol_title_10: "Integración PMS", sol_desc_10: "Sincronización disponibilidad.",
+                sol_tooltip_10: "Sincronización automática de disponibilidad de habitaciones y salones con su PMS.",
+                sol_title_11: "Marketplace Servicios", sol_desc_11: "Profesionales verificados.",
+                sol_tooltip_11: "Contratación de profesionales calificados y verificados sin burocracia.",
+                sol_title_12: "Asistente de RM", sol_desc_12: "Precios y fluctuación con automatización.",
+                sol_tooltip_12: "Sistema de precios y fluctuación que ayuda en la precisión de las tarifas.",
+                sol_preview: "Panel SellaStay (Vista)",
+                impact_title: "Impacto de Grupos/Eventos",
+                impact_body_prefix: "Grupos y Eventos representan entre",
+                impact_body_suffix: "de los ingresos totales de un hotel.",
+                demand_title: "Proyección de Demanda",
+                demand_body_prefix: "Se estima un aumento de",
+                demand_body_suffix: "en la demanda de reservas de Grupo y/o Eventos para los próximos 5 años.",
+                tl_title: "Características Disponibles:",
+                tl_date_1: "2 Ene 2026", tl_desc_1: "Gestor de Tareas, Recordatorios, Kanban, Calculadora.",
+                tl_date_2: "6 Abr 2026", tl_desc_2: "Chatbot IA, Email, Automatizaciones, Mapa de Eventos.",
+                tl_date_3: "1 Jul 2026", tl_desc_3: "Radar, Integración PMS, Marketplace, Asistente RM.",
+                chart_1_title: "Proyección Global", chart_2_title: "Oportunidad Brasil", sunburst_desc: "Brasil es ~50% de Latam.",
+                market_title: "Tamaño del Mercado",
+                comp_title: "Panorama Competitivo", comp_map: "Posicionamiento", swot_s: "Fortalezas", swot_s1: "Foco en Grupos", swot_s2: "Asequible (SaaS)", swot_s3: "Pagos Locales", swot_w: "Debilidades", swot_w1: "Conocimiento Marca", swot_w2: "Integraciones Iniciales", swot_o: "Oportunidades", swot_o1: "30% Mercado Desatendido", swot_o2: "Tendencia Bleisure", swot_o3: "Expansión Latam", swot_t: "Amenazas", swot_t1: "Grandes PMS compran nichos", swot_t2: "Crisis Económicas",
+                comp_feat: "Función", comp_trad: "PMS Tradicional", comp_man: "Excel / Manual", val_high: "Alta", val_low: "Baja/Compleja", val_none: "Ninguna", val_min: "Minutos", val_wks: "Semanas", val_inst: "Instantáneo", val_mod: "Moderno", val_leg: "Legado", val_chao: "Caótico",
+                tag_fin: "Economía Unitaria", fin_title: "Salud Financiera", fin_price: "Precio (Entrada)", fin_price_sub: "o $99.90 USD Global", fin_burn: "Gasto Mensual", fin_burn_sub: "Estructura Liviana", fin_break: "Punto Equilibrio", fin_break_val: "Mes 8-10", fin_break_sub: "~75 Clientes neces.",
+                fin_details_btn: "Ver Desglose Financiero (Transparencia)",
+                chart_proj: "Proyección (12 Meses)", chart_cap: "Cap Table (Post-Invest)", cap_note: "35% Filipe | 35% Abner | 20% Inversores | 10% Mentores.",
+                team_title: "Equipo Soñado", team_exec: "Founders", team_mentor: "Mentores", team_open: "Vacante",
+                bio_filipe: "Estrategia Operativa y Market Fit.", bio_abner: "Arquitectura de Producto y Dev.", role_gabriela: "Experta Hotelería", role_su: "Alianzas Globales", role_open: "Asesor Estratégico",
+                role_sales: "Asistente de Ventas", role_cs: "Éxito del Cliente", role_dev1: "Dev Junior 1", role_dev2: "Dev Junior 2", role_tech_advisor: "Asesor Tecnológico",
+                comp_gabriela: "Senac RJ", comp_su: "Brazil-Korea Conference",
+                sources_title: "Fuentes Auditables", s1:"Mercado $29.8B en 2032.", s2:"Valida share ingresos Grupos.", s3:"Presupuestos más altos.", s4:"Análisis mix ingresos.", s5:"Confirma demanda grupos.", s6:"Dependencia hoteles convención.", s7:"Datos hotelería BR.", s8:"Eventos SP: R$ 305B.", s9:"Previsión R$ 8.4B inversión.", s10:"Datos ocupación.", s11:"Demanda tech local.", s12:"Noticias B2B.", s13:"Adopción PMS Cloud.", s14:"Tendencia Bleisure.", s15:"Hábitos de compra.", s16:"Crecimiento online.",
+                survey_title: "Datos en tiempo real de la encuesta",
+                survey_total: "Total de respuestas",
+                survey_interest: "Interés en probar",
+                survey_pilot: "Hoteles piloto",
+                survey_chains: "Cadenas hoteleras",
+                survey_source_label: "Fuente:",
+                survey_source_text: "Encuesta SellaStay",
+                c_mkt:"Mercado ($B)", c_mat1:"PMS", c_mat2:"Manual", c_proj1:"Ingresos", c_proj2:"Costo", c_cap1:"Filipe", c_cap2:"Abner", c_cap3: "Inversores", c_cap4:"Mentores", c_sun: ["Global", "Resto", "Latam", "Otros", "Brasil", "R$1.5B"]
+            }
+        };
+
+        // --- UI LOGIC ---
+        function toggleLangMenu(event) { 
+            event.stopPropagation();
+            const menu = document.getElementById('lang-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+                menu.classList.add('block');
+            } else {
+                menu.classList.add('hidden');
+                menu.classList.remove('block');
+            }
+        }
+        
+        document.addEventListener('click', (e) => {
+            const menu = document.getElementById('lang-menu');
+            const btn = document.getElementById('lang-btn');
+            if (!btn.contains(e.target) && !menu.contains(e.target)) {
+                menu.classList.add('hidden');
+                menu.classList.remove('block');
+            }
+        });
+
+        document.getElementById('toggle-pass').addEventListener('click', function() {
+            const input = document.getElementById('investor-pass');
+            // Re-generate icon to avoid null reference error on re-render
+            this.innerHTML = ''; 
+            const newIcon = document.createElement('i');
+            newIcon.classList.add('w-4', 'h-4');
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                newIcon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                newIcon.setAttribute('data-lucide', 'eye');
+            }
+            this.appendChild(newIcon);
+            lucide.createIcons();
+        });
+
+        // Terms modal logic
+        const termsModal = document.getElementById('terms-modal');
+        const openTermsBtn = document.getElementById('open-terms');
+        const closeTermsBtn = document.getElementById('close-terms');
+        const acceptTermsBtn = document.getElementById('accept-terms');
+        const termsCheck = document.getElementById('terms-check');
+        const frameWrapper = document.getElementById('frame-wrapper');
+        const dashboardFrame = document.getElementById('dashboard-frame');
+        const btnDesktop = document.getElementById('mode-desktop');
+        const btnMobile = document.getElementById('mode-mobile');
+
+        function openTerms() {
+            termsModal.classList.remove('hidden');
+            termsModal.classList.add('flex');
+        }
+
+        function closeTerms() {
+            termsModal.classList.add('hidden');
+            termsModal.classList.remove('flex');
+        }
+
+        openTermsBtn.addEventListener('click', openTerms);
+        closeTermsBtn.addEventListener('click', closeTerms);
+        acceptTermsBtn.addEventListener('click', () => {
+            termsCheck.checked = true;
+            closeTerms();
+        });
+        termsModal.addEventListener('click', (e) => {
+            if (e.target === termsModal) closeTerms();
+        });
+
+        function updateFrameSize() {
+            if (!frameWrapper || !dashboardFrame) return;
+            // reset classes
+            frameWrapper.className = "flex justify-center";
+            dashboardFrame.className = "";
+            if (dashboardMode === 'desktop') {
+                frameWrapper.classList.add('w-full');
+                dashboardFrame.classList.add('w-full','h-[620px]','rounded-2xl','border','border-slate-200','dark:border-white/10','shadow-lg','bg-white','dark:bg-slate-900');
+            } else {
+                frameWrapper.classList.add('w-[380px]');
+                dashboardFrame.classList.add('w-full','h-[720px]','rounded-[28px]','border','border-slate-200','dark:border-white/10','shadow-lg','bg-white','dark:bg-slate-900');
+            }
+
+            if (btnDesktop && btnMobile) {
+                if (dashboardMode === 'desktop') {
+                    btnDesktop.classList.add('bg-white','dark:bg-slate-700','text-brand-primary','dark:text-white','shadow');
+                    btnMobile.classList.remove('bg-white','dark:bg-slate-700','text-brand-primary','dark:text-white','shadow');
+                    btnMobile.classList.add('text-slate-600','dark:text-slate-300');
+                } else {
+                    btnMobile.classList.add('bg-white','dark:bg-slate-700','text-brand-primary','dark:text-white','shadow');
+                    btnDesktop.classList.remove('bg-white','dark:bg-slate-700','text-brand-primary','dark:text-white','shadow');
+                    btnDesktop.classList.add('text-slate-600','dark:text-slate-300');
+                }
+            }
+        }
+
+        if (btnDesktop && btnMobile) {
+            btnDesktop.addEventListener('click', () => { dashboardMode = 'desktop'; updateFrameSize(); });
+            btnMobile.addEventListener('click', () => { dashboardMode = 'mobile'; updateFrameSize(); });
+        }
+        updateFrameSize();
+
+
+        function toggleTheme() {
+            isDark = !isDark;
+            document.documentElement.classList.toggle('dark');
+            updateCharts();
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            document.getElementById('current-lang-display').innerText = lang.toUpperCase();
+            document.getElementById('lang-menu').classList.add('hidden');
+            
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const k = el.getAttribute('data-i18n');
+                if(translations[lang][k]) {
+                    // Check if element has 'innerHTML' needed (for the highlight phrase)
+                    if(el.id === 'highlight-phrase' || k.startsWith('tag_problem')) {
+                        el.innerHTML = translations[lang][k];
+                    } else {
+                        el.innerText = translations[lang][k];
+                    }
+                }
+            });
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const k = el.getAttribute('data-i18n-placeholder');
+                if(translations[lang][k]) el.placeholder = translations[lang][k];
+            });
+            updateCharts();
+        }
+
+        document.querySelectorAll('[data-lang]').forEach(btn => {
+            btn.addEventListener('click', () => setLanguage(btn.getAttribute('data-lang')));
+        });
+
+        // --- OBSERVER FOR ACTIVE NAV ---
+        const observerOptions = {
+            root: null,
+            rootMargin: '-50% 0px -50% 0px', // Trigger when section is in middle
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.getAttribute('id');
+                    // Reset all
+                    document.querySelectorAll('nav a').forEach(link => {
+                        link.classList.remove('text-brand-secondary');
+                        link.classList.add(isDark ? 'text-slate-300' : 'text-slate-600');
+                    });
+                    // Set active
+                    const activeLink = document.querySelector(`nav a[href="#${id}"]`);
+                    if (activeLink) {
+                        activeLink.classList.remove(isDark ? 'text-slate-300' : 'text-slate-600');
+                        activeLink.classList.add('text-brand-secondary');
+                    }
+                }
+            });
+        }, observerOptions);
+
+        // --- CHARTS ---
+        function initCharts() {
+            Chart.defaults.font.family = "'Poppins', sans-serif";
+            const common = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid: { color: 'rgba(0,0,0,0.05)' } } } };
+
+            const ctx1 = document.getElementById('marketGrowthChart').getContext('2d');
+            chartInstances.market = new Chart(ctx1, { type: 'line', data: { labels: ['24','26','28','30','32'], datasets: [{ label: 'USD Billions', data: [12.1, 15.1, 18.9, 23.7, 29.8], borderColor: '#173162', backgroundColor: 'rgba(23, 49, 98, 0.1)', fill: true, tension: 0.4 }] }, options: common });
+
+            const ctx2 = document.getElementById('maturityChart').getContext('2d');
+            chartInstances.maturity = new Chart(ctx2, { type: 'doughnut', data: { labels: ['PMS','Manual'], datasets: [{ data: [70,30], backgroundColor: ['#E2E8F0','#f58b3f'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'bottom' } } } });
+
+            const ctx3 = document.getElementById('competitorMap').getContext('2d');
+            chartInstances.comp = new Chart(ctx3, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        { label: 'SellaStay', data: [{x: 9, y: 9}], backgroundColor: '#173162', pointRadius: 10 },
+                        { label: 'EVNT', data: [{x: 7, y: 8}], backgroundColor: '#f58b3f', pointRadius: 8 },
+                        { label: 'Cvent', data: [{x: 2, y: 8}], backgroundColor: '#94a3b8', pointRadius: 6 },
+                        { label: 'Excel', data: [{x: 8, y: 2}], backgroundColor: '#5a3869', pointRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        x: { title: {display: true, text: 'Affordability'}, min: 0, max: 10 },
+                        y: { title: {display: true, text: 'Automation'}, min: 0, max: 10 }
+                    },
+                    plugins: { legend: { display: true, position: 'bottom' } }
+                }
+            });
+
+            // UPDATED: Projection Chart with Dual Axis
+            const ctx4 = document.getElementById('projectionChart').getContext('2d');
+            chartInstances.proj = new Chart(ctx4, {
+                type: 'line',
+                data: {
+                    labels: ['M1','M3','M6','M9','M12'],
+                    datasets: [
+                        { 
+                            label: 'Revenue (R$)', 
+                            data: [0, 5000, 15000, 35000, 60000], 
+                            borderColor: '#10B981', 
+                            borderWidth: 3, 
+                            yAxisID: 'y'
+                        },
+                        { 
+                            label: 'Cost (R$)', 
+                            data: [18000, 19000, 22000, 25000, 30000], 
+                            borderColor: '#EF4444', 
+                            borderWidth: 2, 
+                            borderDash: [5,5],
+                            yAxisID: 'y' 
+                        },
+                        {
+                            label: 'Active Clients',
+                            data: [0, 15, 50, 115, 200],
+                            borderColor: '#173162',
+                            backgroundColor: 'rgba(23, 49, 98, 0.1)',
+                            type: 'bar',
+                            yAxisID: 'y1',
+                            barThickness: 20
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: { display: true, text: 'Values (R$)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: { display: true, text: 'Client Count' },
+                            grid: { drawOnChartArea: false } // Only draw grid for left axis
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            const ctx5 = document.getElementById('capTableChart').getContext('2d');
+            chartInstances.cap = new Chart(ctx5, {
+                type: 'doughnut',
+                data: { 
+                    labels: [
+                        translations[currentLang].c_cap1,
+                        translations[currentLang].c_cap2,
+                        translations[currentLang].c_cap3,
+                        translations[currentLang].c_cap4
+                    ], 
+                    datasets: [{ data: [35,35,20,10], backgroundColor: ['#173162','#f58b3f', '#10B981', '#5a3869'], borderWidth: 0 }] 
+                },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom' } } }
+            });
+
+            renderSunburst();
+        }
+
+        function renderSunburst() {
+            const l = translations[currentLang].c_sun;
+            const colorsLight = ["#f1f5f9","#cbd5e1","#173162","#5a3869","#f58b3f","#9f3d5f"];
+            const colorsDark = ["#1e293b","#334155","#60a5fa","#a78bfa","#fbbf24","#f472b6"];
+            
+            const data = [{
+                type: "sunburst",
+                labels: l,
+                parents: ["", l[0], l[0], l[2], l[2], l[4]],
+                values:  [100, 94, 6, 3, 3, 3],
+                leaf: {opacity: 0.9},
+                marker: { line: {width: 2, color: isDark?'#000':'#fff'}, colors: isDark ? colorsDark : colorsLight },
+                branchvalues: 'total', insidetextorientation: 'radial'
+            }];
+            const layout = { margin: {l:0, r:0, b:0, t:0}, font: {family: "Poppins", color: isDark?'#fff':'#1d1d1f'}, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: 'rgba(0,0,0,0)' };
+            Plotly.react('plotlySunburst', data, layout, {displayModeBar: false});
+        }
+
+        function updateCharts() {
+            if(!chartInstances.market) return;
+            const t = translations[currentLang];
+            const color = isDark ? '#FFF' : '#1D1D1F';
+            const grid = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+            const primary = isDark ? '#60a5fa' : '#173162';
+
+            chartInstances.market.data.datasets[0].label = t.c_mkt;
+            chartInstances.market.data.datasets[0].borderColor = primary;
+            chartInstances.maturity.data.labels = [t.c_mat1, t.c_mat2];
+            chartInstances.proj.data.datasets[0].label = t.c_proj1;
+            chartInstances.proj.data.datasets[1].label = t.c_proj2;
+            if (chartInstances.cap) {
+                chartInstances.cap.data.labels = [t.c_cap1, t.c_cap2, t.c_cap3, t.c_cap4];
+                chartInstances.cap.data.datasets[0].data = [35,35,20,10];
+            }
+
+            Object.values(chartInstances).forEach(c => {
+                if(c.options.scales?.x) c.options.scales.x.grid.color = 'transparent';
+                if(c.options.scales?.y) c.options.scales.y.grid.color = grid;
+                if(c.options.plugins?.legend) c.options.plugins.legend.labels.color = color;
+                c.update();
+            });
+            renderSunburst();
+        }
+
+        async function loadSurveyStats() {
+            if (surveyLoaded) return;
+            const totalEl = document.getElementById('stat-total-resp');
+            const interestEl = document.getElementById('stat-interest');
+            const pilotEl = document.getElementById('stat-pilot');
+            const chainsEl = document.getElementById('stat-chains');
+            if (!totalEl || !interestEl || !pilotEl || !chainsEl) return;
+
+            const setFallback = () => {
+                totalEl.innerText = '--';
+                interestEl.innerText = '--%';
+                pilotEl.innerText = '--%';
+                chainsEl.innerText = '--';
+            };
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append('action', 'getSurveyStats');
+                const response = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+                });
+                if (!response.ok) throw new Error(`Erro ao ler survey (${response.status})`);
+                const result = await response.json();
+                if (result.success && result.stats) {
+                    const s = result.stats;
+                    totalEl.innerText = s.totalResponses ?? '--';
+                    interestEl.innerText = (s.interestPct ?? 0) + '%';
+                    pilotEl.innerText = (s.pilotPct ?? 0) + '%';
+                    chainsEl.innerText = s.hotelChains ?? '--';
+                    surveyLoaded = true;
+                } else {
+                    setFallback();
+                }
+            } catch (err) {
+                console.error('Erro ao carregar survey:', err);
+                setFallback();
+            }
+        }
+
+        window.onload = function() {
+            lucide.createIcons();
+            const userLang = navigator.language || navigator.userLanguage; 
+            const langCode = userLang.split('-')[0];
+            initCharts();
+            if(translations[langCode]) setLanguage(langCode); else setLanguage('en');
+            
+            // Add listener here to be sure it exists
+            document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
+            
+            // Observe sections for active nav
+            document.querySelectorAll('header, section').forEach(section => {
+                observer.observe(section);
+            });
+        };
+    </script>
+
+    <script>
+        // ===== CONFIGURAÇÃO =====
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0HMFJlU0mb23L-_wOmvVhJlCIVIE0MpqwMTm896bRumdfztwZdU6UUlzj2N-d19uZ2A/exec';
+
+        // ===== DADOS DO USUÁRIO ATUAL =====
+        let currentUser = {
+        nome: '',
+        senha: '',
+        ip: '',
+        userAgent: navigator.userAgent,
+        loginTime: null
+        };
+
+        // ===== PROTEÇÕES DE SEGURANÇA =====
+
+        // 1. Bloquear cópia de texto em toda a página
+        document.addEventListener('copy', handleSecurityViolation);
+        document.addEventListener('cut', handleSecurityViolation);
+        document.addEventListener('contextmenu', handleSecurityViolation); // Botão direito
+
+        // 2. Bloquear seleção de texto
+        document.addEventListener('selectstart', function(e) {
+        const gate = document.getElementById('access-gate');
+        const gateVisible = gate ? gate.style.display !== 'none' : false;
+        
+        // Permite seleção enquanto o gate está aberto (formulário)
+        if (gateVisible) {
+            return;
+        }
+
+        // Quando o gate já foi removido, não há elemento para consultar
+        if (!gate) {
+            return;
+        }
+
+        e.preventDefault();
+        return false;
+        });
+
+        // 3. Bloquear teclas de atalho perigosas
+        document.addEventListener('keydown', function(e) {
+        // Bloquear Ctrl+C, Ctrl+X, Ctrl+A, Ctrl+S, Ctrl+P, F12, Ctrl+Shift+I
+        if (
+            (e.ctrlKey && (e.keyCode === 67 || e.keyCode === 88 || e.keyCode === 65 || e.keyCode === 83 || e.keyCode === 80)) ||
+            e.keyCode === 123 || // F12
+            (e.ctrlKey && e.shiftKey && e.keyCode === 73) || // Ctrl+Shift+I
+            (e.ctrlKey && e.shiftKey && e.keyCode === 74) || // Ctrl+Shift+J
+            (e.ctrlKey && e.keyCode === 85) // Ctrl+U (view source)
+        ) {
+            e.preventDefault();
+            handleSecurityViolation(e);
+            return false;
+        }
+        });
+
+        // 4. Bloquear drag and drop
+        document.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        return false;
+        });
+
+        // 5. Detectar quando usuário sai da janela (possível screenshot)
+        let windowBlurCount = 0;
+        window.addEventListener('blur', function() {
+        if (!currentUser.loginTime) return; // Não está logado
+        
+        windowBlurCount++;
+        if (windowBlurCount > 3) { // Após 3 saídas, registra suspeita
+            logSuspiciousActivity('Múltiplas saídas da janela detectadas (possível captura de tela)');
+        }
+        });
+
+        // 6. Desabilitar ferramentas de desenvolvedor (log removido para evitar spam no console)
+        setInterval(function() {
+        const devtools = /./;
+        devtools.toString = function() {
+            handleSecurityViolation({ type: 'devtools' });
+        };
+        }, 1000);
+
+        // 7. Adicionar watermark dinâmico
+        function createWatermark() {
+        const watermark = document.createElement('div');
+        watermark.id = 'security-watermark';
+        watermark.style.cssText = `
+            position: fixed;
+            top: 76px;
+            right: 16px;
+            font-size: 22px;
+            color: rgba(23, 49, 98, 0.25);
+            pointer-events: none;
+            z-index: 9998;
+            user-select: none;
+            font-weight: 600;
+            white-space: nowrap;
+            transform: translateY(0);
+        `;
+        watermark.textContent = `${currentUser.nome} - ${new Date().toLocaleDateString()}`;
+        document.body.appendChild(watermark);
+        }
+
+        // ===== FUNÇÕES DE SEGURANÇA =====
+
+        function handleSecurityViolation(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        if (!currentUser.loginTime) return; // Não está logado
+        
+        const reason = e.type === 'devtools' ? 
+            'Tentativa de abrir ferramentas de desenvolvedor' :
+            e.type === 'copy' || e.type === 'cut' ?
+            'Tentativa de copiar conteúdo' :
+            'Tentativa de ação não autorizada';
+        
+        // Bloqueia imediatamente
+        blockUserAccess(reason);
+        
+        // Envia notificação
+        sendSecurityAlert(reason);
+        
+        return false;
+        }
+
+        function blockUserAccess(reason) {
+        // Bloqueia visualmente
+        document.getElementById('main-content').classList.add('locked');
+        document.getElementById('main-content').style.display = 'none';
+        
+        // Mostra mensagem de bloqueio
+        const blockMessage = document.createElement('div');
+        blockMessage.style.cssText = `
+            position: fixed;
+            inset: 0;
+            background: rgba(239, 68, 68, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 99999;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+        `;
+        blockMessage.innerHTML = `
+            <div style="text-align: center; max-width: 600px; padding: 40px;">
+            <i data-lucide="shield-off" style="width: 80px; height: 80px; margin-bottom: 20px;"></i>
+            <h1 style="font-size: 32px; margin-bottom: 20px;">Acesso Bloqueado</h1>
+            <p style="font-size: 18px; margin-bottom: 20px;">
+                Motivo: ${reason}
+            </p>
+            <p style="font-size: 14px; opacity: 0.9;">
+                Uma notificação foi enviada ao administrador.<br>
+                Data/Hora: ${new Date().toLocaleString('pt-BR')}<br>
+                Usuário: ${currentUser.nome}
+            </p>
+            </div>
+        `;
+        document.body.appendChild(blockMessage);
+        lucide.createIcons();
+        
+        // Registra no Google Sheets
+        logBlockedUser(reason);
+        }
+
+        async function sendSecurityAlert(reason) {
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'blockUser',
+                nome: currentUser.nome,
+                senha: currentUser.senha,
+                ip: currentUser.ip,
+                userAgent: currentUser.userAgent,
+                reason: reason
+            })
+            });
+        } catch (error) {
+            console.error('Erro ao enviar alerta:', error);
+        }
+        }
+
+        async function logBlockedUser(reason) {
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'logAccess',
+                nome: currentUser.nome,
+                senha: currentUser.senha,
+                ip: currentUser.ip,
+                userAgent: currentUser.userAgent,
+                status: 'Bloqueado - ' + reason
+            })
+            });
+        } catch (error) {
+            console.error('Erro ao registrar bloqueio:', error);
+        }
+        }
+
+        async function logSuspiciousActivity(activity) {
+        try {
+            await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'logAccess',
+                nome: currentUser.nome,
+                senha: currentUser.senha,
+                ip: currentUser.ip,
+                userAgent: currentUser.userAgent,
+                status: 'Suspeito - ' + activity
+            })
+            });
+        } catch (error) {
+            console.error('Erro ao registrar atividade suspeita:', error);
+        }
+        }
+
+        // ===== MODIFICAR FUNÇÃO DE LOGIN EXISTENTE =====
+
+        // Substitua a função de submit do formulário existente por esta:
+        document.getElementById('gate-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const passInput = document.getElementById('investor-pass');
+        const btn = document.getElementById('unlock-btn');
+        const errorDiv = document.getElementById('gate-error');
+        
+        const originalBtnText = btn.innerText;
+        btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i>';
+        btn.disabled = true;
+        errorDiv.classList.add('hidden');
+        lucide.createIcons();
+
+        // Exige concordância com os termos
+        const termsCheck = document.getElementById('terms-check');
+        if (!termsCheck.checked) {
+            btn.innerText = originalBtnText;
+            btn.disabled = false;
+            errorDiv.innerText = 'Você precisa concordar com os Termos.';
+            errorDiv.classList.remove('hidden');
+            return;
+        }
+        
+        try {
+            // Obter IP (aproximado)
+            const ipResponse = await fetch('https://api.ipify.org?format=json');
+            const ipData = await ipResponse.json();
+            currentUser.ip = ipData.ip;
+        } catch (e) {
+            currentUser.ip = 'N/A';
+        }
+        
+        // Validar senha no Google Sheets
+        try {
+            const formData = new URLSearchParams();
+            formData.append('action', 'validatePassword');
+            formData.append('password', passInput.value);
+
+            const response = await fetch(APPS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData
+            });
+            
+            if (!response.ok) {
+            throw new Error(`Falha na validação (${response.status})`);
+            }
+            
+            let result;
+            try {
+            result = await response.json();
+            } catch (parseError) {
+            throw new Error('Resposta inválida do servidor de validação.');
+            }
+            
+            const hasUser = result && result.userData && result.userData.nome;
+            
+            if (result.success && hasUser) {
+            // Login bem-sucedido
+            currentUser.nome = result.userData.nome;
+            currentUser.senha = passInput.value;
+            currentUser.loginTime = new Date();
+            
+            // Registrar login
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                action: 'logAccess',
+                nome: currentUser.nome,
+                senha: currentUser.senha,
+                ip: currentUser.ip,
+                userAgent: currentUser.userAgent,
+                status: 'Liberado'
+                })
+            });
+            
+            // Liberar acesso
+            setTimeout(() => {
+                document.getElementById('access-gate').style.opacity = '0';
+                setTimeout(() => {
+                document.getElementById('access-gate').remove();
+                document.getElementById('main-content').classList.remove('locked');
+                createWatermark();
+                loadSurveyStats();
+                if (window.Plotly) window.dispatchEvent(new Event('resize'));
+                }, 500);
+            }, 800);
+            
+            } else {
+            // Senha incorreta
+            btn.innerText = originalBtnText;
+            btn.disabled = false;
+            errorDiv.innerText = result.message || 'Senha incorreta';
+            errorDiv.classList.remove('hidden');
+            passInput.value = '';
+            passInput.focus();
+            }
+            
+        } catch (error) {
+            console.error('Erro:', error);
+            btn.innerText = originalBtnText;
+            btn.disabled = false;
+            errorDiv.innerText = error?.message || 'Erro ao validar senha. Tente novamente.';
+            errorDiv.classList.remove('hidden');
+        }
+        });
+
+        // 8. Adicionar CSS para proteção visual
+        const style = document.createElement('style');
+        style.textContent = `
+        * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        
+        #investor-pass {
+            -webkit-user-select: text !important;
+            -moz-user-select: text !important;
+            -ms-user-select: text !important;
+            user-select: text !important;
+        }
+        `;
+        document.head.appendChild(style);
+    </script>
+
+</body>
+</html>

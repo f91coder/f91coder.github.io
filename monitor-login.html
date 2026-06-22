@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS · Sistema de Monitoramento</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  /* ── Design Tokens ── */
+  :root {
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-mono:    'Space Mono', monospace;
+
+    --text-xs:   clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+    --text-sm:   clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+    --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+    --text-lg:   clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+    --text-xl:   clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    --radius-full: 9999px;
+
+    --transition: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    --transition-slow: 400ms cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Dark palette – tech cyan */
+    --color-bg:            #080c10;
+    --color-surface:       rgba(10, 18, 26, 0.72);
+    --color-surface-2:     rgba(14, 24, 36, 0.85);
+    --color-border:        rgba(0, 210, 220, 0.15);
+    --color-border-focus:  rgba(0, 210, 220, 0.65);
+    --color-text:          #e8eef4;
+    --color-text-muted:    rgba(200, 218, 232, 0.55);
+    --color-text-faint:    rgba(160, 185, 205, 0.30);
+    --color-primary:       #00d2dc;
+    --color-primary-dim:   rgba(0, 210, 220, 0.12);
+    --color-primary-glow:  rgba(0, 210, 220, 0.35);
+    --color-error:         #ff5e7a;
+    --color-error-dim:     rgba(255, 94, 122, 0.12);
+    --color-success:       #00e5a0;
+    --color-success-dim:   rgba(0, 229, 160, 0.12);
+
+    --shadow-card: 0 0 0 1px rgba(0,210,220,0.08),
+                   0 24px 64px rgba(0,0,0,0.6),
+                   0 4px 16px rgba(0,0,0,0.4);
+    --shadow-input: 0 0 0 1px var(--color-border);
+    --shadow-input-focus: 0 0 0 1px var(--color-border-focus),
+                          0 0 20px rgba(0, 210, 220, 0.2);
+    --shadow-btn:  0 0 24px rgba(0, 210, 220, 0.3);
+  }
+
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  body {
+    min-height: 100dvh;
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    background: var(--color-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  input, button { font: inherit; color: inherit; }
+  button { cursor: pointer; background: none; border: none; }
+
+  /* ── Background ── */
+  .bg-image {
+    position: fixed;
+    inset: 0;
+    background: url('img/background_1.png') center/cover no-repeat;
+    filter: brightness(0.22) saturate(1.3);
+    transform: scale(1.05);
+    z-index: 0;
+  }
+
+  /* Vignette + scanline overlay */
+  .bg-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background:
+      radial-gradient(ellipse 80% 80% at 50% 50%, transparent 30%, rgba(0,0,0,0.7) 100%),
+      linear-gradient(180deg, rgba(0,8,20,0.4) 0%, transparent 40%, rgba(0,8,20,0.5) 100%);
+  }
+
+  /* Animated grid lines */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background-image:
+      linear-gradient(rgba(0,210,220,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,210,220,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 100%);
+    animation: grid-drift 20s linear infinite;
+  }
+  @keyframes grid-drift {
+    0%   { background-position: 0 0; }
+    100% { background-position: 0 60px; }
+  }
+
+  /* Floating cyan orbs */
+  .orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: 1;
+    pointer-events: none;
+    animation: orb-pulse 8s ease-in-out infinite alternate;
+  }
+  .orb-1 {
+    width: 400px; height: 400px;
+    top: -100px; left: -100px;
+    background: radial-gradient(circle, rgba(0,210,220,0.07) 0%, transparent 70%);
+    animation-delay: 0s;
+  }
+  .orb-2 {
+    width: 500px; height: 500px;
+    bottom: -150px; right: -100px;
+    background: radial-gradient(circle, rgba(0,180,255,0.06) 0%, transparent 70%);
+    animation-delay: -4s;
+  }
+  @keyframes orb-pulse {
+    0%   { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.15); }
+  }
+
+  /* ── Main Layout ── */
+  .login-wrapper {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 420px;
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-8);
+    animation: fade-in-up 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes fade-in-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Brand Mark ── */
+  .brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    animation: fade-in-up 0.7s 0.1s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .brand-logo {
+    width: 52px;
+    height: 52px;
+    position: relative;
+  }
+
+  .brand-name {
+    font-family: var(--font-mono);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    letter-spacing: 0.25em;
+    color: var(--color-text);
+    text-transform: uppercase;
+  }
+
+  .brand-tagline {
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.18em;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    margin-top: calc(-1 * var(--space-2));
+  }
+
+  /* ── Card ── */
+  .login-card {
+    width: 100%;
+    background: var(--color-surface);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-card);
+    padding: var(--space-10) var(--space-8);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    animation: fade-in-up 0.7s 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Subtle top edge glow */
+  .login-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 20%; right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--color-primary-glow), transparent);
+    border-radius: var(--radius-full);
+  }
+
+  /* Inner shimmer */
+  .login-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(0,210,220,0.04), transparent 70%);
+    pointer-events: none;
+  }
+
+  /* ── Card Header ── */
+  .card-header { text-align: left; }
+
+  .card-eyebrow {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    font-weight: 400;
+    letter-spacing: 0.2em;
+    color: var(--color-primary);
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .status-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    box-shadow: 0 0 8px var(--color-primary-glow);
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .card-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-text);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .card-subtitle {
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+    margin-top: var(--space-2);
+    font-weight: 400;
+    line-height: 1.5;
+  }
+
+  /* ── Form ── */
+  .form { display: flex; flex-direction: column; gap: var(--space-6); }
+
+  .input-group { display: flex; flex-direction: column; gap: var(--space-2); }
+
+  .input-label {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    font-weight: 400;
+  }
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .access-input {
+    width: 100%;
+    height: 52px;
+    background: rgba(0, 16, 30, 0.5);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: 0 52px 0 var(--space-5);
+    font-family: var(--font-mono);
+    font-size: var(--text-base);
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    color: var(--color-text);
+    outline: none;
+    transition:
+      border-color var(--transition),
+      box-shadow var(--transition),
+      background var(--transition);
+    caret-color: var(--color-primary);
+  }
+
+  .access-input::placeholder {
+    font-family: var(--font-mono);
+    letter-spacing: 0.12em;
+    color: var(--color-text-faint);
+    font-size: var(--text-sm);
+  }
+
+  .access-input:hover {
+    border-color: rgba(0, 210, 220, 0.3);
+    background: rgba(0, 20, 36, 0.6);
+  }
+
+  .access-input:focus {
+    box-shadow: var(--shadow-input-focus);
+    border-color: var(--color-border-focus);
+    background: rgba(0, 24, 40, 0.7);
+  }
+
+  /* Error state */
+  .access-input.error {
+    border-color: var(--color-error);
+    box-shadow: 0 0 0 1px var(--color-error), 0 0 16px rgba(255, 94, 122, 0.15);
+  }
+
+  /* Toggle button */
+  .toggle-btn {
+    position: absolute;
+    right: var(--space-3);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 32px; height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-text-faint);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition), background var(--transition);
+    flex-shrink: 0;
+  }
+  .toggle-btn:hover {
+    color: var(--color-primary);
+    background: var(--color-primary-dim);
+  }
+  .toggle-btn:active { transform: translateY(-50%) scale(0.9); }
+  .toggle-btn svg { pointer-events: none; }
+
+  /* Input hint */
+  .input-hint {
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-top: calc(-1 * var(--space-1));
+    min-height: 1.2em;
+    transition: color var(--transition);
+  }
+  .input-hint.error-msg { color: var(--color-error); }
+
+  /* ── Submit Button ── */
+  .btn-submit {
+    width: 100%;
+    height: 52px;
+    background: var(--color-primary);
+    color: #040d12;
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    border: none;
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+  }
+
+  .btn-submit::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .btn-submit:hover {
+    background: #00edf8;
+    box-shadow: var(--shadow-btn);
+    transform: translateY(-1px);
+  }
+  .btn-submit:active { transform: translateY(0) scale(0.98); }
+
+  .btn-submit.loading {
+    pointer-events: none;
+    color: transparent;
+  }
+  .btn-submit.loading::after {
+    content: '';
+    position: absolute;
+    width: 20px; height: 20px;
+    border: 2px solid rgba(4,13,18,0.3);
+    border-top-color: #040d12;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .btn-submit.success {
+    background: var(--color-success);
+    box-shadow: 0 0 24px rgba(0, 229, 160, 0.4);
+    transform: none;
+  }
+
+  /* ── Footer ── */
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: var(--space-2);
+    border-top: 1px solid rgba(0, 210, 220, 0.07);
+  }
+
+  .footer-badge {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .secure-icon {
+    color: var(--color-primary);
+    opacity: 0.7;
+  }
+
+  .version-badge {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    letter-spacing: 0.08em;
+    background: rgba(0, 210, 220, 0.06);
+    border: 1px solid rgba(0, 210, 220, 0.1);
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+  }
+
+  /* ── Bottom Tagline ── */
+  .bottom-info {
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    color: var(--color-text-faint);
+    letter-spacing: 0.12em;
+    text-align: center;
+    animation: fade-in-up 0.7s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* ── Accessibility ── */
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+    border-radius: var(--radius-sm);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* ── Mobile ── */
+  @media (max-width: 480px) {
+    .login-card { padding: var(--space-8) var(--space-5); }
+  }
+
+  /* ── Success overlay ── */
+  .success-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.92);
+    backdrop-filter: blur(8px);
+    border-radius: var(--radius-2xl);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .success-overlay.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .success-check {
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--color-success-dim);
+    border: 1px solid var(--color-success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-success);
+    box-shadow: 0 0 30px rgba(0, 229, 160, 0.3);
+    animation: scale-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+  @keyframes scale-in {
+    from { transform: scale(0.5); opacity: 0; }
+    to   { transform: scale(1);   opacity: 1; }
+  }
+  .success-text {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--color-success);
+  }
+  .success-sub {
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+    letter-spacing: 0.08em;
+  }
+</style>
+</head>
+<body>
+
+<!-- Background layers -->
+<div class="bg-image" aria-hidden="true"></div>
+<div class="bg-overlay" aria-hidden="true"></div>
+<div class="bg-grid" aria-hidden="true"></div>
+<div class="orb orb-1" aria-hidden="true"></div>
+<div class="orb orb-2" aria-hidden="true"></div>
+
+<a href="#main-content" class="sr-only">Pular para o conteúdo</a>
+
+<main id="main-content" class="login-wrapper" role="main">
+
+  <!-- Brand -->
+  <div class="brand" aria-label="NEXUS Monitor">
+    <!-- SVG Logo -->
+    <svg class="brand-logo" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="26" cy="26" r="22" stroke="rgba(0,210,220,0.18)" stroke-width="1.5"/>
+      <circle cx="26" cy="26" r="14" stroke="rgba(0,210,220,0.35)" stroke-width="1"/>
+      <!-- Crosshair lines -->
+      <line x1="26" y1="4" x2="26" y2="12" stroke="#00d2dc" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="26" y1="40" x2="26" y2="48" stroke="#00d2dc" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="4" y1="26" x2="12" y2="26" stroke="#00d2dc" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="40" y1="26" x2="48" y2="26" stroke="#00d2dc" stroke-width="1.5" stroke-linecap="round"/>
+      <!-- Corner ticks -->
+      <path d="M14 8 L8 8 L8 14" stroke="#00d2dc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M38 8 L44 8 L44 14" stroke="#00d2dc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M14 44 L8 44 L8 38" stroke="#00d2dc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M38 44 L44 44 L44 38" stroke="#00d2dc" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Center dot -->
+      <circle cx="26" cy="26" r="3" fill="#00d2dc" opacity="0.9"/>
+      <circle cx="26" cy="26" r="6" stroke="#00d2dc" stroke-width="1" opacity="0.4"/>
+    </svg>
+    <span class="brand-name">NEXUS</span>
+    <span class="brand-tagline">Monitoring System</span>
+  </div>
+
+  <!-- Login Card -->
+  <div class="login-card" role="region" aria-label="Área de autenticação">
+
+    <!-- Card header -->
+    <div class="card-header">
+      <p class="card-eyebrow">
+        <span class="status-dot" aria-hidden="true"></span>
+        Sistema Online
+      </p>
+      <h1 class="card-title">Acesso Seguro</h1>
+      <p class="card-subtitle">Insira seu código de acesso para acessar o painel de monitoramento.</p>
+    </div>
+
+    <!-- Form -->
+    <form class="form" id="loginForm" novalidate autocomplete="off">
+      <div class="input-group">
+        <label class="input-label" for="accessCode">Código de Acesso</label>
+        <div class="input-wrapper">
+          <input
+            class="access-input"
+            type="password"
+            id="accessCode"
+            name="accessCode"
+            placeholder="••••  ••••  ••••"
+            autocomplete="current-password"
+            spellcheck="false"
+            aria-describedby="accessHint"
+            required
+          >
+          <button
+            type="button"
+            class="toggle-btn"
+            id="toggleBtn"
+            aria-label="Mostrar código de acesso"
+            aria-pressed="false"
+          >
+            <!-- Eye icon (show) -->
+            <svg id="iconEye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <!-- Eye-off icon (hide) — hidden initially -->
+            <svg id="iconEyeOff" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+              <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+              <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+          </button>
+        </div>
+        <p class="input-hint" id="accessHint" role="status" aria-live="polite"></p>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" id="btnIcon">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <span id="btnText">Acessar Sistema</span>
+      </button>
+    </form>
+
+    <!-- Card footer -->
+    <div class="card-footer">
+      <span class="footer-badge">
+        <svg class="secure-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+        Conexão Criptografada
+      </span>
+      <span class="version-badge">v4.2.1</span>
+    </div>
+
+    <!-- Success overlay -->
+    <div class="success-overlay" id="successOverlay" aria-live="assertive" aria-hidden="true">
+      <div class="success-check" aria-hidden="true">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <p class="success-text">Acesso Autorizado</p>
+      <p class="success-sub">Redirecionando para o painel...</p>
+    </div>
+
+  </div>
+
+  <!-- Bottom info -->
+  <p class="bottom-info">NEXUS MONITOR · ACESSO RESTRITO</p>
+
+</main>
+
+<script>
+  (function () {
+    const form      = document.getElementById('loginForm');
+    const input     = document.getElementById('accessCode');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const iconEye   = document.getElementById('iconEye');
+    const iconEyeOff= document.getElementById('iconEyeOff');
+    const hint      = document.getElementById('accessHint');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText   = document.getElementById('submitBtn').querySelector('#btnText');
+    const successOv = document.getElementById('successOverlay');
+
+    let isVisible = false;
+
+    // Demo valid code
+    const VALID_CODE = 'NEXUS-2024';
+
+    /* ── Toggle visibility ── */
+    toggleBtn.addEventListener('click', function () {
+      isVisible = !isVisible;
+      input.type = isVisible ? 'text' : 'password';
+      iconEye.style.display    = isVisible ? 'none'  : '';
+      iconEyeOff.style.display = isVisible ? ''      : 'none';
+      toggleBtn.setAttribute('aria-label', isVisible ? 'Ocultar código de acesso' : 'Mostrar código de acesso');
+      toggleBtn.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+    });
+
+    /* ── Clear error on input ── */
+    input.addEventListener('input', function () {
+      input.classList.remove('error');
+      hint.textContent = '';
+      hint.classList.remove('error-msg');
+    });
+
+    /* ── Format input: insert spaces every 4 chars when visible ── */
+    input.addEventListener('keydown', function (e) {
+      // Allow natural typing; no forced format in password mode
+    });
+
+    /* ── Submit ── */
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const value = input.value.trim();
+
+      if (!value) {
+        shakeError('O código de acesso não pode estar vazio.');
+        return;
+      }
+      if (value.length < 4) {
+        shakeError('Código inválido. Tente novamente.');
+        return;
+      }
+
+      // Show loading
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      // Simulate async check
+      setTimeout(function () {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+
+        if (value === VALID_CODE || value.length >= 4) {
+          // Success flow
+          submitBtn.classList.add('success');
+          successOv.classList.add('visible');
+          successOv.setAttribute('aria-hidden', 'false');
+          // Simulate redirect after 2.5s
+          setTimeout(function () {
+            // In real app: window.location.href = '/dashboard';
+            successOv.classList.remove('visible');
+            submitBtn.classList.remove('success');
+            input.value = '';
+            hint.textContent = '✓ Demonstração concluída. Redirecionamento real aqui.';
+            hint.style.color = 'var(--color-success)';
+            hint.classList.remove('error-msg');
+          }, 2500);
+        } else {
+          shakeError('Código de acesso incorreto.');
+        }
+      }, 1400);
+    });
+
+    function shakeError(message) {
+      input.classList.add('error');
+      hint.textContent = message;
+      hint.classList.add('error-msg');
+
+      // Shake animation
+      input.style.animation = 'none';
+      input.offsetHeight; // reflow
+      input.style.animation = 'shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97)';
+    }
+
+    /* Inject shake keyframes */
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        20%       { transform: translateX(-6px); }
+        40%       { transform: translateX(6px); }
+        60%       { transform: translateX(-4px); }
+        80%       { transform: translateX(4px); }
+      }
+    `;
+    document.head.appendChild(style);
+  })();
+</script>
+</body>
+</html>

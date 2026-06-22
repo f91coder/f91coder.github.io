@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <link rel="stylesheet" href="css/responsive.css" media="screen">
+
+
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <link rel="icon" type="image/x-icon" href="img/favicon.png">
+
+    
+
+
+
+    <!--Google fonts-->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css?family=Poppins: ital, wght@0,100; 0,200; 0,300; 0,400; 0,500; 0,600; 0,700;0,800;0,900;1,100;1,200; 1,300; 1,400;1,500; 1,600;1,700;1,800; 1,900&display=swap" rel="stylesheet">
+
+    <!--/Google fonts-->
+
+
+
+    <!--Bootstrap icons-->
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!--/Bootstrap icons-->
+
+
+
+    <!--Scripts-->
+
+    <script src="js/i18n.js" defer></script>
+    <script src="js/script.js" defer></script>
+
+    <script src="js/btn-menu-mob.js" defer></script>
+
+    <!--/Scripts-->
+
+
+
+    <title data-i18n="form.title">F91 - Soluções Operacionais | Formulário</title>
+
+
+
+    <!-- Style of the page -->
+
+    <style>
+
+        body {
+
+            font-family: 'Poppins', sans-serif;
+
+            background-color: #001a3b;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            height: 100vh;
+
+            margin: 0;
+
+        }
+
+        .container {
+
+            background: transparent;
+
+            padding: 20px 30px;
+
+            border-radius: 25px;
+
+            border: 1.5px solid #c0d000;
+
+            box-shadow: 0 0 50px #000f26;
+
+            max-width: 450px;
+
+            width: 100%;
+
+            justify-content: center;  
+
+            align-content: center;
+
+            text-align: center;
+
+        }
+
+        /* Responsive container */
+
+        @media screen and (max-width: 900px){
+
+            .container {
+
+                box-shadow: none;
+
+                border: none; 
+
+            }
+
+        }
+
+
+
+
+
+        .form-step {
+
+            display: none;
+
+        }
+
+        .form-step.active {
+
+            display: block;
+
+        }
+
+        .form-step h2 {
+
+            text-align: center;
+
+            margin-bottom: 20px;
+
+            color: #fff;
+
+        }
+
+        .form-group {
+
+            margin-bottom: 20px;
+
+        }
+
+        .form-group label {
+
+            display: block;
+
+            margin-bottom: 8px;
+
+            color: #ffffff;
+
+        }
+
+        .form-group input,
+
+        .form-group select {
+
+            width: 100%;
+
+            padding: 10px;
+
+            border: 1px solid #ddd;
+
+            background-color: transparent;
+
+            color: #fff;
+
+            border-radius: 25px;
+
+            font-size: 18px;
+
+            margin-bottom: 10px;
+
+        }
+
+        
+
+        .btn {
+
+            display: inline;
+
+            width: 48%;
+
+            padding: 10px;
+
+            background: transparent;
+
+            color: #c0d000;
+
+            border: #c0d000 solid 1px;
+
+            border-radius: 12px;
+
+            font-size: 20px;
+
+            font-weight: 400;
+
+            cursor: pointer;
+
+            margin-top: -3px;
+
+        }
+
+        .btn:hover {
+
+            background: #a8b800;
+
+            box-shadow: 0 0 10px #c0d000;
+
+            font-size: 20px;
+
+            font-weight: 600;
+
+            color: #fff;
+
+        }
+
+        .btn:disabled {
+
+            background: #ddd;
+
+            cursor: not-allowed;
+
+        }
+
+        .progress-bar {
+
+            height: 5px;
+
+            background: #c0d000;
+
+            border-radius: 5px;
+
+            margin-bottom: 20px;
+
+            width: 0;
+
+        }
+
+        #free-trial button{
+
+            width: 180px;
+
+            height: 30px;
+
+            margin-right: 25px;
+
+            margin-bottom: 2px;
+
+            font-size: 18px;
+
+            background-color: transparent;
+
+            border: 1px solid #ffffff;
+
+            border-radius: 25px;
+
+            color: #fff;
+
+            cursor: pointer;
+
+            transition: .5s;
+
+        }
+
+        #free-trial button:hover{
+
+            background-color: #c0d000;
+
+            border: none;
+
+        }
+
+
+
+        #rodappe{
+
+            text-align: center;
+
+            padding: 10px;
+
+            background-color: transparent;
+
+            color: #acacac;
+
+            font-size: 14px;
+
+            position:fixed;
+
+            bottom: 0;
+
+            width: 100%;
+
+        }
+
+        #gender{
+
+            background-color: #001840;
+
+            cursor: pointer;
+
+            transition: .2s;
+
+        }
+
+        .help-textarea{
+            background-color: transparent;
+
+            width: 100%;
+
+            height: 50px;
+
+            font-size: 20px;
+
+            font-weight: 350;
+
+            border-radius: 15px;
+
+            padding: 10px;
+
+            color: #fff;
+
+            border: 1px solid #002050;
+
+        }
+
+        #source{
+
+            background-color: #001840;
+
+            color: #c0d000;
+
+        }
+
+
+
+        /* btn Enviar */
+
+        .btn-next{
+
+            display: inline;
+
+            width: 48%;
+
+            padding: 10px;
+
+            background: #c0d000;
+
+            color: #fff;
+
+            border: #c0d000 solid 1px;
+
+            border-radius: 12px;
+
+            font-size: 20px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            margin-top: -3px;
+
+            transition: .3s;
+
+        }
+
+        .btn-next:hover{
+
+            transform: scale(1.1);
+
+        }
+
+        #formMessage{
+
+            margin-top: 10px;
+
+        }
+
+
+
+    </style>
+
+    <!-- /Style of the page -->
+
+</head>
+
+<body style="background-color: #001840; font-family: Arial, sans-serif; margin: 0; padding: 0;">
+
+
+
+    <header id="header">
+
+
+
+        <div class="interface">
+
+
+
+            <section class="logo">
+
+                <a href="index.html"><img class="logo-white" src="img/logo.png" alt="F91"></a>
+
+                <a href="index.html"><img class="logo-color" src="img/logo.png" alt="F91"></a>
+
+            </section> 
+
+
+
+            <section class="menu-desktop">
+
+                <nav>
+
+                    <ul><li><a href="index.html#about" data-i18n="global.nav.about">Quem sou eu</a></li>
+
+                        <li><a href="index.html#what" data-i18n="global.nav.what">O que faço</a></li>
+
+                        <li><a href="index.html#how" data-i18n="global.nav.how">Como faço</a></li>
+                        <li><a href="index.html#contact" data-i18n="global.nav.contact">Fala comigo!</a></li>
+
+                        <li><a href="blog.html" data-i18n="global.nav.blog">Blog</a></li>
+
+                        <!-- <li><a href="#blog">Blog</a></li> -->
+                        <li class="lang-switcher" aria-label="Seletor de idioma">
+                            <button type="button" class="lang-toggle" data-lang-toggle aria-haspopup="true" aria-expanded="false">
+                                <i class="bi bi-globe2"></i>
+                                <span class="lang-current" data-lang-current>PT</span>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <ul class="lang-dropdown" data-lang-menu role="menu">
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="pt" role="menuitem">Português</button></li>
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="en" role="menuitem">English</button></li>
+                                <li role="none"><button type="button" class="lang-option" data-lang-switch="es" role="menuitem">Español</button></li>
+                            </ul>
+                        </li>
+
+                    </ul>
+
+                </nav>
+
+            </section>
+
+
+
+            <section class="btn-contato">
+
+                <a href="form.html">
+
+                    <button data-i18n="global.cta.free_trial">Teste GRÁTIS!</button>
+
+                </a>
+
+            </section>
+
+
+
+            <div class="btn-menu-mob" id="btn-menu-mob">
+
+                <div class="line-menumob-1"></div>
+
+                <div class="line-menumob-2"></div>
+
+                <div class="line-menumob-3"></div>
+
+            </div>
+
+
+
+            <section class="menu-mobile" id="menu-mobile">
+
+                <nav>
+
+                    <ul><li><a href="index.html#about" data-i18n="global.nav.about">Quem sou eu</a></li>
+
+                        <li><a href="index.html#what" data-i18n="global.nav.what">O que faço</a></li>
+
+                        <li><a href="index.html#how" data-i18n="global.nav.how">Como faço</a></li>
+                        <li><a href="index.html#contact" data-i18n="global.nav.contact">Fala comigo!</a></li>
+
+                        <li><a href="blog.html" data-i18n="global.nav.blog">Blog</a></li>
+
+                        <!-- <li><a href="#blog">Blog</a></li> -->
+                        <li class="lang-switcher" aria-label="Seletor de idioma">
+                            <button type="button" class="lang-btn" data-lang-switch="pt" aria-label="Português" title="Português">PT</button>
+                            <button type="button" class="lang-btn" data-lang-switch="en" aria-label="English" title="English">EN</button>
+                            <button type="button" class="lang-btn" data-lang-switch="es" aria-label="Español" title="Español">ES</button>
+                        </li>
+
+                    </ul>
+
+                </nav>
+
+            </section>
+
+
+
+
+
+        </div>
+
+
+
+    </header>
+
+    
+
+<!-- Content -->
+
+<div class="container">
+
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <form id="customerForm" method="POST">
+
+        <div class="form-step active" data-step="1">
+
+            <h2 data-i18n="form.step.name.title">Qual é o seu nome?</h2>
+
+            <div class="form-group">
+
+                <input type="text" id="name" name="nome" placeholder="Nome completo" data-i18n="form.full_name" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="2">
+
+            <h2 data-i18n="form.step.email.title">Qual é o seu email?</h2>
+
+            <div class="form-group">
+
+                <input type="email" id="email" name="email" placeholder="E-mail" data-i18n="form.email" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="3">
+
+            <h2 data-i18n="form.step.phone.title">Qual é o seu telefone?</h2>
+
+            <div class="form-group">
+
+                <input type="tel" id="phone" name="phone" placeholder="Telefone" data-i18n="form.phone" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="4">
+
+            <h2 data-i18n="form.step.gender.title">Qual é o seu gênero?</h2>
+
+            <div class="form-group">
+
+                <select id="gender" name="gender" required>
+
+                    <option value="" data-i18n="global.form.select">Selecione</option>
+
+                    <option value="male" data-i18n="global.gender.male">Masculino</option>
+
+                    <option value="female" data-i18n="global.gender.female">Feminino</option>
+
+                    <option value="other" data-i18n="global.gender.other">Outro</option>
+
+                </select>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="5">
+
+            <h2 data-i18n="form.step.business.title">Qual é o nome do seu negócio?</h2>
+
+            <div class="form-group">
+
+                <input type="text" id="business_name" name="business_name" placeholder="Razão Social e nome fantasia" data-i18n="form.business_name" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="6">
+
+            <h2 data-i18n="form.step.cnpj.title">Qual o CNPJ?</h2>
+
+            <div class="form-group">
+
+                <input type="text" id="cnpj" name="cnpj" placeholder="Digite apenas números" data-i18n="global.form.only_numbers" data-i18n-attr="placeholder" required>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="7">
+
+            <h2 data-i18n="form.step.help.title">Como podemos te ajudar?</h2>
+
+            <div class="form-group">
+
+                <textarea id="help" class="help-textarea" name="help" rows="4" placeholder="Descreva sua necessidade" data-i18n="form.need_desc" data-i18n-attr="placeholder" required></textarea>
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="button" class="btn-next" onclick="nextStep()" data-i18n="global.form.next">Próximo ➟</button>
+
+        </div>
+
+        <div class="form-step" data-step="8">
+
+            <h2 data-i18n="form.step.source.title">Por fim, diga como nos conheceu...</h2>
+
+            <div class="form-group">
+
+                <select id="source" name="source" required>
+
+                    <option value="" data-i18n="global.form.select">Selecione</option>
+
+                    <option value="instagram" data-i18n="form.source.instagram">Instagram</option>
+
+                    <option value="linkedin" data-i18n="form.source.linkedin">Linkedin</option>
+
+                    <option value="indication" data-i18n="form.source.indication">Indicação</option>
+
+                    <option value="google" data-i18n="form.source.google">Pesquisa no Google</option>
+
+                    <option value="youtube" data-i18n="form.source.youtube">YouTube</option>
+
+                    <option value="other" data-i18n="form.source.other">Outro</option>
+
+                </select>
+
+            </div>
+
+            <button type="button" class="btn" onclick="prevStep()" data-i18n="global.form.prev">🠔 Anterior</button>
+
+            <button type="submit" class="btn-next" data-i18n="global.form.send">Enviar</button>
+
+        </div>
+
+    </form>
+
+    <div id="formMessage"></div>
+
+</div>
+
+<!-- /Content -->  
+
+
+
+<!--Footer 1-->
+
+<footer class="footer1" id="rodape">
+
+    &copy; <span id="anoAtual"></span> F91 - Soluções Operacionais.
+
+</footer>
+
+<!-- /Footer1 -->
+
+
+
+<!--Footer 2-->
+
+    <footer id="footer">
+
+        <div class="interface">
+
+            <section class="top-footer">
+
+
+
+                <a href="https://www.linkedin.com/company/yailup" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-linkedin"></i></button></a>
+
+                <a href="https://www.instagram.com/yailup/" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-instagram"></i></button></a>
+
+                <a href="https://www.youtube.com/channel/UCnPAEcSoKhVrN--XwGxcVJg" target="_blank" rel="noopener noreferrer"><button><i class="bi bi-youtube"></i></button></a>
+
+            </section>
+
+
+
+            <section class="middle-footer">
+
+                <h1 id="footer-text">&copy; <span id="anoAtualz"></span> F91 - Soluções Operacionais.</h1>
+
+                <h2>Filipe Oliveira MEI - CNPJ 40.664.197/0001-88</h2>
+
+
+
+                <p>
+
+                    <a href="terms.html" class="terms" data-i18n="global.footer.terms">Termos e Condições</a> <i class="bi bi-dot terms"></i>
+
+                    <a href="policy.html" class="terms" data-i18n="global.footer.policy">Política de Privacidade</a> <i class="bi bi-dot terms"></i>
+
+                    <a href="form_partner.html" class="terms" data-i18n="global.footer.partner">Seja um Parceiro</a>
+
+                </p>
+
+            </section>
+
+        </div>
+
+    </footer>
+
+<!--/Footer2-->
+
+
+
+
+
+<!-- Scripts -->
+
+<script>
+
+let currentStep = 1;
+
+const formSteps = document.querySelectorAll('.form-step');
+
+const progressBar = document.getElementById('progress-bar');
+
+
+
+function prevStep() {
+
+    const currentStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+
+    currentStepElement.classList.remove("active");
+
+    currentStep -= 1;
+
+    const prevStepElement = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+
+    prevStepElement.classList.add("active");
+
+}
+
+
+
+function nextStep() {
+
+    if (currentStep < formSteps.length) {
+
+        formSteps[currentStep - 1].classList.remove('active');
+
+        formSteps[currentStep].classList.add('active');
+
+        currentStep++;
+
+        updateProgressBar();
+
+    }
+
+}
+
+
+
+function updateProgressBar() {
+
+    progressBar.style.width = ((currentStep - 1) / (formSteps.length - 1)) * 100 + '%';
+
+}
+
+
+
+updateProgressBar();
+
+
+
+document.getElementById("customerForm").addEventListener("submit", function(event){
+
+    event.preventDefault(); // Evita o redirecionamento padr?o do formulário
+
+    var form = this;
+    var formMessage = document.getElementById("formMessage");
+    var formData = new FormData(form);
+
+    // Enviar os dados via AJAX
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "php/send.php", true); // Arquivo PHP que processa o envio
+
+    xhr.onload = function() {
+        var successMessage = window.I18N ? window.I18N.t('global.form.response.success') : 'Formulário enviado com sucesso!';
+        var errorMessage = window.I18N ? window.I18N.t('global.form.response.error') : 'Erro ao enviar o formulário. Tente novamente.';
+        var status = 'error';
+
+        if (xhr.responseText) {
+            try {
+                var response = JSON.parse(xhr.responseText);
+                status = response.status || status;
+            } catch (e) {
+                // Mantém o status padrão
+            }
+        }
+
+        if (xhr.status === 200 && status === "success") {
+            formMessage.innerHTML = '<p style="color: #c0d000;">' + successMessage + '</p>';
+            form.reset();
+            formSteps.forEach(function(step, index) {
+                step.classList.toggle('active', index === 0);
+            });
+            currentStep = 1;
+            updateProgressBar();
+        } else {
+            formMessage.innerHTML = '<p style="color: #ff6c6c;">' + errorMessage + '</p>';
+        }
+    };
+
+    xhr.onerror = function() {
+        var connectionMessage = window.I18N ? window.I18N.t('global.form.response.connection') : 'Erro de conexão com o servidor.';
+        formMessage.innerHTML = '<p style="color: #ff6c6c;">' + connectionMessage + '</p>';
+    };
+
+    xhr.send(formData); // Envia os dados do formulário
+});
+
+</script>
+
+<!-- /Scripts -->
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

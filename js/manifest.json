@@ -1,0 +1,22 @@
+{
+  "name": "F91 - Solu\u00e7\u00f5es Operacionais",
+  "short_name": "F91",
+  "description": "Solu\u00e7\u00f5es sob medida para PMEs aumentarem efici\u00eancia, produtividade e reduzirem custos.",
+  "start_url": "../index.html",
+  "scope": "../",
+  "display": "standalone",
+  "background_color": "#002050",
+  "theme_color": "#002050",
+  "icons": [
+    {
+      "src": "../img/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "../img/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

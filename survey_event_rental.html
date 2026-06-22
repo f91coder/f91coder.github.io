@@ -1,0 +1,1437 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>F91 - Soluções Operacionais: Locação para Eventos</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/favicon.png">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Json manifest for mobile icon App -->
+<link rel="manifest" href="js/manifest.json">
+<meta name="theme-color" content="#002050">
+
+<!-- SEO Meta Tags -->
+<meta name="description" data-i18n="meta_description" data-i18n-attr="content" content="Pesquisa da F91 para validar uma solução operacional voltada à locação para eventos, com foco em propostas, negociações, disponibilidade e eficiência comercial.">
+<meta name="keywords" data-i18n="meta_keywords" data-i18n-attr="content" content="F91, locação para eventos, pesquisa, orçamento para eventos, propostas comerciais, locação de equipamentos, locação de itens, operação de eventos">
+<meta name="author" content="F91 - Soluções Operacionais">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:type" content="website">
+<meta property="og:title" data-i18n="og_title" data-i18n-attr="content" content="F91 - Soluções Operacionais: Locação para Eventos">
+<meta property="og:description" data-i18n="og_description" data-i18n-attr="content" content="Validação de uma solução operacional da F91 para empresas de locação para eventos.">
+<meta property="og:image" content="img/logof91.png">
+
+<style>
+  :root{
+    --bg:#f4f7fb;
+    --card:rgba(255,255,255,0.96);
+    --surface:#ffffff;
+    --primary:#002050;
+    --primary-strong:#001633;
+    --primary-soft:#e8eff8;
+    --accent:#c0d000;
+    --accent-soft:#eff6c6;
+    --text:#11263d;
+    --muted:#5f6d7d;
+    --border:#d9e2ec;
+    --radius:22px;
+    --shadow:0 24px 64px rgba(0,32,80,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:"Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    display: flex;
+    align-items:center;
+    justify-content:center;
+    padding:32px;
+    color:var(--text);
+    position:relative;
+  }
+
+  .card{
+    width:100%;
+    max-width:780px;
+    max-height:min(920px, calc(100vh - 32px));
+    max-height:min(920px, calc(100dvh - 32px));
+    background:var(--card);
+    border:1px solid rgba(0,32,80,0.08);
+    border-radius:var(--radius);
+    padding:28px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    position:relative;
+    z-index:1;
+    backdrop-filter:blur(16px);
+    display:flex;
+    flex-direction:column;
+  }
+  .card::before{
+    content:"";
+    position:absolute;
+    inset:0 0 auto 0;
+    height:6px;
+    background:linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+  }
+
+  .language-selector {
+    position:absolute;
+    top:18px;
+    right:18px;
+    display:flex;
+    gap:6px;
+    background:rgba(255,255,255,0.84);
+    border:1px solid rgba(0,32,80,0.08);
+    backdrop-filter:blur(10px);
+    padding:6px;
+    border-radius:999px;
+    z-index:1000;
+  }
+
+  .language-btn {
+    background:transparent;
+    border:1px solid transparent;
+    border-radius:999px;
+    padding:5px 10px;
+    font-size:11px;
+    font-weight:600;
+    cursor:pointer;
+    transition:all 0.2s ease;
+    color:var(--muted);
+    white-space:nowrap;
+  }
+
+  .language-btn:hover {
+    background:var(--primary);
+    color:#fff;
+    box-shadow:0 10px 18px rgba(0,32,80,0.18);
+  }
+
+  .language-btn.active {
+    background:var(--primary);
+    color:#fff;
+    border-color:var(--primary);
+  }
+
+  .topbar {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:1px;
+    padding:5px 7px;
+    margin-top: 5px;
+  }
+
+  .brand{
+    display:flex;
+    gap:2px;
+    align-items:center;
+    min-width:0;
+  }
+
+  .logo{
+    flex-shrink:0;
+    padding:12px 14px;
+  }
+
+  .logo img {
+    height:40px;
+    width:auto;
+    display:block;
+  }
+
+  .brand-copy{
+    min-width:0;
+  }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:6px 10px;
+    margin-bottom:10px;
+    background:var(--accent-soft);
+    color:var(--primary);
+    border-radius:999px;
+    font-size:8px;
+    font-weight:500;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+  }
+
+  .title{
+    font-size:16px;
+    font-weight:700;
+    line-height:1.2;
+    color:var(--primary);
+  }
+
+  .subtitle{
+    margin-top:5px;
+    color:var(--muted);
+    font-size:12px;
+    line-height:1.2;
+    max-width:440px;
+  }
+
+  .survey-meta{
+    margin-left:auto;
+    flex-shrink:0;
+    padding:10px 1px;
+    color:var(--muted);
+    font-size:9px;
+    font-weight:500;
+    text-align: right;
+  }
+
+  .progress-wrap{
+    margin-top:18px;
+  }
+  #surveyForm{
+    display:flex;
+    flex:1 1 auto;
+    flex-direction:column;
+    min-height:0;
+  }
+  .progress{
+    width:100%;
+    height:7px;
+    background:var(--primary-soft);
+    border-radius:999px;
+    overflow:hidden;
+  }
+  .progress > .bar{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+    border-radius:999px;
+    transition:width 300ms ease;
+  }
+  .question-wrap{
+    display:flex;
+    flex:1 1 auto;
+    align-items:flex-start;
+    gap:24px;
+    margin-top:26px;
+    min-height:0;
+    overflow:hidden;
+  }
+
+  .step-indicator{
+    min-width:74px;
+    text-align:center;
+  }
+  .step-indicator .num{
+    background:transparent;
+    color: var(--primary);
+    width:52px;
+    height:52px;
+    border-radius:16px;
+    border: 1px solid var(--accent);
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:800;
+    font-size:18px;
+  }
+  .step-indicator p{
+    margin-top:10px;
+    color:var(--muted);
+    font-size:12px;
+    font-weight:600;
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+
+  .question-body{
+    flex:1;
+    min-width:0;
+    min-height:0;
+    display:flex;
+    flex-direction:column;
+  }
+  .question-text{
+    font-size:18px;
+    font-weight:700;
+    line-height:1.35;
+    color:var(--text);
+    margin-bottom:8px;
+  }
+  .question-desc{
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.6;
+    margin-bottom:18px;
+  }
+
+  .input, textarea {
+    width:100%;
+    padding:14px 16px;
+    border-radius:16px;
+    border:1px solid var(--border);
+    background:#fbfcfe;
+    font-size:15px;
+    font-family:inherit;
+    color:var(--text);
+    outline:none;
+    box-shadow:none;
+    transition:border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+  }
+  textarea{
+    resize:vertical;
+    min-height:124px;
+  }
+  .input:hover, textarea:hover{
+    border-color:rgba(0,32,80,0.24);
+    background:#fff;
+  }
+  select.input,
+  select.input:hover,
+  select.input:focus{
+    cursor:pointer;
+    appearance:none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--primary) 50%),
+      linear-gradient(135deg, var(--primary) 50%, transparent 50%),
+      linear-gradient(rgba(0,32,80,0.16), rgba(0,32,80,0.16));
+    background-position:
+      calc(100% - 24px) calc(50% - 4px),
+      calc(100% - 16px) calc(50% - 4px),
+      calc(100% - 42px) 50%;
+    background-size:8px 8px, 8px 8px, 1px 22px;
+    background-repeat:no-repeat;
+    padding-right:58px;
+  }
+  .input:focus, select:focus, textarea:focus {
+    border-color:var(--accent);
+    box-shadow:0 0 0 4px rgba(192,208,0,0.18);
+    background:#fff;
+  }
+
+  .choice-group{
+    display:grid;
+    gap:10px;
+    min-height:0;
+    max-height:min(36dvh, 340px);
+    overflow:auto;
+    padding-right:6px;
+    overscroll-behavior:contain;
+    scrollbar-width:thin;
+    scrollbar-color:rgba(0,32,80,0.22) transparent;
+  }
+  .choice-group::-webkit-scrollbar{
+    width:6px;
+  }
+  .choice-group::-webkit-scrollbar-track{
+    background:transparent;
+  }
+  .choice-group::-webkit-scrollbar-thumb{
+    background:rgba(0,32,80,0.22);
+    border-radius:999px;
+  }
+  .choice-group::-webkit-scrollbar-thumb:hover{
+    background:rgba(0,32,80,0.34);
+  }
+  .choice-item{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:14px 16px;
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:#fbfcfe;
+    transition:border-color .15s ease, box-shadow .15s ease, transform .15s ease, background-color .15s ease;
+    cursor:pointer;
+  }
+  .choice-item:hover{
+    border-color:rgba(0,32,80,0.22);
+    background:#fff;
+    transform:translateY(-1px);
+    box-shadow:0 14px 30px rgba(0,32,80,0.06);
+  }
+  .choice-item input{
+    margin-top:3px;
+    accent-color:var(--primary);
+    flex-shrink:0;
+  }
+  .choice-item span{
+    font-size:14px;
+    line-height:1.55;
+    color:var(--text);
+  }
+
+  .scale-group{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .scale-item{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:54px;
+    padding:12px;
+    border:1px solid var(--border);
+    border-radius:16px;
+    background:#fbfcfe;
+    cursor:pointer;
+    font-weight:600;
+    color:var(--text);
+  }
+  .scale-item input{
+    margin:0;
+    accent-color:var(--primary);
+  }
+  .scale-item span{
+    margin-left:8px;
+  }
+
+  .actions{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top:22px;
+    gap:12px;
+  }
+  .actions-group{
+    margin-left:auto;
+    display:flex;
+    gap:12px;
+  }
+  .btn {
+    padding:12px 18px;
+    border-radius:14px;
+    border:1px solid transparent;
+    cursor:pointer;
+    font-family:inherit;
+    font-size:14px;
+    font-weight:700;
+    transition:all 0.2s ease;
+  }
+  .btn:disabled{
+    opacity:0.65;
+    cursor:not-allowed;
+    transform:none;
+    box-shadow:none;
+  }
+  .btn.primary{
+    background:var(--primary);
+    color:#fff;
+  }
+  .btn.primary:hover:not(:disabled){
+    background:var(--accent);
+    color: var(--primary);
+    transform: scale(1.1);
+  }
+  .btn.ghost{
+    background: transparent;
+    color:var(--primary);
+    border-color:var(--border);
+  }
+  .btn.ghost:hover:not(:disabled){
+    border-color:var(--accent);
+    color: var(--primary);
+  }
+
+  .small{
+    font-size:13px;
+    color:var(--muted);
+    margin-top:10px;
+    font-weight:500;
+  }
+
+  .thankyou{
+    text-align:center;
+    padding:32px 8px 12px;
+  }
+  .thankyou h2{
+    color:var(--primary);
+    margin-bottom:10px;
+    font-size:28px;
+  }
+  .thankyou p{
+    color:var(--muted);
+    font-size:15px;
+    line-height:1.7;
+  }
+  .thankyou a{
+    color:var(--primary);
+    font-weight:700;
+    text-decoration:none;
+  }
+  .thankyou a:hover{
+    color:var(--primary-strong);
+  }
+
+  @media (max-width:768px){
+    body{
+      padding:16px;
+      align-items:flex-start;
+    }
+
+    .card{
+      padding:18px;
+      max-height:calc(100vh - 24px);
+      max-height:calc(100dvh - 24px);
+    }
+
+    .language-selector{
+      position:static;
+      margin:0 auto 16px;
+      justify-content:center;
+      width:fit-content;
+    }
+
+    .topbar{
+      flex-direction:column;
+      align-items:flex-start;
+      gap:14px;
+      padding:18px;
+      margin-top:0;
+    }
+
+    .brand{
+      width:100%;
+    }
+
+    .logo img{
+      height:34px;
+    }
+
+    .eyebrow{
+      margin-bottom:8px;
+    }
+
+    .survey-meta{
+      margin-left:0;
+    }
+
+    .question-wrap{
+      flex-direction:column;
+      gap:14px;
+    }
+
+    .step-indicator{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-align:left;
+      min-width:0;
+    }
+
+    .step-indicator p{
+      margin-top:0;
+    }
+
+    .actions{
+      flex-direction:column-reverse;
+      align-items:stretch;
+    }
+
+    .actions-group{
+      margin-left:0;
+      width:100%;
+      flex-direction:column;
+    }
+
+    .btn{
+      width:100%;
+    }
+  }
+
+  @media (max-width:480px){
+    .language-btn{
+      padding:6px 10px;
+      font-size:10px;
+    }
+
+    .topbar{
+      padding:16px;
+    }
+
+    .title{
+      font-size:18px;
+    }
+
+    .subtitle,
+    .question-desc,
+    .survey-meta{
+      font-size:12px;
+    }
+
+    .question-text{
+      font-size:20px;
+    }
+
+    .choice-item{
+      padding:12px 14px;
+    }
+
+    .step-indicator .num{
+      width:48px;
+      height:48px;
+    }
+  }
+
+  #rodape {
+    text-align: center;
+    padding: 10px;
+    background-color: transparent;
+    color: #7a7a7a;
+    position:fixed;
+    bottom: 0;
+    width: 100%;
+    font-size: 14px;
+  }
+</style>
+</head>
+<body>
+    <main class="card" role="main" aria-labelledby="surveyTitle">
+        <div class="language-selector">
+            <button class="language-btn active" data-lang="pt" title="Português">🇧🇷 PT</button>
+            <button class="language-btn" data-lang="en" title="English">🇺🇸 EN</button>
+            <button class="language-btn" data-lang="es" title="Español">🇪🇸 ES</button>
+        </div>
+
+        <div class="topbar">
+            <div class="brand">
+                <div class="logo">
+                    <img src="img/logo_.png" alt="F91 - Soluções Operacionais" data-i18n="brand_alt" data-i18n-attr="alt" />
+                </div>
+
+                <div class="brand-copy">
+                    <div class="eyebrow" data-i18n="survey_eyebrow">Pesquisa de validação</div>
+                    <div class="title" id="surveyTitle" data-i18n="survey_title">F91 - Soluções Operacionais: Locação para Eventos</div>
+                    <div class="subtitle" data-i18n="survey_subtitle">Ajude-nos a desenhar a solução operacional ideal para empresas de locação de equipamentos e itens para eventos.</div>
+                </div>
+            </div>
+            <div class="survey-meta" data-i18n="estimated_time">Tempo estimado: 3 minutos</div>
+        </div>
+
+        <div class="progress-wrap" aria-hidden="true">
+            <div class="progress"><div class="bar" id="progressBar"></div></div>
+        </div>
+
+        <form id="surveyForm" autocomplete="off" novalidate>
+            <div id="questionContainer" class="question-wrap" role="group" aria-live="polite"></div>
+
+            <div class="actions" id="actions">
+            <button type="button" class="btn ghost" id="backBtn" style="visibility:hidden;"><i class="fa fa-arrow-left"></i> <span data-i18n="back_btn">Voltar</span></button>
+            <div class="actions-group">
+                <button type="button" class="btn ghost" id="skipBtn" style="display:none;" data-i18n="skip_btn">Pular</button>
+                <button type="submit" class="btn primary" id="nextBtn"><span data-i18n="next_btn">Próximo</span> <i class="fa fa-arrow-right" style="margin-left:10px;"></i></button>
+            </div>
+            </div>
+
+            <div class="small" id="stepMeta" aria-hidden="true"></div>
+        </form>
+
+        <div id="thankyou" class="thankyou" style="display:none;">
+            <h2 data-i18n="thank_you_title">Obrigado!</h2>
+            <p data-i18n="thank_you_text">Sua resposta foi registrada. Se fizer sentido, podemos convidar você para os próximos testes.</p>
+            <p style="margin-top:12px;"><a id="restart" href="#" data-i18n="restart_link">Enviar outra resposta</a></p>
+        </div>
+    </main>
+
+    <!--Footer-->
+    <footer class="footer1" id="rodape">
+        &copy; <span id="anoAtual"></span> F91 - Soluções Operacionais.
+    </footer>
+
+    <script src="js/script.js" defer></script>
+
+    <script type="text/plain" id="legacySurveyScript">
+        const translations = {
+            pt: {
+                brand_alt: "F91 - Soluções Operacionais",
+                meta_description: "Pesquisa da F91 para validar uma solução operacional voltada à hotelaria, com foco em eficiência comercial, grupos e eventos.",
+                meta_keywords: "F91, hotelaria, pesquisa, SaaS para hotelaria, grupos, eventos, operações hoteleiras, eficiência operacional",
+                og_title: "F91 - Soluções Operacionais: Hotelaria",
+                og_description: "Validação de uma solução operacional da F91 para a hotelaria.",
+                survey_eyebrow: "Pesquisa de validação",
+                survey_title: "F91 - Soluções Operacionais: Hotelaria",
+                survey_subtitle: "Ajude-nos a desenhar a solução operacional perfeita para uma gestão de grupos e eventos mais eficiente para a hotelaria.",
+                estimated_time: "Tempo estimado: 2 minutos",
+                back_btn: "Voltar",
+                skip_btn: "Pular",
+                next_btn: "Próximo",
+                submit_btn: "Enviar",
+                sending: "Enviando...",
+                thank_you_title: "Obrigado!",
+                thank_you_text: "Sua resposta foi registrada. Se fizer sentido, podemos convidar você para os próximos testes.",
+                restart_link: "Enviar outra resposta",
+                step_indicator: "Passo",
+                question_of: "de",
+                question_num: "Pergunta",
+                select_placeholder: "Selecione uma opção",
+                validation_required: "Por favor responda esta pergunta.",
+                validation_multiselect: "Por favor selecione ao menos uma opção.",
+                validation_max_choices: "Você pode selecionar no máximo",
+                validation_max_choices_end: "opções.",
+                validation_scale: "Selecione um valor na escala.",
+                error_send: "Ocorreu um erro ao enviar. Tente novamente mais tarde.",
+                error_connection: "Falha ao enviar. Verifique sua conexão."
+            },
+            en: {
+                brand_alt: "F91 - Operational Solutions",
+                meta_description: "F91 survey to validate an operational solution for hospitality, focused on commercial efficiency, groups, and events.",
+                meta_keywords: "F91, hospitality, survey, hospitality SaaS, groups, events, hotel operations, operational efficiency",
+                og_title: "F91 - Soluções Operacionais: Hotelaria",
+                og_description: "Validation of an F91 operational solution for hospitality.",
+                survey_eyebrow: "Validation survey",
+                survey_title: "F91 - Soluções Operacionais: Hotelaria",
+                survey_subtitle: "Help us design the perfect operational solution for more efficient group and event management in the hospitality industry.",
+                estimated_time: "Estimated time: 2 minutes",
+                back_btn: "Back",
+                skip_btn: "Skip",
+                next_btn: "Next",
+                submit_btn: "Submit",
+                sending: "Sending...",
+                thank_you_title: "Thank you!",
+                thank_you_text: "Your response has been recorded. If it makes sense, we may invite you to the next testing rounds.",
+                restart_link: "Submit another response",
+                step_indicator: "Step",
+                question_of: "of",
+                question_num: "Question",
+                select_placeholder: "Select an option",
+                validation_required: "Please answer this question.",
+                validation_multiselect: "Please select at least one option.",
+                validation_max_choices: "You can select a maximum of",
+                validation_max_choices_end: "options.",
+                validation_scale: "Select a value on the scale.",
+                error_send: "An error occurred while sending. Please try again later.",
+                error_connection: "Failed to send. Check your connection."
+            },
+            es: {
+                brand_alt: "F91 - Soluciones Operativas",
+                meta_description: "Encuesta de F91 para validar una solución operativa para hotelería, con foco en eficiencia comercial, grupos y eventos.",
+                meta_keywords: "F91, hotelería, encuesta, SaaS para hotelería, grupos, eventos, operaciones hoteleras, eficiencia operativa",
+                og_title: "F91 - Soluções Operacionais: Hotelaria",
+                og_description: "Validación de una solución operativa de F91 para hotelería.",
+                survey_eyebrow: "Encuesta de validación",
+                survey_title: "F91 - Soluções Operacionais: Hotelaria",
+                survey_subtitle: "Ayúdanos a diseñar la solución operativa perfecta para una gestión más eficiente de grupos y eventos en la industria hotelera.",
+                estimated_time: "Tiempo estimado: 2 minutos",
+                back_btn: "Atrás",
+                skip_btn: "Omitir",
+                next_btn: "Siguiente",
+                submit_btn: "Enviar",
+                sending: "Enviando...",
+                thank_you_title: "¡Gracias!",
+                thank_you_text: "Su respuesta ha sido registrada. Si tiene sentido, podemos invitarle a las próximas rondas de pruebas.",
+                restart_link: "Enviar otra respuesta",
+                step_indicator: "Paso",
+                question_of: "de",
+                question_num: "Pregunta",
+                select_placeholder: "Seleccione una opción",
+                validation_required: "Por favor responda esta pregunta.",
+                validation_multiselect: "Por favor seleccione al menos una opción.",
+                validation_max_choices: "Puede seleccionar un máximo de",
+                validation_max_choices_end: "opciones.",
+                validation_scale: "Seleccione un valor en la escala.",
+                error_send: "Ocurrió un error al enviar. Intente nuevamente más tarde.",
+                error_connection: "Error al enviar. Verifique su conexión."
+            }
+        };
+
+        const questionsTranslations = {
+            pt: {
+                "Nome do hotel ou rede hoteleira": "Nome do hotel ou rede hoteleira",
+                "Ex.: Hotel Aurora": "Ex.: Hotel Aurora",
+                "Cidade / Estado": "Cidade / Estado",
+                "Ex.: São Paulo, SP": "Ex.: São Paulo, SP",
+                "Categoria do hotel": "Categoria do hotel",
+                "Número aproximado de quartos": "Número aproximado de quartos",
+                "Possui salas de eventos / reuniões?": "Possui salas de eventos / reuniões?",
+                "Seu hotel já trabalha (ou deseja trabalhar) com negociação de tarifa para hospedagem em grupos e/ou eventos?": "Seu hotel já trabalha (ou deseja trabalhar) com negociação de tarifa para hospedagem em grupos e/ou eventos?",
+                "Como atualmente recebem solicitações de orçamento de eventos e/ou hospedagem em grupo?": "Como atualmente recebem solicitações de orçamento de eventos e/ou hospedagem em grupo?",
+                "Com que frequência o hotel recebe solicitações de grupos?": "Com que frequência o hotel recebe solicitações de grupos?",
+                "Em média, quanto tempo leva da solicitação até o envio da proposta?": "Em média, quanto tempo leva da solicitação até o envio da proposta?",
+                "Quais são os maiores desafios no processo de negociação de grupos/eventos?": "Quais são os maiores desafios no processo de negociação de grupos/eventos?",
+                "Qual sistema/ferramenta o hotel utiliza hoje para registrar, acompanhar e enviar propostas dessas negociações?": "Qual sistema/ferramenta o hotel utiliza hoje para registrar, acompanhar e enviar propostas dessas negociações?",
+                "O que você gostaria que este sistema/ferramenta tivesse de recurso para que seu processo de envio de proposta e negociação fosse mais prático e eficiente?": "O que você gostaria que este sistema/ferramenta tivesse de recurso para que seu processo de envio de proposta e negociação fosse mais prático e eficiente?",
+                "Se existisse uma ferramenta com todos os recursos que você selecionou na pergunta anterior, toparia testar gratuitamente por um período?": "Se existisse uma ferramenta com todos os recursos que você selecionou na pergunta anterior, toparia testar gratuitamente por um período?",
+                "Gostaria de participar como hotel piloto (fase de testes) e obter benefícios vitalícios exclusivos?": "Gostaria de participar como hotel piloto (fase de testes) e obter benefícios vitalícios exclusivos?",
+                "Digite seu nome": "Digite seu nome",
+                "Nome completo": "Nome completo",
+                "Seu E-mail": "Seu E-mail",
+                "email@empresa.com": "email@empresa.com",
+                "Seu Telefone": "Seu Telefone",
+                "De preferência WhatsApp": "De preferência WhatsApp",
+                "Alguma sugestão adicional ou comentário?": "Alguma sugestão adicional ou comentário?",
+                "Escreva aqui...": "Escreva aqui...",
+                "Econômico": "Econômico",
+                "Midscale": "Midscale",
+                "Luxo": "Luxo",
+                "Resort": "Resort",
+                "Rede hoteleira": "Rede hoteleira",
+                "Até 50": "Até 50",
+                "51–100": "51–100",
+                "101–200": "101–200",
+                "Acima de 200": "Acima de 200",
+                "Sim": "Sim",
+                "Não": "Não",
+                "Talvez": "Talvez",
+                "E-mail": "E-mail",
+                "WhatsApp": "WhatsApp",
+                "Telefone": "Telefone",
+                "Site do hotel": "Site do hotel",
+                "Redes sociais": "Redes sociais",
+                "Agências/OTAs": "Agências/OTAs",
+                "Outro...": "Outro...",
+                "Diariamente": "Diariamente",
+                "Semanalmente": "Semanalmente",
+                "Quinzenalmente": "Quinzenalmente",
+                "Mensalmente": "Mensalmente",
+                "Raramente": "Raramente",
+                "Menos de 1h": "Menos de 1h",
+                "1–3h": "1–3h",
+                "3–6h": "3–6h",
+                "6–12h": "6–12h",
+                "12–24h": "12–24h",
+                "Mais de 24h": "Mais de 24h",
+                "Disponibilidade do hotel": "Disponibilidade do hotel",
+                "Bater o preço da concorrência": "Bater o preço da concorrência",
+                "Volume alto de solicitações": "Volume alto de solicitações",
+                "Controlar o status de cada negociação": "Controlar o status de cada negociação",
+                "Falta de integração entre ferramentas": "Falta de integração entre ferramentas",
+                "Falta de histórico de negociações": "Falta de histórico de negociações",
+                "Dificuldade em gerar relatórios": "Dificuldade em gerar relatórios",
+                "Retrabalho / erros manuais": "Retrabalho / erros manuais",
+                "Comunicação fragmentada com clientes": "Comunicação fragmentada com clientes",
+                "Tempo excessivo em tarefas operacionais": "Tempo excessivo em tarefas operacionais",
+                "Outros...": "Outros...",
+                "Nenhum / Planilhas": "Nenhum / Planilhas",
+                "CRM (Salesforce, Monday, Hubspot, etc...)": "CRM (Salesforce, Monday, Hubspot, etc...)",
+                "PMS (Opera, TOTVS, Mews...)": "PMS (Opera, TOTVS, Mews...)",
+                "Evnt": "Evnt",
+                "Sistema próprio": "Sistema próprio",
+                "Integração perfeita com outros sistemas/plataformas": "Integração perfeita com outros sistemas/plataformas",
+                "Integração perfeita com e-mail e WhatsApp": "Integração perfeita com e-mail e WhatsApp",
+                "Reconhecimento automático de disponibilidade de salas/quartos para data solicitada": "Reconhecimento automático de disponibilidade de salas/quartos para data solicitada",
+                "Mapeamento de eventos e datas que impactam a demanda": "Mapeamento de eventos e datas que impactam a demanda",
+                "Calculadora automática de proposta final": "Calculadora automática de proposta final",
+                "Painel de indicadores": "Painel de indicadores",
+                "Histórico de cotações enviadas": "Histórico de cotações enviadas",
+                "Relatórios automatizados": "Relatórios automatizados",
+                "Análises personalizadas com IA": "Análises personalizadas com IA",
+                "Automatização de tarefas com IA": "Automatização de tarefas com IA",
+                "Espião de preço da concorrência com IA": "Espião de preço da concorrência com IA",
+                "Outros recursos com IA": "Outros recursos com IA",
+                "Nenhum destes": "Nenhum destes",
+                "Sim, claro!": "Sim, claro!",
+                "Provavelmente sim.": "Provavelmente sim.",
+                "Talvez...": "Talvez...",
+                "Provavelmente não.": "Provavelmente não.",
+                "Não, definitivamente!": "Não, definitivamente!"
+            },
+            en: {
+                "Nome do hotel ou rede hoteleira": "Hotel or hotel chain name",
+                "Ex.: Hotel Aurora": "Ex.: Aurora Hotel",
+                "Cidade / Estado": "City / State",
+                "Ex.: São Paulo, SP": "Ex.: Miami, FL",
+                "Categoria do hotel": "Hotel category",
+                "Número aproximado de quartos": "Approximate number of rooms",
+                "Possui salas de eventos / reuniões?": "Do you have event/meeting rooms?",
+                "Seu hotel já trabalha (ou deseja trabalhar) com negociação de tarifa para hospedagem em grupos e/ou eventos?": "Does your hotel already work (or wish to work) with rate negotiation for group accommodations and/or events?",
+                "Como atualmente recebem solicitações de orçamento de eventos e/ou hospedagem em grupo?": "How do you currently receive event or group accommodation budget requests?",
+                "Com que frequência o hotel recebe solicitações de grupos?": "How often does the hotel receive group requests?",
+                "Em média, quanto tempo leva da solicitação até o envio da proposta?": "On average, how long does it take from request to proposal submission?",
+                "Quais são os maiores desafios no processo de negociação de grupos/eventos?": "What are the biggest challenges in group/event negotiation?",
+                "Qual sistema/ferramenta o hotel utiliza hoje para registrar, acompanhar e enviar propostas dessas negociações?": "What system/tool does the hotel currently use to register, track, and send proposals for these negotiations?",
+                "O que você gostaria que este sistema/ferramenta tivesse de recurso para que seu processo de envio de proposta e negociação fosse mais prático e eficiente?": "What features would you like this system/tool to have to make your proposal and negotiation process more practical and efficient?",
+                "Se existisse uma ferramenta com todos os recursos que você selecionou na pergunta anterior, toparia testar gratuitamente por um período?": "If a tool with all the features you selected in the previous question existed, would you be willing to test it for free for a period?",
+                "Gostaria de participar como hotel piloto (fase de testes) e obter benefícios vitalícios exclusivos?": "Would you like to participate as a pilot hotel (testing phase) and obtain exclusive lifetime benefits?",
+                "Digite seu nome": "Enter your name",
+                "Nome completo": "Full name",
+                "Seu E-mail": "Your Email",
+                "email@empresa.com": "email@company.com",
+                "Seu Telefone": "Your Phone",
+                "De preferência WhatsApp": "Preferably WhatsApp",
+                "Alguma sugestão adicional ou comentário?": "Any additional suggestions or comments?",
+                "Escreva aqui...": "Write here...",
+                "Econômico": "Economy",
+                "Midscale": "Midscale",
+                "Luxo": "Luxury",
+                "Resort": "Resort",
+                "Rede hoteleira": "Hotel chain",
+                "Até 50": "Up to 50",
+                "51–100": "51–100",
+                "101–200": "101–200",
+                "Acima de 200": "Above 200",
+                "Sim": "Yes",
+                "Não": "No",
+                "Talvez": "Maybe",
+                "E-mail": "Email",
+                "WhatsApp": "WhatsApp",
+                "Telefone": "Phone",
+                "Site do hotel": "Hotel website",
+                "Redes sociais": "Social media",
+                "Agências/OTAs": "Agencies/OTAs",
+                "Outro...": "Other...",
+                "Diariamente": "Daily",
+                "Semanalmente": "Weekly",
+                "Quinzenalmente": "Biweekly",
+                "Mensalmente": "Monthly",
+                "Raramente": "Rarely",
+                "Menos de 1h": "Less than 1h",
+                "1–3h": "1–3h",
+                "3–6h": "3–6h",
+                "6–12h": "6–12h",
+                "12–24h": "12–24h",
+                "Mais de 24h": "More than 24h",
+                "Disponibilidade do hotel": "Hotel availability",
+                "Bater o preço da concorrência": "Matching competitor prices",
+                "Volume alto de solicitações": "High volume of requests",
+                "Controlar o status de cada negociação": "Controlling negotiation status",
+                "Falta de integração entre ferramentas": "Lack of tool integration",
+                "Falta de histórico de negociações": "Lack of negotiation history",
+                "Dificuldade em gerar relatórios": "Difficulty generating reports",
+                "Retrabalho / erros manuais": "Rework / manual errors",
+                "Comunicação fragmentada com clientes": "Fragmented client communication",
+                "Tempo excessivo em tarefas operacionais": "Excessive time on operational tasks",
+                "Outros...": "Others...",
+                "Nenhum / Planilhas": "None / Spreadsheets",
+                "CRM (Salesforce, Monday, Hubspot, etc...)": "CRM (Salesforce, Monday, Hubspot, etc...)",
+                "PMS (Opera, TOTVS, Mews...)": "PMS (Opera, TOTVS, Mews...)",
+                "Evnt": "Evnt",
+                "Sistema próprio": "Own system",
+                "Integração perfeita com outros sistemas/plataformas": "Perfect integration with other systems/platforms",
+                "Integração perfeita com e-mail e WhatsApp": "Perfect integration with email and WhatsApp",
+                "Reconhecimento automático de disponibilidade de salas/quartos para data solicitada": "Automatic recognition of room/space availability for requested dates",
+                "Mapeamento de eventos e datas que impactam a demanda": "Mapping of events and dates that impact demand",
+                "Calculadora automática de proposta final": "Automatic final proposal calculator",
+                "Painel de indicadores": "Dashboard",
+                "Histórico de cotações enviadas": "History of sent quotations",
+                "Relatórios automatizados": "Automated reports",
+                "Análises personalizadas com IA": "Personalized AI analysis",
+                "Automatização de tarefas com IA": "AI task automation",
+                "Espião de preço da concorrência com IA": "AI competitor price spy",
+                "Outros recursos com IA": "Other AI features",
+                "Nenhum destes": "None of these",
+                "Sim, claro!": "Yes, of course!",
+                "Provavelmente sim.": "Probably yes.",
+                "Talvez...": "Maybe...",
+                "Provavelmente não.": "Probably not.",
+                "Não, definitivamente!": "No, definitely not!"
+            },
+            es: {
+                "Nome do hotel ou rede hoteleira": "Nombre del hotel o cadena hotelera",
+                "Ex.: Hotel Aurora": "Ej.: Hotel Aurora",
+                "Cidade / Estado": "Ciudad / Estado",
+                "Ex.: São Paulo, SP": "Ej.: Madrid, España",
+                "Categoria do hotel": "Categoría del hotel",
+                "Número aproximado de quartos": "Número aproximado de habitaciones",
+                "Possui salas de eventos / reuniões?": "¿Tiene salas de eventos/reuniones?",
+                "Seu hotel já trabalha (ou deseja trabalhar) com negociação de tarifa para hospedagem em grupos e/ou eventos?": "¿Su hotel ya trabaja (o desea trabajar) con negociación de tarifas para hospedaje en grupos y/o eventos?",
+                "Como atualmente recebem solicitações de orçamento de eventos e/ou hospedagem em grupo?": "¿Cómo reciben actualmente solicitudes de presupuesto de eventos u hospedaje en grupo?",
+                "Com que frequência o hotel recebe solicitações de grupos?": "¿Con qué frecuencia recibe el hotel solicitudes de grupos?",
+                "Em média, quanto tempo leva da solicitação até o envio da proposta?": "En promedio, ¿cuánto tiempo toma desde la solicitud hasta el envío de la propuesta?",
+                "Quais são os maiores desafios no processo de negociação de grupos/eventos?": "¿Cuáles son los mayores desafíos en la negociación de grupos/eventos?",
+                "Qual sistema/ferramenta o hotel utiliza hoje para registrar, acompanhar e enviar propostas dessas negociações?": "¿Qué sistema/herramienta usa el hotel actualmente para registrar, hacer seguimiento y enviar propuestas de estas negociaciones?",
+                "O que você gostaria que este sistema/ferramenta tivesse de recurso para que seu processo de envio de proposta e negociação fosse mais prático e eficiente?": "¿Qué características le gustaría que tuviera este sistema/herramienta para que su proceso de envío de propuestas y negociación fuera más práctico y eficiente?",
+                "Se existisse uma ferramenta com todos os recursos que você selecionou na pergunta anterior, toparia testar gratuitamente por um período?": "Si existiera una herramienta con todas las características que seleccionó en la pregunta anterior, ¿estaría dispuesto a probarla gratis por un período?",
+                "Gostaria de participar como hotel piloto (fase de testes) e obter benefícios vitalícios exclusivos?": "¿Le gustaría participar como hotel piloto (fase de pruebas) y obtener beneficios exclusivos de por vida?",
+                "Digite seu nome": "Ingrese su nombre",
+                "Nome completo": "Nombre completo",
+                "Seu E-mail": "Su Email",
+                "email@empresa.com": "email@empresa.com",
+                "Seu Telefone": "Su Teléfono",
+                "De preferência WhatsApp": "Preferiblemente WhatsApp",
+                "Alguma sugestão adicional ou comentário?": "¿Alguna sugerencia adicional o comentario?",
+                "Escreva aqui...": "Escriba aquí...",
+                "Econômico": "Económico",
+                "Midscale": "Escala media",
+                "Luxo": "Lujo",
+                "Resort": "Resort",
+                "Rede hoteleira": "Cadena hotelera",
+                "Até 50": "Hasta 50",
+                "51–100": "51–100",
+                "101–200": "101–200",
+                "Acima de 200": "Más de 200",
+                "Sim": "Sí",
+                "Não": "No",
+                "Talvez": "Tal vez",
+                "E-mail": "Email",
+                "WhatsApp": "WhatsApp",
+                "Telefone": "Teléfono",
+                "Site do hotel": "Sitio web del hotel",
+                "Redes sociais": "Redes sociales",
+                "Agências/OTAs": "Agencias/OTAs",
+                "Outro...": "Otro...",
+                "Diariamente": "Diariamente",
+                "Semanalmente": "Semanalmente",
+                "Quinzenalmente": "Quincenalmente",
+                "Mensualmente": "Mensualmente",
+                "Raramente": "Raramente",
+                "Menos de 1h": "Menos de 1h",
+                "1–3h": "1–3h",
+                "3–6h": "3–6h",
+                "6–12h": "6–12h",
+                "12–24h": "12–24h",
+                "Mais de 24h": "Más de 24h",
+                "Disponibilidade do hotel": "Disponibilidad del hotel",
+                "Bater o preço da concorrência": "Igualar precios de la competencia",
+                "Volume alto de solicitações": "Alto volumen de solicitudes",
+                "Controlar o status de cada negociação": "Controlar el estado de cada negociación",
+                "Falta de integração entre ferramentas": "Falta de integración entre herramientas",
+                "Falta de histórico de negociações": "Falta de historial de negociaciones",
+                "Dificuldade em gerar relatórios": "Dificultad para generar reportes",
+                "Retrabalho / erros manuais": "Retrabajo / errores manuales",
+                "Comunicação fragmentada com clientes": "Comunicación fragmentada con clientes",
+                "Tempo excessivo em tarefas operacionais": "Tiempo excesivo en tareas operacionales",
+                "Outros...": "Otros...",
+                "Nenhum / Planilhas": "Ninguno / Hojas de cálculo",
+                "CRM (Salesforce, Monday, Hubspot, etc...)": "CRM (Salesforce, Monday, Hubspot, etc...)",
+                "PMS (Opera, TOTVS, Mews...)": "PMS (Opera, TOTVS, Mews...)",
+                "Evnt": "Evnt",
+                "Sistema próprio": "Sistema propio",
+                "Integração perfeita com outros sistemas/plataformas": "Integración perfecta con otros sistemas/plataformas",
+                "Integração perfeita com e-mail e WhatsApp": "Integración perfecta con email y WhatsApp",
+                "Reconhecimento automático de disponibilidade de salas/quartos para data solicitada": "Reconocimiento automático de disponibilidad de salas/habitaciones para fecha solicitada",
+                "Mapeamento de eventos e datas que impactam a demanda": "Mapeo de eventos y fechas que impactan la demanda",
+                "Calculadora automática de proposta final": "Calculadora automática de propuesta final",
+                "Painel de indicadores": "Panel de indicadores",
+                "Histórico de cotações enviadas": "Historial de cotizaciones enviadas",
+                "Relatórios automatizados": "Reportes automatizados",
+                "Análises personalizadas com IA": "Análisis personalizados con IA",
+                "Automatização de tarefas com IA": "Automatización de tareas con IA",
+                "Espião de preço da concorrência com IA": "Espía de precios de la competencia con IA",
+                "Outros recursos com IA": "Otras características con IA",
+                "Nenhum destes": "Ninguno de estos",
+                "Sim, claro!": "¡Sí, claro!",
+                "Provavelmente sim.": "Probablemente sí.",
+                "Talvez...": "Tal vez...",
+                "Provavelmente não.": "Probablemente no.",
+                "Não, definitivamente!": "¡No, definitivamente!"
+            }
+        };
+
+        const SURVEY_CONFIG = {
+            slug: "hotelaria",
+            niche: "Hotelaria",
+            title: "F91 - Soluções Operacionais: Hotelaria",
+            version: "2026-03-30",
+            sourceFile: "survey.html"
+        };
+
+        const SURVEY_LANGUAGE_STORAGE_KEY = "f91-survey-language";
+
+        class LanguageManager {
+            constructor() {
+                this.currentLang = this.detectLanguage();
+                this.init();
+            }
+
+            detectLanguage() {
+                const saved = localStorage.getItem(SURVEY_LANGUAGE_STORAGE_KEY);
+                if (saved && translations[saved]) return saved;
+                const browserLang = navigator.language || navigator.userLanguage;
+                const langCode = browserLang.split('-')[0].toLowerCase();
+                const langMap = { 'pt': 'pt', 'en': 'en', 'es': 'es' };
+                return langMap[langCode] || 'pt';
+            }
+
+            init() {
+                this.updateLanguageButtons();
+                this.translatePage();
+                this.attachEventListeners();
+            }
+
+            updateLanguageButtons() {
+                document.querySelectorAll('.language-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === this.currentLang);
+                });
+            }
+
+            translatePage() {
+                const texts = translations[this.currentLang];
+                document.querySelectorAll('[data-i18n]').forEach(element => {
+                    const key = element.dataset.i18n;
+                    if (!texts[key]) return;
+                    const attr = element.dataset.i18nAttr;
+                    if (attr) {
+                        element.setAttribute(attr, texts[key]);
+                    } else {
+                        element.textContent = texts[key];
+                    }
+                });
+                const langMap = { 'pt': 'pt-BR', 'en': 'en-US', 'es': 'es-ES' };
+                document.documentElement.lang = langMap[this.currentLang];
+                document.title = texts.survey_title;
+            }
+
+            switchLanguage(lang) {
+                if (translations[lang]) {
+                    this.currentLang = lang;
+                    localStorage.setItem(SURVEY_LANGUAGE_STORAGE_KEY, lang);
+                    this.updateLanguageButtons();
+                    this.translatePage();
+                    if (typeof currentIndex !== 'undefined' && currentIndex >= 0) {
+                        renderQuestion(currentIndex);
+                    }
+                }
+            }
+
+            attachEventListeners() {
+                document.querySelectorAll('.language-btn').forEach(btn => {
+                    btn.addEventListener('click', () => this.switchLanguage(btn.dataset.lang));
+                });
+            }
+
+            translate(text) {
+                const currentTranslations = questionsTranslations[this.currentLang];
+                return currentTranslations[text] || text;
+            }
+        }
+
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztCzoDzxzzEyg70Mkc6PHDSsICsi0nFcXqpBhepeMWhstrZI46_peAlBh6nNAd7lEn/exec";
+        const SURVEY_ENDPOINT = `${SCRIPT_URL}?action=submitSurvey`;
+
+        const QUESTIONS = [
+        { key: "nome_hotel", type: "text", label: "Nome do hotel ou rede hoteleira", placeholder: "Ex.: Hotel Aurora", required: true },
+        { key: "cidade_estado", type: "text", label: "Cidade / Estado", placeholder: "Ex.: São Paulo, SP", required: true },
+        { key: "categoria", type: "select", label: "Categoria do hotel", options: ["Econômico","Midscale","Luxo","Resort","Rede hoteleira"], required: true },
+        { key: "num_quartos", type: "select", label: "Número aproximado de quartos", options: ["Até 50","51–100","101–200","Acima de 200"], required: true },
+        { key: "possui_salas", type: "select", label: "Possui salas de eventos / reuniões?", options: ["Sim","Não"], required: true },
+        { key: "trabalha_grupos", type: "select", label: "Seu hotel já trabalha (ou deseja trabalhar) com negociação de tarifa para hospedagem em grupos e/ou eventos?", options: ["Sim","Não","Talvez"], required: true },
+        { key: "como_recebe_solicitacoes", type: "multiselect", label: "Como atualmente recebem solicitações de orçamento de eventos e/ou hospedagem em grupo?", options: ["E-mail","WhatsApp","Telefone","Site do hotel","Redes sociais","Agências/OTAs","Outro..."], required: true },
+        { key: "frequencia_solicitacoes", type: "select", label: "Com que frequência o hotel recebe solicitações de grupos?", options: ["Diariamente","Semanalmente","Quinzenalmente","Mensalmente","Raramente"], required: true },
+        { key: "tempo_ate_proposta", type: "select", label: "Em média, quanto tempo leva da solicitação até o envio da proposta?", options: ["Menos de 1h","1–3h","3–6h","6–12h","12–24h","Mais de 24h"], required: true },
+        { key: "maiores_desafios", type: "multiselect", label: "Quais são os maiores desafios no processo de negociação de grupos/eventos?", options: ["Disponibilidade do hotel","Bater o preço da concorrência","Volume alto de solicitações","Controlar o status de cada negociação","Falta de integração entre ferramentas","Falta de histórico de negociações","Dificuldade em gerar relatórios","Retrabalho / erros manuais","Comunicação fragmentada com clientes","Tempo excessivo em tarefas operacionais","Outros..."], required: true },
+        { key: "sistema_registro", type: "multiselect", label: "Qual sistema/ferramenta o hotel utiliza hoje para registrar, acompanhar e enviar propostas dessas negociações?", options: ["Nenhum / Planilhas","CRM (Salesforce, Monday, Hubspot, etc...)","PMS (Opera, TOTVS, Mews...)","Evnt","Sistema próprio","Outro..."], required: true },
+        { key: "que_gostaria", type: "multiselect", label: "O que você gostaria que este sistema/ferramenta tivesse de recurso para que seu processo de envio de proposta e negociação fosse mais prático e eficiente?", options: ["Integração perfeita com outros sistemas/plataformas","Integração perfeita com e-mail e WhatsApp","Reconhecimento automático de disponibilidade de salas/quartos para data solicitada","Mapeamento de eventos e datas que impactam a demanda","Calculadora automática de proposta final","Painel de indicadores","Histórico de cotações enviadas","Relatórios automatizados","Análises personalizadas com IA","Automatização de tarefas com IA","Espião de preço da concorrência com IA","Outros recursos com IA","Nenhum destes"], required: true},
+        { key: "interesse_teste", type: "select", label: "Se existisse uma ferramenta com todos os recursos que você selecionou na pergunta anterior, toparia testar gratuitamente por um período?", options:["Sim, claro!","Provavelmente sim.","Talvez...","Provavelmente não.","Não, definitivamente!"], required:true },
+        { key: "participar_piloto", type: "select", label: "Gostaria de participar como hotel piloto (fase de testes) e obter benefícios vitalícios exclusivos?", options:["Sim","Não"], required:true },
+        { key: "responsavel_nome", type: "text", label: "Digite seu nome", placeholder:"Nome completo", required:true },
+        { key: "responsavel_email", type: "email", label: "Seu E-mail", placeholder:"email@empresa.com", required:true },
+        { key: "responsavel_telefone", type: "text", label: "Seu Telefone", placeholder:"De preferência WhatsApp", required:true },
+        { key: "comentarios", type: "textarea", label: "Alguma sugestão adicional ou comentário?", placeholder:"Escreva aqui...", required:false }
+        ];
+
+        let currentIndex = 0;
+        const state = {};
+        const Qcontainer = document.getElementById("questionContainer");
+        const progressBar = document.getElementById("progressBar");
+        const backBtn = document.getElementById("backBtn");
+        const skipBtn = document.getElementById("skipBtn");
+        const nextBtn = document.getElementById("nextBtn");
+        const stepMeta = document.getElementById("stepMeta");
+        const form = document.getElementById("surveyForm");
+        const thankyou = document.getElementById("thankyou");
+        const restart = document.getElementById("restart");
+
+        function updateProgress(){
+        const pct = Math.round((currentIndex) / QUESTIONS.length * 100);
+        progressBar.style.width = pct + "%";
+        const texts = translations[window.languageManager.currentLang];
+        stepMeta.textContent = `${texts.question_num} ${Math.min(currentIndex+1, QUESTIONS.length)} ${texts.question_of} ${QUESTIONS.length}`;
+        }
+
+        function renderQuestion(idx){
+        Qcontainer.innerHTML = "";
+        const q = QUESTIONS[idx];
+        if(!q) return;
+        const texts = translations[window.languageManager.currentLang];
+
+        const stepDiv = document.createElement("div");
+        stepDiv.className = "step-indicator";
+        const stepText = texts.step_indicator;
+        stepDiv.innerHTML = `<div class="num">${idx+1}</div><p>${stepText}</p>`;
+
+        const body = document.createElement("div");
+        body.className = "question-body";
+        const translatedLabel = window.languageManager.translate(q.label);
+        const translatedPlaceholder = q.placeholder ? window.languageManager.translate(q.placeholder) : '';
+        body.innerHTML = `<div class="question-text">${translatedLabel}</div>
+                            ${translatedPlaceholder ? `<div class="question-desc">${translatedPlaceholder}</div>` : ''}`;
+
+        let inputEl;
+        if(q.type === "text" || q.type === "email"){
+            inputEl = document.createElement("input");
+            inputEl.type = q.type === "email" ? "email" : "text";
+            inputEl.className = "input";
+            inputEl.placeholder = translatedPlaceholder || "";
+            inputEl.value = state[q.key] || "";
+            inputEl.id = "inputField";
+            inputEl.required = !!q.required;
+            body.appendChild(inputEl);
+        } else if(q.type === "textarea"){
+            inputEl = document.createElement("textarea");
+            inputEl.className = "input";
+            inputEl.placeholder = translatedPlaceholder || "";
+            inputEl.rows = 4;
+            inputEl.id = "inputField";
+            inputEl.value = state[q.key] || "";
+            inputEl.required = !!q.required;
+            body.appendChild(inputEl);
+        } else if(q.type === "select"){
+            inputEl = document.createElement("select");
+            inputEl.className = "input";
+            inputEl.id = "inputField";
+            const placeholderOption = document.createElement("option");
+            placeholderOption.value = "";
+            placeholderOption.textContent = texts.select_placeholder;
+            placeholderOption.disabled = !!q.required;
+            inputEl.appendChild(placeholderOption);
+            q.options.forEach(opt => {
+            const o = document.createElement("option");
+            o.value = opt; 
+            o.textContent = window.languageManager.translate(opt);
+            inputEl.appendChild(o);
+            });
+            inputEl.value = state[q.key] || "";
+            inputEl.required = !!q.required;
+            body.appendChild(inputEl);
+        } else if(q.type === "multiselect"){
+            inputEl = document.createElement("div");
+            inputEl.className = "choice-group";
+            q.options.forEach(opt => {
+            const id = `chk_${q.key}_${opt.replace(/\s+/g,'_')}`;
+            const label = document.createElement("label");
+            label.className = "choice-item";
+            const translatedOpt = window.languageManager.translate(opt);
+            label.innerHTML = `<input type="checkbox" id="${id}" value="${opt}" ${ (state[q.key]||[]).includes(opt) ? 'checked' : ''}> <span>${translatedOpt}</span>`;
+            inputEl.appendChild(label);
+            });
+            body.appendChild(inputEl);
+        } else if(q.type === "scale"){
+            inputEl = document.createElement("div");
+            inputEl.className = "scale-group";
+            for(let i=q.min;i<=q.max;i++){
+            const id = `scale_${q.key}_${i}`;
+            const label = document.createElement("label");
+            label.className = "scale-item";
+            label.innerHTML = `<input type="radio" id="${id}" name="scale_${q.key}" value="${i}" ${ (state[q.key]==i) ? 'checked' : '' }> <span>${i}</span>`;
+            inputEl.appendChild(label);
+            }
+            body.appendChild(inputEl);
+        }
+
+        Qcontainer.appendChild(stepDiv);
+        Qcontainer.appendChild(body);
+
+        backBtn.style.visibility = idx === 0 ? "hidden" : "visible";
+        skipBtn.style.display = (q.required ? "none" : "inline-block");
+
+        setTimeout(()=> {
+            const f = document.getElementById("inputField");
+            if(f) f.focus();
+        },50);
+
+        updateProgress();
+        }
+
+        function collectAnswer(){
+        const q = QUESTIONS[currentIndex];
+        if(!q) return true;
+        let val = null;
+        const texts = translations[window.languageManager.currentLang];
+
+        if(q.type === "text" || q.type === "email" || q.type === "textarea" || q.type === "select"){
+            const el = document.getElementById("inputField");
+            if(!el) return true;
+            val = el.value && el.value.trim();
+            if(q.required && (!val || val.length === 0)){
+            alert(texts.validation_required);
+            el.focus();
+            return false;
+            }
+        } else if(q.type === "multiselect"){
+            const checkboxes = Qcontainer.querySelectorAll(`input[type="checkbox"]`);
+            val = [];
+            checkboxes.forEach(cb => { if(cb.checked) val.push(cb.value) });
+            if(q.required && (!val || val.length === 0)){
+            alert(texts.validation_multiselect);
+            return false;
+            }
+            if(q.maxChoices && val.length > q.maxChoices){
+            alert(`${texts.validation_max_choices} ${q.maxChoices} ${texts.validation_max_choices_end}`);
+            return false;
+            }
+        } else if(q.type === "scale"){
+            const sel = Qcontainer.querySelector(`input[type="radio"]:checked`);
+            if(sel) val = sel.value;
+            if(q.required && !val){
+            alert(texts.validation_scale);
+            return false;
+            }
+        }
+
+        state[q.key] = val === null ? "" : val;
+        return true;
+        }
+
+        function createResponseId() {
+        if (window.crypto && typeof window.crypto.randomUUID === "function") {
+            return window.crypto.randomUUID();
+        }
+        return `resp_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+        }
+
+        function normalizeAnswerValue(value) {
+        if (Array.isArray(value)) {
+            return value.filter(item => item !== null && item !== undefined && item !== "");
+        }
+        return value ?? "";
+        }
+
+        function serializeAnswerValue(value) {
+        if (Array.isArray(value)) {
+            return value.join(" | ");
+        }
+        return value == null ? "" : String(value);
+        }
+
+        function buildSurveyPayload() {
+        const responseId = createResponseId();
+        const submittedAt = new Date().toISOString();
+        const language = window.languageManager.currentLang;
+        const answers = {};
+        const questions = QUESTIONS.map((q, index) => {
+            const normalizedValue = normalizeAnswerValue(state[q.key]);
+            answers[q.key] = normalizedValue;
+            return {
+            order: index + 1,
+            key: q.key,
+            label: q.label,
+            type: q.type,
+            value: normalizedValue
+            };
+        });
+
+        const payload = {
+            action: "submitSurvey",
+            response_id: responseId,
+            submitted_at: submittedAt,
+            language,
+            survey_slug: SURVEY_CONFIG.slug,
+            survey_title: SURVEY_CONFIG.title,
+            survey_niche: SURVEY_CONFIG.niche,
+            survey_version: SURVEY_CONFIG.version,
+            source_file: SURVEY_CONFIG.sourceFile,
+            source_url: window.location.href,
+            survey: {
+            slug: SURVEY_CONFIG.slug,
+            title: SURVEY_CONFIG.title,
+            niche: SURVEY_CONFIG.niche,
+            version: SURVEY_CONFIG.version,
+            sourceFile: SURVEY_CONFIG.sourceFile,
+            sourceUrl: window.location.href
+            },
+            questions,
+            answers
+        };
+
+        questions.forEach(question => {
+            payload[question.key] = serializeAnswerValue(question.value);
+        });
+
+        return payload;
+        }
+
+        function buildSurveyFormPayload(payload) {
+        const formPayload = new URLSearchParams();
+
+        Object.entries(payload).forEach(([key, value]) => {
+            if (value === null || value === undefined) {
+            formPayload.append(key, "");
+            return;
+            }
+
+            if (typeof value === "object") {
+            formPayload.append(key, JSON.stringify(value));
+            return;
+            }
+
+            formPayload.append(key, String(value));
+        });
+
+        return formPayload;
+        }
+
+        form.addEventListener("submit", async (ev) => {
+        ev.preventDefault();
+        const ok = collectAnswer();
+        if(!ok) return;
+
+        if(currentIndex < QUESTIONS.length - 1){
+            currentIndex++;
+            renderQuestion(currentIndex);
+        } else {
+            await submitSurvey();
+        }
+        });
+
+        backBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        if(currentIndex > 0) { currentIndex--; renderQuestion(currentIndex); }
+        });
+
+        skipBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        state[QUESTIONS[currentIndex].key] = "";
+        if(currentIndex < QUESTIONS.length - 1){
+            currentIndex++; renderQuestion(currentIndex);
+        } else {
+            submitSurvey();
+        }
+        });
+
+        restart.addEventListener("click", (e) => {
+        e.preventDefault();
+        location.reload();
+        });
+
+        async function submitSurvey(){
+        nextBtn.disabled = true;
+        backBtn.disabled = true;
+        const texts = translations[window.languageManager.currentLang];
+        nextBtn.innerHTML = `${texts.sending}...`;
+
+        try {
+            const payload = buildSurveyPayload();
+            const formPayload = buildSurveyFormPayload(payload);
+
+            const res = await fetch(SURVEY_ENDPOINT, {
+            method: "POST",
+            body: formPayload
+            });
+
+            const result = await res.json().catch(() => null);
+
+            if(!res.ok || (result && result.success === false)){
+            const message = result && result.message ? result.message : "Resposta inválida do servidor.";
+            console.error("Erro no envio:", message);
+            alert(texts.error_send);
+            nextBtn.disabled = false; backBtn.disabled = false; 
+            nextBtn.innerHTML = `${texts.submit_btn} <i class="fa fa-arrow-right" style="margin-left:10px;"></i>`;
+            return;
+            }
+
+            form.style.display = "none";
+            document.getElementById("thankyou").style.display = "block";
+            progressBar.style.width = "100%";
+
+        } catch(err){
+            console.error(err);
+            alert(texts.error_connection);
+            nextBtn.disabled = false; backBtn.disabled = false; 
+            nextBtn.innerHTML = `${texts.submit_btn} <i class="fa fa-arrow-right" style="margin-left:10px;"></i>`;
+        }
+        }
+
+        window.languageManager = new LanguageManager();
+        renderQuestion(0);
+        updateProgress();
+    </script>
+    <script src="js/survey_event_rental.js" defer></script>
+</body>
+</html>

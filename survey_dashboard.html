@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>F91 | Survey Analytics</title>
+<meta name="description" content="Painel administrativo da F91 para acompanhar respostas dos surveys em tempo quase real.">
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="apple-touch-icon" href="img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="css/survey_dashboard.css">
+</head>
+<body class="dashboard-page" data-theme="light">
+    <section class="login-shell" id="loginScreen">
+        <div class="bg-image" aria-hidden="true"></div>
+        <div class="bg-overlay" aria-hidden="true"></div>
+        <div class="bg-grid" aria-hidden="true"></div>
+        <div class="orb orb-1" aria-hidden="true"></div>
+        <div class="orb orb-2" aria-hidden="true"></div>
+
+        <a href="#main-content" class="sr-only">Pular para o conteudo</a>
+
+        <main id="main-content" class="login-wrapper" role="main">
+            <div class="brand" aria-label="NEXUS Monitor">
+                <img class="brand-logo-image" src="img/logo.png" alt="F91">
+            </div>
+
+            <div class="login-card" role="region" aria-label="Area de autenticacao">
+                <div class="card-header">
+                    <p class="card-eyebrow">
+                        <span class="status-dot" aria-hidden="true"></span>
+                        Sistema Online
+                    </p>
+                    <h1 class="card-title">Login</h1>
+                </div>
+
+                <form class="form" id="loginForm" novalidate autocomplete="off">
+                    <div class="input-group">
+                        <label class="input-label" for="dashboardPassword">Código de Acesso</label>
+                        <div class="input-wrapper">
+                            <input
+                                class="access-input"
+                                type="password"
+                                id="dashboardPassword"
+                                name="password"
+                                placeholder="••••  ••••  ••••"
+                                autocomplete="current-password"
+                                spellcheck="false"
+                                aria-describedby="loginFeedback"
+                                required
+                            >
+                            <button
+                                type="button"
+                                class="toggle-btn"
+                                id="togglePassword"
+                                aria-label="Mostrar codigo de acesso"
+                                aria-pressed="false"
+                            >
+                                <svg id="iconEye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                                <svg id="iconEyeOff" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                                    <line x1="1" y1="1" x2="23" y2="23"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <p class="input-hint" id="loginFeedback" role="status" aria-live="polite"></p>
+                    </div>
+
+                    <button type="submit" class="btn-submit" id="loginButton">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" id="btnIcon">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                        </svg>
+                        <span id="btnText">Acessar Sistema</span>
+                    </button>
+                </form>
+
+                <div class="card-footer">
+                    <span class="footer-badge">
+                        <svg class="secure-icon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                        Conexao Criptografada
+                    </span>
+                    <span class="version-badge">v4.2.1</span>
+                </div>
+
+                <div class="success-overlay" id="loginSuccessOverlay" aria-live="assertive" aria-hidden="true">
+                    <div class="success-check" aria-hidden="true">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                    </div>
+                    <p class="success-text">Acesso Autorizado</p>
+                    <p class="success-sub">Redirecionando para o painel...</p>
+                </div>
+            </div>
+
+            <p class="bottom-info">F91 · ACESSO RESTRITO</p>
+        </main>
+    </section>
+
+    <div class="dashboard-shell" id="dashboardShell" hidden>
+        <button type="button" class="sidebar-overlay" id="sidebarOverlay" hidden aria-label="Fechar navegacao"></button>
+
+        <aside class="app-sidebar" id="appSidebar">
+            <div class="sidebar-inner">
+                <div class="sidebar-head">
+                    <div class="brand-lockup brand-lockup-sidebar">
+                        <img src="img/logo_.png" alt="F91">
+                        <div>
+                            <span class="brand-kicker">Admin</span>
+                            <strong>Survey Analytics</strong>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-head-tools">
+                        <button type="button" class="theme-toggle theme-toggle-sidebar" data-theme-toggle aria-pressed="false">
+                            <span class="theme-toggle-track">
+                                <span class="theme-toggle-thumb">
+                                    <i class="fa-solid fa-moon"></i>
+                                </span>
+                            </span>
+                        </button>
+
+                        <button type="button" class="icon-btn sidebar-close" id="sidebarCloseButton" aria-label="Fechar menu">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <a href="#overview" class="nav-link">
+                        <span class="nav-link-index"><i class="fa-solid fa-gauge-high"></i></span>
+                        <span class="nav-link-copy">
+                            <strong>Visao geral</strong>
+                            <small>Filtros e indicadores</small>
+                        </span>
+                    </a>
+                    <a href="#surveys" class="nav-link">
+                        <span class="nav-link-index"><i class="fa-solid fa-chart-column"></i></span>
+                        <span class="nav-link-copy">
+                            <strong>Comparativos</strong>
+                            <small>Survey, idioma e cadencia</small>
+                        </span>
+                    </a>
+                    <a href="#questions" class="nav-link">
+                        <span class="nav-link-index"><i class="fa-solid fa-circle-question"></i></span>
+                        <span class="nav-link-copy">
+                            <strong>Perguntas</strong>
+                            <small>Insights dominantes</small>
+                        </span>
+                    </a>
+                    <a href="#responses" class="nav-link">
+                        <span class="nav-link-index"><i class="fa-solid fa-inbox"></i></span>
+                        <span class="nav-link-copy">
+                            <strong>Respostas</strong>
+                            <small>Inbox e detalhamento</small>
+                        </span>
+                    </a>
+                </nav>
+
+                <div class="sidebar-utility">
+                    <div class="sidebar-actions">
+                        <button type="button" class="sidebar-button sidebar-button-primary" id="openSheetButton">
+                            <i class="fa-solid fa-table-cells-large"></i>
+                            Abrir planilha
+                        </button>
+                        <button type="button" class="sidebar-button" id="refreshButton">
+                            <i class="fa-solid fa-rotate"></i>
+                            Atualizar painel
+                        </button>
+                        <button type="button" class="sidebar-button sidebar-button-danger" id="logoutButton">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            Encerrar sessao
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="app-main">
+            <header class="app-header filters-header">
+                <div class="filters-heading-group">
+                    <button type="button" class="icon-btn header-menu" id="sidebarToggleButton" aria-label="Abrir menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+
+                    <div class="filters-heading">
+                        <p class="eyebrow">Filtros</p>
+                    </div>
+                </div>
+
+                <div class="filters-toolbar">
+                    <div class="range-group filters-range-group" id="rangeGroup">
+                        <button type="button" class="range-pill" data-range="24h">24h</button>
+                        <button type="button" class="range-pill" data-range="7d">7 dias</button>
+                        <button type="button" class="range-pill active" data-range="30d">30 dias</button>
+                        <button type="button" class="range-pill" data-range="90d">90 dias</button>
+                        <button type="button" class="range-pill" data-range="all">Tudo</button>
+                    </div>
+
+                    <label class="filter-field filter-inline-field filter-inline-survey">
+                        <span>Survey</span>
+                        <select id="surveyFilter">
+                            <option value="">Todos os surveys</option>
+                        </select>
+                    </label>
+
+                    <label class="filter-field filter-inline-field filter-inline-language">
+                        <span>Idioma</span>
+                        <select id="languageFilter">
+                            <option value="">Todos os idiomas</option>
+                        </select>
+                    </label>
+
+                    <label class="filter-field filter-inline-field filter-inline-search">
+                        <span>Busca</span>
+                        <input id="searchFilter" type="search" placeholder="Empresa, contato, email, nicho...">
+                    </label>
+                </div>
+            </header>
+
+            <section class="app-hero" id="overview">
+                <div class="summary-grid" id="summaryGrid"></div>
+            </section>
+
+            <section class="analytics-grid" id="surveys">
+                <article class="panel panel-xl">
+                    <div class="section-heading section-heading-tight">
+                        <div>
+                            <p class="eyebrow">Tendencia</p>
+                            <h2>Volume de respostas</h2>
+                        </div>
+                        <p>Leitura cronologica da janela ativa para identificar aceleracao ou perda de ritmo.</p>
+                    </div>
+                    <div class="timeline-chart" id="timelineChart"></div>
+                </article>
+
+                <article class="panel">
+                    <div class="section-heading section-heading-tight">
+                        <div>
+                            <p class="eyebrow">Survey</p>
+                            <h2>Performance por survey</h2>
+                        </div>
+                    </div>
+                    <div class="stack-list" id="surveyBreakdown"></div>
+                </article>
+
+                <article class="panel">
+                    <div class="section-heading section-heading-tight">
+                        <div>
+                            <p class="eyebrow">Idioma</p>
+                            <h2>Distribuicao linguistica</h2>
+                        </div>
+                    </div>
+                    <div class="stack-list" id="languageBreakdown"></div>
+                </article>
+
+                <article class="panel">
+                    <div class="section-heading section-heading-tight">
+                        <div>
+                            <p class="eyebrow">Horario</p>
+                            <h2>Mapa de intensidade</h2>
+                        </div>
+                    </div>
+                    <div class="heatmap heatmap-hours" id="hourlyHeatmap"></div>
+                </article>
+
+                <article class="panel">
+                    <div class="section-heading section-heading-tight">
+                        <div>
+                            <p class="eyebrow">Semana</p>
+                            <h2>Cadencia semanal</h2>
+                        </div>
+                    </div>
+                    <div class="heatmap heatmap-weekdays" id="weekdayHeatmap"></div>
+                </article>
+            </section>
+
+            <section class="panel panel-wide" id="questions">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Perguntas</p>
+                        <h2>Maiores sinais do formulario</h2>
+                    </div>
+                    <p>Identifique quais perguntas concentram respostas, formatos e respostas dominantes no recorte atual.</p>
+                </div>
+                <div class="question-insights" id="questionInsights"></div>
+            </section>
+
+            <section class="panel panel-wide" id="responses">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Inbox</p>
+                        <h2>Ultimas respostas recebidas</h2>
+                    </div>
+                    <p>Clique em qualquer linha para abrir o detalhamento completo da resposta.</p>
+                </div>
+
+                <div class="responses-table-wrap">
+                    <table class="responses-table">
+                        <thead>
+                            <tr>
+                                <th>Recebida em</th>
+                                <th>Survey</th>
+                                <th>Principal registro</th>
+                                <th>Contato</th>
+                                <th>Idioma</th>
+                                <th>Preenchimento</th>
+                            </tr>
+                        </thead>
+                        <tbody id="responsesTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div class="response-drawer" id="responseDrawer" hidden>
+        <button type="button" class="drawer-backdrop" id="drawerBackdrop" aria-label="Fechar detalhamento"></button>
+        <aside class="drawer-panel">
+            <div class="drawer-head">
+                <div>
+                    <p class="eyebrow">Resposta individual</p>
+                    <h3 id="drawerTitle">Detalhamento da resposta</h3>
+                </div>
+                <button type="button" class="icon-btn" id="closeDrawerButton" aria-label="Fechar painel">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="drawer-body" id="drawerBody"></div>
+        </aside>
+    </div>
+
+    <div class="dashboard-toast" id="dashboardToast" hidden></div>
+
+    <script src="js/survey_dashboard.js" defer></script>
+</body>
+</html>
