@@ -398,6 +398,7 @@ header .btn-contato button:hover, .portfolio button:hover{
 
 /*---Hero Section Style*/
 section.hero-site{
+    position: relative;
     height: 100vh;
     background-image: linear-gradient(rgb(0, 0, 0), rgba(0, 0, 0, 0.715)), url(../img/background.png);
     background-repeat: no-repeat;
@@ -406,6 +407,40 @@ section.hero-site{
     background-attachment: fixed;
     color: #fff;
     scroll-behavior: smooth;
+}
+
+.hero-apps-strip {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    right: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+.hero-apps-label {
+    color: rgba(255, 255, 255, 0.28);
+    font-size: 9px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    font-family: 'Poppins', sans-serif;
+}
+.hero-apps-logos {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+.hero-apps-logos img {
+    height: 20px;
+    filter: brightness(0) invert(1);
+    opacity: 0.35;
+    transition: opacity 0.3s ease;
+    pointer-events: auto;
+}
+.hero-apps-logos img:hover {
+    opacity: 0.65;
 }
 
 .hero-site .interface{
