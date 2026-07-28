@@ -39,14 +39,6 @@ try {
 
         case 'status':
             $result = ['success' => true, 'status' => 'ready', 'version' => '1.0', 'timestamp' => gmdate('Y-m-d\TH:i:s\Z')];
-            if (($_GET['debug_db'] ?? '') === 'f91-temp-check-2026') {
-                try {
-                    survey_pdo();
-                    $result['db'] = 'ok';
-                } catch (Throwable $e) {
-                    $result['db'] = 'error: ' . $e->getMessage();
-                }
-            }
             break;
 
         default:
