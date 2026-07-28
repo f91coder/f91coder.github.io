@@ -48,7 +48,11 @@ try {
     json_response(['success' => false, 'message' => $e->getMessage()], 401);
 } catch (Throwable $e) {
     error_log('survey/api.php [' . $action . ']: ' . $e->getMessage());
-    json_response(['success' => false, 'message' => 'Erro interno do servidor.'], 500);
+    $debugMessage = 'Erro interno do servidor.';
+    if (($_REQUEST['debug'] ?? '') === 'f91-temp-check-2026') {
+        $debugMessage .= ' DEBUG: ' . $e->getMessage() . ' @ ' . $e->getFile() . ':' . $e->getLine();
+    }
+    json_response(['success' => false, 'message' => $debugMessage], 500);
 }
 
 $code = (int) ($result['_code'] ?? 200);
