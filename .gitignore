@@ -1,8 +1,10 @@
 # Credenciais SMTP — nunca versionar
 php/mail-config.php
 
-# Credenciais do banco de dados do survey — nunca versionar
-php/survey/db-config.php
+# Credenciais reais do banco de dados do survey — nunca versionar.
+# (db-config.php em si nao tem segredo, so valores padrao/fallback — e
+# versionado de proposito para sobreviver a qualquer redeploy que limpe
+# arquivos fora do Git; so o .local.php tem as credenciais reais.)
 php/survey/db-config.local.php
 
 # OS
