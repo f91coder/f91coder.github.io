@@ -1,7 +1,7 @@
 (() => {
     const STORAGE_LANGUAGE_KEY = "f91_survey_language";
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztCzoDzxzzEyg70Mkc6PHDSsICsi0nFcXqpBhepeMWhstrZI46_peAlBh6nNAd7lEn/exec";
-    const SURVEY_ENDPOINT = `${SCRIPT_URL}?action=submitSurvey`;
+    const SURVEY_ENDPOINT = "php/survey/api.php?action=submitSurvey";
+    const FORM_RENDERED_AT = Date.now();
     const SURVEY_CONFIG = {
         slug: "locacao-para-eventos",
         title: "F91 - Soluções Operacionais: Locação para Eventos",
@@ -951,6 +951,8 @@
 
         const payload = {
             action: "submitSurvey",
+            hp_field: (document.getElementById("hp_field") || {}).value || "",
+            form_rendered_at: FORM_RENDERED_AT,
             response_id: responseId,
             submitted_at: submittedAt,
             language,

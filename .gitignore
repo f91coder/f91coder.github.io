@@ -1,6 +1,10 @@
 # Credenciais SMTP — nunca versionar
 php/mail-config.php
 
+# Credenciais do banco de dados do survey — nunca versionar
+php/survey/db-config.php
+php/survey/db-config.local.php
+
 # OS
 .DS_Store
 Thumbs.db

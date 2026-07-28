@@ -620,6 +620,9 @@
         </div>
 
         <form id="surveyForm" autocomplete="off" novalidate>
+            <div style="position:absolute;left:-9999px;top:-9999px;" aria-hidden="true">
+                <label>Não preencha este campo<input type="text" id="hp_field" name="hp_field" tabindex="-1" autocomplete="off"></label>
+            </div>
             <div id="questionContainer" class="question-wrap" role="group" aria-live="polite"></div>
 
             <div class="actions" id="actions">
@@ -824,6 +827,7 @@
                 "Reconhecimento automático de disponibilidade de salas/quartos para data solicitada": "Reconhecimento automático de disponibilidade de salas/quartos para data solicitada",
                 "Mapeamento de eventos e datas que impactam a demanda": "Mapeamento de eventos e datas que impactam a demanda",
                 "Calculadora automática de proposta final": "Calculadora automática de proposta final",
+                "Assinatura Eletrônica de Contratos": "Assinatura Eletrônica de Contratos",
                 "Painel de indicadores": "Painel de indicadores",
                 "Histórico de cotações enviadas": "Histórico de cotações enviadas",
                 "Relatórios automatizados": "Relatórios automatizados",
@@ -914,6 +918,7 @@
                 "Reconhecimento automático de disponibilidade de salas/quartos para data solicitada": "Automatic recognition of room/space availability for requested dates",
                 "Mapeamento de eventos e datas que impactam a demanda": "Mapping of events and dates that impact demand",
                 "Calculadora automática de proposta final": "Automatic final proposal calculator",
+                "Assinatura Eletrônica de Contratos": "Electronic Contract Signature",
                 "Painel de indicadores": "Dashboard",
                 "Histórico de cotações enviadas": "History of sent quotations",
                 "Relatórios automatizados": "Automated reports",
@@ -1004,6 +1009,7 @@
                 "Reconhecimento automático de disponibilidade de salas/quartos para data solicitada": "Reconocimiento automático de disponibilidad de salas/habitaciones para fecha solicitada",
                 "Mapeamento de eventos e datas que impactam a demanda": "Mapeo de eventos y fechas que impactan la demanda",
                 "Calculadora automática de proposta final": "Calculadora automática de propuesta final",
+                "Assinatura Eletrônica de Contratos": "Firma Electrónica de Contratos",
                 "Painel de indicadores": "Panel de indicadores",
                 "Histórico de cotações enviadas": "Historial de cotizaciones enviadas",
                 "Relatórios automatizados": "Reportes automatizados",
@@ -1024,7 +1030,7 @@
             slug: "hotelaria",
             niche: "Hotelaria",
             title: "F91 - Soluções Operacionais: Hotelaria",
-            version: "2026-03-30",
+            version: "2026-07-28",
             sourceFile: "survey.html"
         };
 
@@ -1098,8 +1104,8 @@
             }
         }
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztCzoDzxzzEyg70Mkc6PHDSsICsi0nFcXqpBhepeMWhstrZI46_peAlBh6nNAd7lEn/exec";
-        const SURVEY_ENDPOINT = `${SCRIPT_URL}?action=submitSurvey`;
+        const SURVEY_ENDPOINT = "php/survey/api.php?action=submitSurvey";
+        const FORM_RENDERED_AT = Date.now();
 
         const QUESTIONS = [
         { key: "nome_hotel", type: "text", label: "Nome do hotel ou rede hoteleira", placeholder: "Ex.: Hotel Aurora", required: true },
@@ -1113,7 +1119,7 @@
         { key: "tempo_ate_proposta", type: "select", label: "Em média, quanto tempo leva da solicitação até o envio da proposta?", options: ["Menos de 1h","1–3h","3–6h","6–12h","12–24h","Mais de 24h"], required: true },
         { key: "maiores_desafios", type: "multiselect", label: "Quais são os maiores desafios no processo de negociação de grupos/eventos?", options: ["Disponibilidade do hotel","Bater o preço da concorrência","Volume alto de solicitações","Controlar o status de cada negociação","Falta de integração entre ferramentas","Falta de histórico de negociações","Dificuldade em gerar relatórios","Retrabalho / erros manuais","Comunicação fragmentada com clientes","Tempo excessivo em tarefas operacionais","Outros..."], required: true },
         { key: "sistema_registro", type: "multiselect", label: "Qual sistema/ferramenta o hotel utiliza hoje para registrar, acompanhar e enviar propostas dessas negociações?", options: ["Nenhum / Planilhas","CRM (Salesforce, Monday, Hubspot, etc...)","PMS (Opera, TOTVS, Mews...)","Evnt","Sistema próprio","Outro..."], required: true },
-        { key: "que_gostaria", type: "multiselect", label: "O que você gostaria que este sistema/ferramenta tivesse de recurso para que seu processo de envio de proposta e negociação fosse mais prático e eficiente?", options: ["Integração perfeita com outros sistemas/plataformas","Integração perfeita com e-mail e WhatsApp","Reconhecimento automático de disponibilidade de salas/quartos para data solicitada","Mapeamento de eventos e datas que impactam a demanda","Calculadora automática de proposta final","Painel de indicadores","Histórico de cotações enviadas","Relatórios automatizados","Análises personalizadas com IA","Automatização de tarefas com IA","Espião de preço da concorrência com IA","Outros recursos com IA","Nenhum destes"], required: true},
+        { key: "que_gostaria", type: "multiselect", label: "O que você gostaria que este sistema/ferramenta tivesse de recurso para que seu processo de envio de proposta e negociação fosse mais prático e eficiente?", options: ["Integração perfeita com outros sistemas/plataformas","Integração perfeita com e-mail e WhatsApp","Reconhecimento automático de disponibilidade de salas/quartos para data solicitada","Mapeamento de eventos e datas que impactam a demanda","Calculadora automática de proposta final","Assinatura Eletrônica de Contratos","Painel de indicadores","Histórico de cotações enviadas","Relatórios automatizados","Análises personalizadas com IA","Automatização de tarefas com IA","Espião de preço da concorrência com IA","Outros recursos com IA","Nenhum destes"], required: true},
         { key: "interesse_teste", type: "select", label: "Se existisse uma ferramenta com todos os recursos que você selecionou na pergunta anterior, toparia testar gratuitamente por um período?", options:["Sim, claro!","Provavelmente sim.","Talvez...","Provavelmente não.","Não, definitivamente!"], required:true },
         { key: "participar_piloto", type: "select", label: "Gostaria de participar como hotel piloto (fase de testes) e obter benefícios vitalícios exclusivos?", options:["Sim","Não"], required:true },
         { key: "responsavel_nome", type: "text", label: "Digite seu nome", placeholder:"Nome completo", required:true },
@@ -1428,6 +1434,8 @@
 
         const payload = {
             action: "submitSurvey",
+            hp_field: (document.getElementById("hp_field") || {}).value || "",
+            form_rendered_at: FORM_RENDERED_AT,
             response_id: responseId,
             submitted_at: submittedAt,
             language,

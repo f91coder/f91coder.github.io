@@ -1,5 +1,6 @@
 ﻿(() => {
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbztCzoDzxzzEyg70Mkc6PHDSsICsi0nFcXqpBhepeMWhstrZI46_peAlBh6nNAd7lEn/exec";
+    const API_URL = "php/survey/api.php";
+    const EXPORT_URL = "php/survey/export.php";
     const SESSION_TOKEN_KEY = "f91_survey_dashboard_token";
     const THEME_STORAGE_KEY = "f91_survey_dashboard_theme";
     const AUTO_REFRESH_MS = 60000;
@@ -18,7 +19,6 @@
         autoRefresh: true,
         filters: { ...DEFAULT_FILTERS },
         dashboard: null,
-        spreadsheetUrl: "",
         refreshTimer: null,
         searchDebounce: null,
         theme: storedTheme || (preferredDark ? "dark" : "light"),
@@ -205,7 +205,7 @@
 
     function setLoadingState(isLoading) {
         elements.refreshButton.disabled = isLoading;
-        elements.openSheetButton.disabled = isLoading && !state.spreadsheetUrl;
+        elements.openSheetButton.disabled = isLoading && !state.token;
         elements.logoutButton.disabled = isLoading;
     }
 
@@ -364,7 +364,7 @@
     }
 
     function buildApiUrl(action, params = {}) {
-        const url = new URL(SCRIPT_URL);
+        const url = new URL(API_URL, window.location.href);
         url.searchParams.set("action", action);
 
         Object.entries(params).forEach(([key, value]) => {
@@ -374,6 +374,19 @@
         });
 
         url.searchParams.set("_ts", String(Date.now()));
+        return url.toString();
+    }
+
+    function buildExportUrl() {
+        const url = new URL(EXPORT_URL, window.location.href);
+        url.searchParams.set("token", state.token);
+
+        Object.entries(state.filters).forEach(([key, value]) => {
+            if (value !== null && value !== undefined && value !== "") {
+                url.searchParams.set(key, String(value));
+            }
+        });
+
         return url.toString();
     }
 
@@ -452,7 +465,6 @@
             sessionStorage.removeItem(SESSION_TOKEN_KEY);
             state.token = "";
             state.dashboard = null;
-            state.spreadsheetUrl = "";
             stopAutoRefresh();
             closeDrawer();
             setAuthenticated(false);
@@ -479,7 +491,6 @@
             });
 
             state.dashboard = payload;
-            state.spreadsheetUrl = payload.spreadsheet_url || "";
 
             renderDashboard(payload);
 
@@ -942,12 +953,12 @@
         elements.logoutButton.addEventListener("click", handleLogout);
 
         elements.openSheetButton.addEventListener("click", () => {
-            if (state.spreadsheetUrl) {
-                window.open(state.spreadsheetUrl, "_blank", "noopener");
+            if (!state.token) {
+                showToast("Faca login para exportar os dados.");
                 return;
             }
 
-            showToast("A URL da planilha ainda nao foi carregada.");
+            window.open(buildExportUrl(), "_blank", "noopener");
         });
 
         elements.rangeGroup.addEventListener("click", (event) => {
