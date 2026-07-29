@@ -39,18 +39,6 @@ try {
 
         case 'status':
             $result = ['success' => true, 'status' => 'ready', 'version' => '1.0', 'timestamp' => gmdate('Y-m-d\TH:i:s\Z')];
-            if (($_GET['debug_mail'] ?? '') === 'f91-temp-check-2026') {
-                try {
-                    send_survey_notification([
-                        'primaryLabel' => 'Teste', 'primaryValue' => 'Email de teste do diagnostico final', 'contactName' => '',
-                        'contactEmail' => '', 'contactPhone' => '', 'answeredItems' => [],
-                        'survey' => ['title' => 'F91 - Teste de E-mail'], 'language' => 'pt',
-                    ]);
-                    $result['mail'] = 'ok';
-                } catch (Throwable $e) {
-                    $result['mail'] = 'error: ' . $e->getMessage();
-                }
-            }
             break;
 
         default:
