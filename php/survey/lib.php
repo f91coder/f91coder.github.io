@@ -344,6 +344,15 @@ function find_preferred_value(array $items, array $preferredKeys): string
 }
 
 const DEFAULT_NOTIFICATION_EMAILS = 'filoliveira.me@gmail.com,f91.adm@gmail.com';
+const EMAIL_BRAND_NAVY = '#0a1442';
+const EMAIL_BRAND_NAVY_SOFT = '#141e5c';
+const EMAIL_BRAND_LIME = '#c3d400';
+const EMAIL_INK = '#12142b';
+const EMAIL_MUTED = '#6c7089';
+const EMAIL_BORDER = '#e7e9f2';
+const EMAIL_SURFACE = '#f7f8fb';
+const EMAIL_LOGO_URL = 'https://www.f91.tech/img/logof91_white.png';
+const EMAIL_DASHBOARD_URL = 'https://www.f91.tech/survey_dashboard.html';
 
 function send_survey_notification(array $response): void
 {
@@ -388,39 +397,157 @@ function send_survey_notification(array $response): void
         $mail->addAddress($to);
     }
 
-    $rows = [];
-    if ($response['primaryValue'] !== '') {
-        $rows[] = [$response['primaryLabel'] ?: 'Registro principal', $response['primaryValue']];
-    }
-    if ($response['contactName'] !== '') {
-        $rows[] = ['Contato', $response['contactName']];
-    }
-    if ($response['contactEmail'] !== '') {
-        $rows[] = ['E-mail', $response['contactEmail']];
-    }
-    if ($response['contactPhone'] !== '') {
-        $rows[] = ['Telefone', $response['contactPhone']];
-    }
-    foreach (array_slice($response['answeredItems'], 0, 6) as $item) {
-        $rows[] = [$item['questionLabel'], $item['answerValue']];
-    }
-
-    $htmlRows = implode('', array_map(static function ($row) {
-        $label = htmlspecialchars($row[0], ENT_QUOTES, 'UTF-8');
-        $value = nl2br(htmlspecialchars($row[1], ENT_QUOTES, 'UTF-8'));
-        return "<tr><td style=\"padding:10px 14px;border-bottom:1px solid #eef2f6;font-size:12px;font-weight:700;color:#5B6776;white-space:nowrap;\">{$label}</td><td style=\"padding:10px 14px;border-bottom:1px solid #eef2f6;font-size:14px;color:#10233A;\">{$value}</td></tr>";
-    }, $rows));
-
+    $email = build_notification_email($response);
     $mail->isHTML(true);
-    $mail->Subject = 'Nova resposta recebida | ' . $response['survey']['title'];
-    $mail->Body = "<div style=\"font-family:Arial,Helvetica,sans-serif;max-width:640px;margin:0 auto;\">"
-        . "<h2 style=\"color:#002050;\">Nova resposta de survey</h2>"
-        . "<p style=\"color:#5B6776;\">Pesquisa: <strong>{$response['survey']['title']}</strong> — Idioma: " . strtoupper($response['language']) . "</p>"
-        . "<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" style=\"border:1px solid #D9E2EC;border-radius:12px;overflow:hidden;\">{$htmlRows}</table>"
-        . "</div>";
-    $mail->AltBody = implode("\n", array_map(static fn($row) => $row[0] . ': ' . $row[1], $rows));
+    $mail->Subject = $email['subject'];
+    $mail->Body = $email['html'];
+    $mail->AltBody = $email['text'];
 
     $mail->send();
+}
+
+function email_esc(string $value): string
+{
+    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+}
+
+function render_email_chip(array $chip): string
+{
+    [$label, $value] = $chip;
+    return '<td width="50%" valign="top" style="padding:0 12px 12px 0;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' . EMAIL_SURFACE . ';border-radius:10px;">'
+        . '<tr><td style="padding:12px 14px;">'
+        . '<div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:' . EMAIL_MUTED . ';">' . email_esc($label) . '</div>'
+        . '<div style="font-family:Arial,Helvetica,sans-serif;font-size:13.5px;font-weight:700;color:' . EMAIL_INK . ';margin-top:4px;">' . email_esc($value) . '</div>'
+        . '</td></tr></table></td>';
+}
+
+function render_email_kv_row(string $label, string $value, string $borderTop): string
+{
+    $borderStyle = $borderTop !== '' ? "border-top:1px solid {$borderTop};" : '';
+    return '<tr>'
+        . '<td style="padding:10px 14px 10px 0;' . $borderStyle . 'font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;color:' . EMAIL_MUTED . ';vertical-align:top;width:140px;">' . email_esc($label) . '</td>'
+        . '<td style="padding:10px 0;' . $borderStyle . 'font-family:Arial,Helvetica,sans-serif;font-size:13.5px;color:' . EMAIL_INK . ';vertical-align:top;">' . nl2br(email_esc($value)) . '</td>'
+        . '</tr>';
+}
+
+function build_notification_email(array $response): array
+{
+    $surveyTitle = (string) $response['survey']['title'];
+    $niche = (string) ($response['survey']['niche'] ?: '—');
+    $language = language_label((string) $response['language']);
+    $receivedAt = (new DateTime('now', new DateTimeZone('America/Sao_Paulo')))->format('d/m/Y \à\s H:i');
+
+    $infoChips = [
+        ['Pesquisa', $surveyTitle],
+        ['Nicho', $niche],
+        ['Idioma', $language],
+        ['Recebida em', $receivedAt],
+    ];
+
+    $contactRows = [];
+    if ($response['primaryValue'] !== '') {
+        $contactRows[] = [$response['primaryLabel'] ?: 'Registro principal', $response['primaryValue']];
+    }
+    if ($response['contactName'] !== '') {
+        $contactRows[] = ['Contato', $response['contactName']];
+    }
+    if ($response['contactEmail'] !== '') {
+        $contactRows[] = ['E-mail', $response['contactEmail']];
+    }
+    if ($response['contactPhone'] !== '') {
+        $contactRows[] = ['Telefone', $response['contactPhone']];
+    }
+
+    $answerItems = array_slice($response['answeredItems'], 0, 8);
+
+    $chipsGridHtml = '<tr>' . render_email_chip($infoChips[0]) . render_email_chip($infoChips[1]) . '</tr>'
+        . '<tr>' . render_email_chip($infoChips[2]) . render_email_chip($infoChips[3]) . '</tr>';
+
+    $contactHtml = '';
+    if ($contactRows) {
+        $contactRowsHtml = '';
+        foreach ($contactRows as $index => $row) {
+            $contactRowsHtml .= render_email_kv_row($row[0], $row[1], $index === 0 ? '' : EMAIL_BORDER);
+        }
+
+        $contactHtml = '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:20px;border-left:3px solid ' . EMAIL_BRAND_LIME . ';background:' . EMAIL_SURFACE . ';border-radius:0 10px 10px 0;">'
+            . '<tr><td style="padding:16px 18px;">'
+            . '<div style="font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:' . EMAIL_MUTED . ';margin-bottom:4px;">Contato principal</div>'
+            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">' . $contactRowsHtml . '</table>'
+            . '</td></tr></table>';
+    }
+
+    $answersHtml = '';
+    if ($answerItems) {
+        $answerRowsHtml = '';
+        foreach ($answerItems as $index => $item) {
+            $answerRowsHtml .= render_email_kv_row(
+                (string) $item['questionLabel'],
+                (string) ($item['answerValue'] ?: '—'),
+                $index === 0 ? '' : EMAIL_BORDER
+            );
+        }
+
+        $answersHtml = '<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;color:' . EMAIL_INK . ';margin:24px 0 2px;">Principais respostas</div>'
+            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">' . $answerRowsHtml . '</table>';
+    }
+
+    $subject = 'Nova resposta recebida | ' . $surveyTitle;
+
+    $html = '<!doctype html>'
+        . '<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . email_esc($subject) . '</title></head>'
+        . '<body style="margin:0;padding:0;background:#eef0f6;font-family:Arial,Helvetica,sans-serif;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#eef0f6;padding:32px 16px;"><tr><td align="center">'
+        . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;background:#ffffff;border-radius:16px;overflow:hidden;">'
+
+        // Cabeçalho
+        . '<tr><td style="background:' . EMAIL_BRAND_NAVY . ';padding:26px 32px;">'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
+        . '<td valign="middle"><img src="' . EMAIL_LOGO_URL . '" height="24" alt="F91" style="display:block;height:24px;width:auto;border:0;"></td>'
+        . '<td valign="middle" align="right"><span style="display:inline-block;padding:5px 12px;border-radius:999px;background:' . EMAIL_BRAND_NAVY_SOFT . ';color:' . EMAIL_BRAND_LIME . ';font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Nova resposta</span></td>'
+        . '</tr></table>'
+        . '</td></tr>'
+
+        // Corpo
+        . '<tr><td style="padding:30px 32px 8px;">'
+        . '<div style="font-family:Arial,Helvetica,sans-serif;font-size:21px;font-weight:700;color:' . EMAIL_INK . ';letter-spacing:-.01em;">Uma nova resposta chegou</div>'
+        . '<p style="margin:8px 0 22px;font-family:Arial,Helvetica,sans-serif;font-size:13.5px;line-height:1.7;color:' . EMAIL_MUTED . ';">Alguém acabou de responder a pesquisa <strong style="color:' . EMAIL_INK . ';">' . email_esc($surveyTitle) . '</strong>. Veja o resumo abaixo ou abra o registro completo no painel.</p>'
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">' . $chipsGridHtml . '</table>'
+        . $contactHtml
+        . $answersHtml
+        . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:26px;"><tr><td align="center">'
+        . '<table role="presentation" cellpadding="0" cellspacing="0"><tr><td style="border-radius:10px;background:' . EMAIL_BRAND_NAVY . ';">'
+        . '<a href="' . EMAIL_DASHBOARD_URL . '" target="_blank" style="display:inline-block;padding:13px 28px;font-family:Arial,Helvetica,sans-serif;font-size:13.5px;font-weight:700;color:#ffffff;text-decoration:none;">Abrir no painel</a>'
+        . '</td></tr></table>'
+        . '</td></tr></table>'
+        . '</td></tr>'
+
+        // Rodapé
+        . '<tr><td style="padding:20px 32px;background:' . EMAIL_SURFACE . ';border-top:1px solid ' . EMAIL_BORDER . ';">'
+        . '<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.6;color:' . EMAIL_MUTED . ';">F91 - Soluções Operacionais &middot; www.f91.tech<br>Você recebeu este e-mail porque está na lista de notificação de respostas de survey do F91.</p>'
+        . '</td></tr>'
+
+        . '</table>'
+        . '</td></tr></table>'
+        . '</body></html>';
+
+    $textLines = ['Nova resposta recebida', '', 'Pesquisa: ' . $surveyTitle, 'Nicho: ' . $niche, 'Idioma: ' . $language, 'Recebida em: ' . $receivedAt, ''];
+    foreach ($contactRows as $row) {
+        $textLines[] = $row[0] . ': ' . $row[1];
+    }
+    $textLines[] = '';
+    foreach ($answerItems as $item) {
+        $textLines[] = $item['questionLabel'] . ': ' . ($item['answerValue'] ?: '-');
+    }
+    $textLines[] = '';
+    $textLines[] = 'Abrir no painel: ' . EMAIL_DASHBOARD_URL;
+
+    return [
+        'subject' => $subject,
+        'html' => $html,
+        'text' => implode("\n", $textLines),
+    ];
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -515,11 +642,19 @@ function build_dashboard_where(array $filters, string $alias = ''): array
         $params['language'] = $filters['language'];
     }
     if ($filters['search'] !== '') {
+        // MySQL, com prepared statements nativos (EMULATE_PREPARES=false), não
+        // aceita o mesmo placeholder nomeado repetido várias vezes na mesma
+        // query — por isso cada coluna recebe seu próprio placeholder, todos
+        // com o mesmo valor.
         $escaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $filters['search']);
         $columns = ['survey_title', 'survey_niche', 'primary_value', 'contact_name', 'contact_email', 'contact_phone'];
-        $likeConditions = array_map(static fn($col) => "{$prefix}{$col} LIKE :search", $columns);
+        $likeConditions = [];
+        foreach ($columns as $index => $col) {
+            $placeholder = 'search' . $index . ($alias !== '' ? '_' . $alias : '');
+            $likeConditions[] = "{$prefix}{$col} LIKE :{$placeholder}";
+            $params[$placeholder] = '%' . $escaped . '%';
+        }
         $conditions[] = '(' . implode(' OR ', $likeConditions) . ')';
-        $params['search'] = '%' . $escaped . '%';
     }
 
     $durationSeconds = range_duration_seconds($filters['range']);

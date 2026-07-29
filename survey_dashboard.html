@@ -109,130 +109,123 @@
     <div class="dashboard-shell" id="dashboardShell" hidden>
         <button type="button" class="sidebar-overlay" id="sidebarOverlay" hidden aria-label="Fechar navegacao"></button>
 
-        <aside class="app-sidebar" id="appSidebar">
-            <div class="sidebar-inner">
-                <div class="sidebar-head">
-                    <div class="brand-lockup brand-lockup-sidebar">
-                        <img src="img/logo_.png" alt="F91">
-                        <div class="brand-lockup-copy">
-                            <span class="brand-kicker">Admin</span>
-                            <strong>Survey Analytics</strong>
+        <header class="topbar">
+            <div class="topbar-left">
+                <button type="button" class="icon-btn header-menu" id="sidebarToggleButton" aria-label="Abrir menu">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <div class="brand-lockup">
+                    <img src="img/logo_.png" alt="F91">
+                    <span class="topbar-wordmark">Survey Analytics</span>
+                </div>
+            </div>
+
+            <label class="topbar-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="searchFilter" type="search" placeholder="Buscar por empresa, contato, e-mail, nicho...">
+            </label>
+
+            <div class="topbar-right">
+                <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false">
+                    <span class="theme-toggle-track">
+                        <span class="theme-toggle-thumb">
+                            <i class="fa-solid fa-moon"></i>
+                        </span>
+                    </span>
+                </button>
+
+                <div class="topbar-divider" aria-hidden="true"></div>
+
+                <div class="profile-chip">
+                    <span class="profile-avatar">F9</span>
+                    <span class="profile-copy">
+                        <strong>Admin</strong>
+                        <small>F91 Team</small>
+                    </span>
+                    <button type="button" class="icon-btn profile-logout" id="logoutButton" aria-label="Encerrar sessao" title="Encerrar sessao">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="shell-body">
+            <aside class="app-sidebar" id="appSidebar">
+                <div class="sidebar-inner">
+                    <button type="button" class="icon-btn sidebar-close" id="sidebarCloseButton" aria-label="Fechar menu">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+
+                    <nav class="sidebar-nav">
+                        <p class="sidebar-group-label">Menu</p>
+                        <a href="#overview" class="nav-link">
+                            <span class="nav-link-index"><i class="fa-solid fa-gauge-high"></i></span>
+                            <span class="nav-link-copy">Visao geral</span>
+                        </a>
+                        <a href="#surveys" class="nav-link">
+                            <span class="nav-link-index"><i class="fa-solid fa-chart-column"></i></span>
+                            <span class="nav-link-copy">Comparativos</span>
+                        </a>
+                        <a href="#deep-dive" class="nav-link">
+                            <span class="nav-link-index"><i class="fa-solid fa-magnifying-glass-chart"></i></span>
+                            <span class="nav-link-copy">Analise por pesquisa</span>
+                        </a>
+                        <a href="#responses" class="nav-link">
+                            <span class="nav-link-index"><i class="fa-solid fa-inbox"></i></span>
+                            <span class="nav-link-copy">Respostas</span>
+                        </a>
+                    </nav>
+
+                    <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseButton" aria-label="Recolher menu" aria-pressed="false">
+                        <i class="fa-solid fa-angles-left"></i>
+                        <span>Recolher menu</span>
+                    </button>
+                </div>
+            </aside>
+
+            <main class="app-main">
+                <div class="page-head">
+                    <p class="breadcrumb">Home <i class="fa-solid fa-chevron-right"></i> Dashboard</p>
+                    <div class="page-head-row">
+                        <h1>Painel de pesquisas</h1>
+                        <div class="page-head-actions">
+                            <button type="button" class="btn-ghost" id="refreshButton">
+                                <i class="fa-solid fa-rotate"></i>
+                                Atualizar
+                            </button>
+                            <button type="button" class="btn-primary" id="openSheetButton">
+                                <i class="fa-solid fa-file-csv"></i>
+                                Exportar CSV
+                            </button>
                         </div>
                     </div>
 
-                    <div class="sidebar-head-tools">
-                        <button type="button" class="theme-toggle theme-toggle-sidebar" data-theme-toggle aria-pressed="false">
-                            <span class="theme-toggle-track">
-                                <span class="theme-toggle-thumb">
-                                    <i class="fa-solid fa-moon"></i>
-                                </span>
-                            </span>
-                        </button>
+                    <div class="filters-toolbar">
+                        <div class="range-group filters-range-group" id="rangeGroup">
+                            <button type="button" class="range-pill" data-range="24h">24h</button>
+                            <button type="button" class="range-pill" data-range="7d">7 dias</button>
+                            <button type="button" class="range-pill active" data-range="30d">30 dias</button>
+                            <button type="button" class="range-pill" data-range="90d">90 dias</button>
+                            <button type="button" class="range-pill" data-range="all">Tudo</button>
+                        </div>
 
-                        <button type="button" class="icon-btn sidebar-close" id="sidebarCloseButton" aria-label="Fechar menu">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
+                        <label class="filter-field filter-inline-field filter-inline-survey">
+                            <span>Survey</span>
+                            <select id="surveyFilter">
+                                <option value="">Todos os surveys</option>
+                            </select>
+                        </label>
+
+                        <label class="filter-field filter-inline-field filter-inline-language">
+                            <span>Idioma</span>
+                            <select id="languageFilter">
+                                <option value="">Todos os idiomas</option>
+                            </select>
+                        </label>
                     </div>
                 </div>
 
-                <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseButton" aria-label="Recolher menu" aria-pressed="false">
-                    <i class="fa-solid fa-angles-left"></i>
-                    <span>Recolher menu</span>
-                </button>
-
-                <nav class="sidebar-nav">
-                    <a href="#overview" class="nav-link">
-                        <span class="nav-link-index"><i class="fa-solid fa-gauge-high"></i></span>
-                        <span class="nav-link-copy">
-                            <strong>Visao geral</strong>
-                            <small>Filtros e indicadores</small>
-                        </span>
-                    </a>
-                    <a href="#surveys" class="nav-link">
-                        <span class="nav-link-index"><i class="fa-solid fa-chart-column"></i></span>
-                        <span class="nav-link-copy">
-                            <strong>Comparativos</strong>
-                            <small>Survey, idioma e cadencia</small>
-                        </span>
-                    </a>
-                    <a href="#deep-dive" class="nav-link">
-                        <span class="nav-link-index"><i class="fa-solid fa-magnifying-glass-chart"></i></span>
-                        <span class="nav-link-copy">
-                            <strong>Analise por pesquisa</strong>
-                            <small>Todas as perguntas, por tema</small>
-                        </span>
-                    </a>
-                    <a href="#responses" class="nav-link">
-                        <span class="nav-link-index"><i class="fa-solid fa-inbox"></i></span>
-                        <span class="nav-link-copy">
-                            <strong>Respostas</strong>
-                            <small>Inbox e detalhamento</small>
-                        </span>
-                    </a>
-                </nav>
-
-                <div class="sidebar-utility">
-                    <div class="sidebar-actions">
-                        <button type="button" class="sidebar-button sidebar-button-primary" id="openSheetButton">
-                            <i class="fa-solid fa-file-csv"></i>
-                            <span>Exportar CSV</span>
-                        </button>
-                        <button type="button" class="sidebar-button" id="refreshButton">
-                            <i class="fa-solid fa-rotate"></i>
-                            <span>Atualizar painel</span>
-                        </button>
-                        <button type="button" class="sidebar-button sidebar-button-danger" id="logoutButton">
-                            <i class="fa-solid fa-right-from-bracket"></i>
-                            <span>Encerrar sessao</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </aside>
-
-        <main class="app-main">
-            <header class="app-header filters-header">
-                <div class="filters-heading-group">
-                    <button type="button" class="icon-btn header-menu" id="sidebarToggleButton" aria-label="Abrir menu">
-                        <i class="fa-solid fa-bars"></i>
-                    </button>
-
-                    <div class="filters-heading">
-                        <p class="eyebrow">Filtros</p>
-                    </div>
-                </div>
-
-                <div class="filters-toolbar">
-                    <div class="range-group filters-range-group" id="rangeGroup">
-                        <button type="button" class="range-pill" data-range="24h">24h</button>
-                        <button type="button" class="range-pill" data-range="7d">7 dias</button>
-                        <button type="button" class="range-pill active" data-range="30d">30 dias</button>
-                        <button type="button" class="range-pill" data-range="90d">90 dias</button>
-                        <button type="button" class="range-pill" data-range="all">Tudo</button>
-                    </div>
-
-                    <label class="filter-field filter-inline-field filter-inline-survey">
-                        <span>Survey</span>
-                        <select id="surveyFilter">
-                            <option value="">Todos os surveys</option>
-                        </select>
-                    </label>
-
-                    <label class="filter-field filter-inline-field filter-inline-language">
-                        <span>Idioma</span>
-                        <select id="languageFilter">
-                            <option value="">Todos os idiomas</option>
-                        </select>
-                    </label>
-
-                    <label class="filter-field filter-inline-field filter-inline-search">
-                        <span>Busca</span>
-                        <input id="searchFilter" type="search" placeholder="Empresa, contato, email, nicho...">
-                    </label>
-                </div>
-            </header>
-
-            <section class="app-hero" id="overview">
+                <section class="app-hero" id="overview">
                 <div class="summary-grid" id="summaryGrid"></div>
             </section>
 
@@ -333,7 +326,8 @@
                     </table>
                 </div>
             </section>
-        </main>
+            </main>
+        </div>
     </div>
 
     <div class="response-drawer" id="responseDrawer" hidden>

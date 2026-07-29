@@ -214,7 +214,7 @@
         const shouldShowTooltips = state.sidebarCollapsed && window.innerWidth > MOBILE_BREAKPOINT;
 
         elements.sidebarNavLinks.forEach((link) => {
-            const label = link.querySelector(".nav-link-copy strong");
+            const label = link.querySelector(".nav-link-copy");
             if (!label) {
                 return;
             }
@@ -222,18 +222,6 @@
                 link.setAttribute("title", label.textContent.trim());
             } else {
                 link.removeAttribute("title");
-            }
-        });
-
-        [elements.openSheetButton, elements.refreshButton, elements.logoutButton].forEach((button) => {
-            if (!button) {
-                return;
-            }
-            const label = button.textContent.trim();
-            if (shouldShowTooltips) {
-                button.setAttribute("title", label);
-            } else {
-                button.removeAttribute("title");
             }
         });
     }
@@ -703,7 +691,7 @@
     }
 
     function renderDashboard(payload) {
-        renderSummary(payload.summary || {});
+        renderSummary(payload.summary || {}, payload.timeline || []);
         renderSelectOptions(
             elements.surveyFilter,
             payload.survey_options || [],
@@ -728,7 +716,36 @@
         renderResponsesTable(payload.latest_responses || []);
     }
 
-    function renderSummary(summary) {
+    function buildSparkline(timeline) {
+        const counts = (timeline || []).map((point) => point.count);
+        if (counts.length < 2) {
+            return "";
+        }
+
+        const width = 240;
+        const height = 40;
+        const max = Math.max(...counts, 1);
+        const min = Math.min(...counts, 0);
+        const range = Math.max(max - min, 1);
+        const stepX = width / (counts.length - 1);
+
+        const points = counts.map((count, index) => {
+            const x = index * stepX;
+            const y = height - ((count - min) / range) * (height - 6) - 3;
+            return `${x.toFixed(1)},${y.toFixed(1)}`;
+        });
+
+        const areaPoints = `0,${height} ${points.join(" ")} ${width},${height}`;
+
+        return `
+            <svg class="summary-sparkline" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true">
+                <polygon points="${areaPoints}" fill="currentColor" fill-opacity="0.14" stroke="none"></polygon>
+                <polyline points="${points.join(" ")}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></polyline>
+            </svg>
+        `;
+    }
+
+    function renderSummary(summary, timeline) {
         const cards = [
             {
                 label: "Total de respostas",
@@ -738,6 +755,7 @@
                     ? `Ultima entrada em ${formatDateTime(summary.latest_received_at)}`
                     : "Aguardando novas entradas",
                 trend: buildTrendMarkup(summary.trend_delta, summary.trend_percent),
+                sparkline: buildSparkline(timeline),
                 featured: true
             },
             {
@@ -781,6 +799,7 @@
                 <strong class="summary-value">${escapeHtml(card.value)}</strong>
                 <p>${escapeHtml(card.description)}</p>
                 <span class="summary-meta">${escapeHtml(card.meta || "")}</span>
+                ${card.sparkline || ""}
             </article>
         `).join("");
     }
