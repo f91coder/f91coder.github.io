@@ -125,6 +125,40 @@
                 <input id="searchFilter" type="search" placeholder="Buscar por empresa, contato, e-mail, nicho...">
             </label>
 
+            <div class="topbar-filters">
+                <div class="topbar-select">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <select id="rangeGroup" aria-label="Periodo">
+                        <option value="24h">24h</option>
+                        <option value="7d">7 dias</option>
+                        <option value="30d" selected>30 dias</option>
+                        <option value="90d">90 dias</option>
+                        <option value="all">Tudo</option>
+                    </select>
+                </div>
+                <div class="topbar-select">
+                    <i class="fa-solid fa-list-check"></i>
+                    <select id="surveyFilter" aria-label="Survey">
+                        <option value="">Todos os surveys</option>
+                    </select>
+                </div>
+                <div class="topbar-select">
+                    <i class="fa-solid fa-globe"></i>
+                    <select id="languageFilter" aria-label="Idioma">
+                        <option value="">Todos os idiomas</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="topbar-actions">
+                <button type="button" class="icon-btn" id="refreshButton" aria-label="Atualizar painel" title="Atualizar painel">
+                    <i class="fa-solid fa-rotate"></i>
+                </button>
+                <button type="button" class="icon-btn" id="openSheetButton" aria-label="Exportar CSV" title="Exportar CSV">
+                    <i class="fa-solid fa-file-csv"></i>
+                </button>
+            </div>
+
             <div class="topbar-right">
                 <button type="button" class="theme-toggle" data-theme-toggle aria-pressed="false">
                     <span class="theme-toggle-track">
@@ -186,43 +220,7 @@
             <main class="app-main">
                 <div class="page-head">
                     <p class="breadcrumb">Home <i class="fa-solid fa-chevron-right"></i> Dashboard</p>
-                    <div class="page-head-row">
-                        <h1>Painel de pesquisas</h1>
-                        <div class="page-head-actions">
-                            <button type="button" class="btn-ghost" id="refreshButton">
-                                <i class="fa-solid fa-rotate"></i>
-                                Atualizar
-                            </button>
-                            <button type="button" class="btn-primary" id="openSheetButton">
-                                <i class="fa-solid fa-file-csv"></i>
-                                Exportar CSV
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="filters-toolbar">
-                        <div class="range-group filters-range-group" id="rangeGroup">
-                            <button type="button" class="range-pill" data-range="24h">24h</button>
-                            <button type="button" class="range-pill" data-range="7d">7 dias</button>
-                            <button type="button" class="range-pill active" data-range="30d">30 dias</button>
-                            <button type="button" class="range-pill" data-range="90d">90 dias</button>
-                            <button type="button" class="range-pill" data-range="all">Tudo</button>
-                        </div>
-
-                        <label class="filter-field filter-inline-field filter-inline-survey">
-                            <span>Survey</span>
-                            <select id="surveyFilter">
-                                <option value="">Todos os surveys</option>
-                            </select>
-                        </label>
-
-                        <label class="filter-field filter-inline-field filter-inline-language">
-                            <span>Idioma</span>
-                            <select id="languageFilter">
-                                <option value="">Todos os idiomas</option>
-                            </select>
-                        </label>
-                    </div>
+                    <h1>Painel de pesquisas</h1>
                 </div>
 
                 <section class="app-hero" id="overview">
@@ -346,7 +344,14 @@
         </aside>
     </div>
 
-    <div class="dashboard-toast" id="dashboardToast" hidden></div>
+    <div class="dashboard-toast" id="dashboardToast" hidden role="status" aria-live="polite">
+        <span class="toast-icon" id="toastIcon"><i class="fa-solid fa-check"></i></span>
+        <span class="toast-message" id="toastMessage"></span>
+        <button type="button" class="toast-close" id="toastCloseButton" aria-label="Fechar notificacao">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <span class="toast-progress"><span class="toast-progress-fill" id="toastProgressFill"></span></span>
+    </div>
 
     <script src="js/survey_dashboard.js" defer></script>
 </body>

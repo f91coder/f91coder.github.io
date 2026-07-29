@@ -63,8 +63,13 @@
         drawerTitle: document.getElementById("drawerTitle"),
         drawerBody: document.getElementById("drawerBody"),
         dashboardToast: document.getElementById("dashboardToast"),
+        toastIcon: document.getElementById("toastIcon"),
+        toastMessage: document.getElementById("toastMessage"),
+        toastCloseButton: document.getElementById("toastCloseButton"),
+        toastProgressFill: document.getElementById("toastProgressFill"),
         sidebarOverlay: document.getElementById("sidebarOverlay"),
         appSidebar: document.getElementById("appSidebar"),
+        topbar: document.querySelector(".topbar"),
         sidebarToggleButton: document.getElementById("sidebarToggleButton"),
         sidebarCloseButton: document.getElementById("sidebarCloseButton"),
         sidebarCollapseButton: document.getElementById("sidebarCollapseButton"),
@@ -232,13 +237,43 @@
         elements.passwordInput.classList.toggle("error", !!message);
     }
 
-    function showToast(message) {
-        elements.dashboardToast.textContent = message;
-        elements.dashboardToast.hidden = false;
+    const TOAST_ICONS = {
+        success: "fa-check",
+        error: "fa-triangle-exclamation",
+        info: "fa-circle-info"
+    };
+
+    function showToast(message, type = "success", duration = 3200) {
         window.clearTimeout(showToast.timeoutId);
-        showToast.timeoutId = window.setTimeout(() => {
+        window.clearTimeout(showToast.hideTimeoutId);
+
+        elements.toastMessage.textContent = message;
+        elements.dashboardToast.hidden = false;
+        elements.dashboardToast.classList.remove("is-leaving");
+        elements.dashboardToast.dataset.tone = TOAST_ICONS[type] ? type : "success";
+        elements.toastIcon.innerHTML = `<i class="fa-solid ${TOAST_ICONS[type] || TOAST_ICONS.success}"></i>`;
+
+        // Reinicia a animacao da barra de progresso mesmo se um toast anterior
+        // ainda estiver visivel (remove, forca reflow, reaplica).
+        elements.toastProgressFill.style.animation = "none";
+        void elements.toastProgressFill.offsetWidth;
+        elements.toastProgressFill.style.animation = `toast-countdown ${duration}ms linear forwards`;
+
+        requestAnimationFrame(() => {
+            elements.dashboardToast.classList.add("is-visible");
+        });
+
+        showToast.timeoutId = window.setTimeout(() => hideToast(), duration);
+    }
+
+    function hideToast() {
+        window.clearTimeout(showToast.timeoutId);
+        elements.dashboardToast.classList.remove("is-visible");
+        elements.dashboardToast.classList.add("is-leaving");
+        showToast.hideTimeoutId = window.setTimeout(() => {
             elements.dashboardToast.hidden = true;
-        }, 3200);
+            elements.dashboardToast.classList.remove("is-leaving");
+        }, 220);
     }
 
     function setLoadingState(isLoading) {
@@ -547,7 +582,7 @@
             }
 
             if (!options.silent) {
-                showToast(error.message || "Nao foi possivel carregar o painel.");
+                showToast(error.message || "Nao foi possivel carregar o painel.", "error");
             }
         } finally {
             setLoadingState(false);
@@ -579,7 +614,7 @@
             }
 
             if (!options.silent) {
-                showToast(error.message || "Nao foi possivel carregar a analise por pesquisa.");
+                showToast(error.message || "Nao foi possivel carregar a analise por pesquisa.", "error");
             }
         }
     }
@@ -749,6 +784,7 @@
         const cards = [
             {
                 label: "Total de respostas",
+                icon: "fa-chart-line",
                 value: formatNumber(summary.total_responses),
                 description: "Volume consolidado dentro da janela ativa.",
                 meta: summary.latest_received_at
@@ -760,30 +796,35 @@
             },
             {
                 label: "Ultimas 24 horas",
+                icon: "fa-bolt",
                 value: formatNumber(summary.last_24h),
                 description: "Pulso operacional mais imediato.",
                 meta: "Leitura de curtissimo prazo"
             },
             {
                 label: "Ultimos 7 dias",
+                icon: "fa-calendar-week",
                 value: formatNumber(summary.last_7d),
                 description: "Ritmo semanal da captacao.",
                 meta: "Janela semanal"
             },
             {
                 label: "Hoje",
+                icon: "fa-sun",
                 value: formatNumber(summary.today),
                 description: "Envios recebidos no dia corrente.",
                 meta: "Atualiza ao longo do dia"
             },
             {
                 label: "Surveys ativos",
+                icon: "fa-layer-group",
                 value: formatNumber(summary.active_surveys),
                 description: "Quantidade de surveys presentes no recorte.",
                 meta: "Cobertura atual"
             },
             {
                 label: "Completion medio",
+                icon: "fa-bullseye",
                 value: formatPercent(summary.avg_completion_rate),
                 description: `Media de ${formatNumber(Math.round(summary.avg_answered_count || 0))} respostas por envio.`,
                 meta: "Qualidade media de preenchimento"
@@ -792,6 +833,7 @@
 
         elements.summaryGrid.innerHTML = cards.map((card) => `
             <article class="summary-card ${card.featured ? "featured" : ""}">
+                <div class="summary-icon"><i class="fa-solid ${card.icon}"></i></div>
                 <div class="summary-head">
                     <p class="eyebrow">${escapeHtml(card.label)}</p>
                     ${card.trend || ""}
@@ -837,8 +879,9 @@
         const maxCount = Math.max(...points.map((item) => item.count), 1);
         elements.timelineChart.innerHTML = points.map((item) => {
             const height = Math.max(12, Math.round((item.count / maxCount) * 190));
+            const tooltip = `${item.label} • ${formatNumber(item.count)} ${item.count === 1 ? "resposta" : "respostas"}`;
             return `
-                <div class="timeline-bar" title="${escapeHtml(item.label)}: ${escapeHtml(String(item.count))}">
+                <div class="timeline-bar has-tooltip" data-tooltip="${escapeHtml(tooltip)}">
                     <span class="timeline-value">${escapeHtml(String(item.count))}</span>
                     <div class="timeline-column" style="height:${height}px"></div>
                     <span class="timeline-label">${escapeHtml(item.label)}</span>
@@ -907,15 +950,19 @@
         }
 
         const maxCount = Math.max(...items.map((item) => item.count), 1);
+        const totalCount = items.reduce((acc, item) => acc + (Number(item.count) || 0), 0);
         container.innerHTML = items.map((item) => {
             const intensity = item.count / maxCount;
             const alpha = 0.08 + (intensity * 0.22);
             const border = 0.14 + (intensity * 0.24);
             const strongTone = intensity > 0.62 ? "is-strong" : "";
+            const share = totalCount ? formatPercent(item.count / totalCount) : "0%";
+            const tooltip = `${item.label} • ${formatNumber(item.count)} (${share})`;
 
             return `
                 <div
-                    class="heatmap-cell ${strongTone}"
+                    class="heatmap-cell has-tooltip ${strongTone}"
+                    data-tooltip="${escapeHtml(tooltip)}"
                     style="background-color:rgba(var(--accent-rgb), ${alpha}); border-color:rgba(var(--accent-rgb), ${border});"
                 >
                     <strong>${escapeHtml(formatNumber(item.count))}</strong>
@@ -1070,6 +1117,24 @@
         elements.drawerTitle.textContent = "Detalhamento da resposta";
     }
 
+    function syncTopbarHeight() {
+        if (!elements.topbar) return;
+        const height = Math.ceil(elements.topbar.getBoundingClientRect().height);
+        if (height > 0) {
+            document.documentElement.style.setProperty("--topbar-height-live", `${height}px`);
+        }
+    }
+
+    function watchTopbarHeight() {
+        syncTopbarHeight();
+        if (typeof ResizeObserver === "function" && elements.topbar) {
+            const observer = new ResizeObserver(() => syncTopbarHeight());
+            observer.observe(elements.topbar);
+        } else {
+            window.addEventListener("resize", syncTopbarHeight);
+        }
+    }
+
     function bindEvents() {
         elements.loginForm.addEventListener("submit", handleLoginSubmit);
 
@@ -1112,23 +1177,15 @@
 
         elements.openSheetButton.addEventListener("click", () => {
             if (!state.token) {
-                showToast("Faca login para exportar os dados.");
+                showToast("Faca login para exportar os dados.", "info");
                 return;
             }
 
             window.open(buildExportUrl(), "_blank", "noopener");
         });
 
-        elements.rangeGroup.addEventListener("click", (event) => {
-            const button = event.target.closest("[data-range]");
-            if (!button) {
-                return;
-            }
-
-            state.filters.range = button.dataset.range;
-            elements.rangeGroup.querySelectorAll("[data-range]").forEach((item) => {
-                item.classList.toggle("active", item.dataset.range === state.filters.range);
-            });
+        elements.rangeGroup.addEventListener("change", () => {
+            state.filters.range = elements.rangeGroup.value;
             loadDashboard();
         });
 
@@ -1166,6 +1223,10 @@
                 loadDashboard({ silent: true });
             }, 260);
         });
+
+        if (elements.toastCloseButton) {
+            elements.toastCloseButton.addEventListener("click", () => hideToast());
+        }
 
         elements.responsesTableBody.addEventListener("click", (event) => {
             const row = event.target.closest("[data-response-id]");
@@ -1228,6 +1289,7 @@
         updateAutoRefreshState();
         bindEvents();
         bindSectionNavigation();
+        watchTopbarHeight();
 
         if (state.token) {
             setAuthenticated(true);
