@@ -397,7 +397,7 @@ function send_survey_notification(array $response): void
         $mail->addAddress($to);
     }
 
-    $logoPath = __DIR__ . '/../../img/logof91_white.png';
+    $logoPath = __DIR__ . '/../../img/logo.png';
     if (is_file($logoPath)) {
         // Logo embutida como anexo inline (CID) em vez de referenciada por URL
         // remota: assim ela sempre aparece, mesmo em clientes que bloqueiam
@@ -512,7 +512,7 @@ function build_notification_email(array $response): array
         // Cabeçalho
         . '<tr><td style="background:' . EMAIL_BRAND_NAVY . ';padding:26px 32px;">'
         . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>'
-        . '<td valign="middle"><img src="' . EMAIL_LOGO_CID . '" height="24" alt="F91" style="display:block;height:24px;width:auto;border:0;"></td>'
+        . '<td valign="middle"><img src="' . EMAIL_LOGO_CID . '" height="36" alt="F91" style="display:block;height:36px;width:auto;border:0;"></td>'
         . '<td valign="middle" align="right"><span style="display:inline-block;padding:5px 12px;border-radius:999px;background:' . EMAIL_BRAND_NAVY_SOFT . ';color:' . EMAIL_BRAND_LIME . ';font-family:Arial,Helvetica,sans-serif;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">Nova resposta</span></td>'
         . '</tr></table>'
         . '</td></tr>'
