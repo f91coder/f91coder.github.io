@@ -10,6 +10,10 @@ php/mail-config.local.php
 # arquivos fora do Git; so o .local.php tem as credenciais reais.)
 php/survey/db-config.local.php
 
+# Chave SSH de deploy gerada localmente — nunca versionar (apagar apos configurar)
+f91_deploy_key
+f91_deploy_key.pub
+
 # OS
 .DS_Store
 Thumbs.db
