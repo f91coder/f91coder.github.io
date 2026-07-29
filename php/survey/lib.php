@@ -283,10 +283,12 @@ function send_survey_notification(array $response): void
 {
     $config = survey_config();
     $mailConfig = require __DIR__ . '/../mail-config.php';
-    foreach (['host', 'username', 'password', 'from_email'] as $key) {
-        if (empty($mailConfig[$key])) {
-            return; // sem SMTP configurado, não bloqueia o envio da resposta
-        }
+    $missing = array_filter(['host', 'username', 'password', 'from_email'], static fn($key) => empty($mailConfig[$key]));
+    if ($missing) {
+        // Lançar (em vez de retornar em silêncio) garante que isso apareça no
+        // error_log via o catch em submit_survey() — sem isso, uma config de
+        // e-mail ausente falhava sem deixar nenhum rastro.
+        throw new RuntimeException('Configuração de e-mail incompleta, faltando: ' . implode(', ', $missing));
     }
 
     require_once __DIR__ . '/../phpmailer/src/Exception.php';
