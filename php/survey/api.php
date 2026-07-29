@@ -41,26 +41,11 @@ try {
             $result = ['success' => true, 'status' => 'ready', 'version' => '1.0', 'timestamp' => gmdate('Y-m-d\TH:i:s\Z')];
             if (($_GET['debug_mail'] ?? '') === 'f91-temp-check-2026') {
                 try {
-                    $mailCfg = require __DIR__ . '/../mail-config.php';
-                    require_once __DIR__ . '/../phpmailer/src/Exception.php';
-                    require_once __DIR__ . '/../phpmailer/src/PHPMailer.php';
-                    require_once __DIR__ . '/../phpmailer/src/SMTP.php';
-
-                    $probe = new PHPMailer\PHPMailer\PHPMailer(true);
-                    $probe->isSMTP();
-                    $probe->Host = $mailCfg['host'];
-                    $probe->SMTPAuth = true;
-                    $probe->Username = $mailCfg['username'];
-                    $probe->Password = $mailCfg['password'];
-                    $probe->Port = (int) $mailCfg['port'];
-                    $result['from_ok'] = $probe->setFrom($mailCfg['from_email'], $mailCfg['from_name'] ?: 'F91');
-
-                    $addResults = [];
-                    foreach (['filoliveira.me@gmail.com', 'f91.adm@gmail.com'] as $addr) {
-                        $addResults[$addr] = $probe->addAddress($addr);
-                    }
-                    $result['add_address_results'] = $addResults;
-                    $result['probe_error_info'] = $probe->ErrorInfo;
+                    send_survey_notification([
+                        'primaryLabel' => 'Teste', 'primaryValue' => 'Teste', 'contactName' => '',
+                        'contactEmail' => '', 'contactPhone' => '', 'answeredItems' => [],
+                        'survey' => ['title' => 'Teste'], 'language' => 'pt',
+                    ], true);
                 } catch (Throwable $e) {
                     $result['mail'] = 'error: ' . $e->getMessage();
                 }

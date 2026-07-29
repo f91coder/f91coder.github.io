@@ -279,7 +279,7 @@ function find_preferred_value(array $items, array $preferredKeys): string
     return $item['answerValue'] ?? '';
 }
 
-function send_survey_notification(array $response): void
+function send_survey_notification(array $response, bool $debug = false): void
 {
     $config = survey_config();
     $mailConfig = require __DIR__ . '/../mail-config.php';
@@ -312,7 +312,16 @@ function send_survey_notification(array $response): void
 
     $mail->CharSet = 'UTF-8';
     $mail->setFrom($mailConfig['from_email'], $mailConfig['from_name'] ?: 'F91 - Soluções Operacionais');
-    foreach (array_filter(array_map('trim', explode(',', (string) $config['notification_emails']))) as $to) {
+
+    $recipients = array_filter(array_map('trim', explode(',', (string) $config['notification_emails'])));
+    if ($debug) {
+        throw new RuntimeException(
+            'DEBUG recipients=' . json_encode($recipients)
+            . ' raw=' . bin2hex((string) $config['notification_emails'])
+            . ' type=' . gettype($config['notification_emails'])
+        );
+    }
+    foreach ($recipients as $to) {
         $mail->addAddress($to);
     }
 
