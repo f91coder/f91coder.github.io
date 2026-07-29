@@ -3,6 +3,7 @@
     const EXPORT_URL = "php/survey/export.php";
     const SESSION_TOKEN_KEY = "f91_survey_dashboard_token";
     const THEME_STORAGE_KEY = "f91_survey_dashboard_theme";
+    const SIDEBAR_COLLAPSED_KEY = "f91_survey_dashboard_sidebar_collapsed";
     const AUTO_REFRESH_MS = 60000;
     const MOBILE_BREAKPOINT = 1100;
     const DEFAULT_FILTERS = {
@@ -23,6 +24,7 @@
         searchDebounce: null,
         theme: storedTheme || (preferredDark ? "dark" : "light"),
         sidebarOpen: false,
+        sidebarCollapsed: localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "1",
         deepDiveSurveySlug: "hotelaria"
     };
 
@@ -44,7 +46,6 @@
         languageBreakdown: document.getElementById("languageBreakdown"),
         hourlyHeatmap: document.getElementById("hourlyHeatmap"),
         weekdayHeatmap: document.getElementById("weekdayHeatmap"),
-        questionInsights: document.getElementById("questionInsights"),
         surveyTabs: document.getElementById("surveyTabs"),
         conversionFunnels: document.getElementById("conversionFunnels"),
         deepDiveSections: document.getElementById("deepDiveSections"),
@@ -66,6 +67,7 @@
         appSidebar: document.getElementById("appSidebar"),
         sidebarToggleButton: document.getElementById("sidebarToggleButton"),
         sidebarCloseButton: document.getElementById("sidebarCloseButton"),
+        sidebarCollapseButton: document.getElementById("sidebarCollapseButton"),
         themeToggleButtons: Array.from(document.querySelectorAll("[data-theme-toggle]")),
         themeStateTargets: Array.from(document.querySelectorAll("[data-theme-state]")),
         themeLabelTargets: Array.from(document.querySelectorAll("[data-theme-label]")),
@@ -190,6 +192,50 @@
         elements.dashboardShell.classList.toggle("sidebar-open", shouldOpen);
         elements.sidebarOverlay.hidden = !shouldOpen;
         elements.body.classList.toggle("has-sidebar-open", shouldOpen);
+    }
+
+    function setSidebarCollapsed(isCollapsed) {
+        state.sidebarCollapsed = !!isCollapsed;
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, state.sidebarCollapsed ? "1" : "0");
+        elements.dashboardShell.classList.toggle("sidebar-collapsed", state.sidebarCollapsed);
+
+        if (elements.sidebarCollapseButton) {
+            elements.sidebarCollapseButton.setAttribute("aria-pressed", String(state.sidebarCollapsed));
+            elements.sidebarCollapseButton.setAttribute(
+                "aria-label",
+                state.sidebarCollapsed ? "Expandir menu" : "Recolher menu"
+            );
+        }
+
+        applySidebarTooltips();
+    }
+
+    function applySidebarTooltips() {
+        const shouldShowTooltips = state.sidebarCollapsed && window.innerWidth > MOBILE_BREAKPOINT;
+
+        elements.sidebarNavLinks.forEach((link) => {
+            const label = link.querySelector(".nav-link-copy strong");
+            if (!label) {
+                return;
+            }
+            if (shouldShowTooltips) {
+                link.setAttribute("title", label.textContent.trim());
+            } else {
+                link.removeAttribute("title");
+            }
+        });
+
+        [elements.openSheetButton, elements.refreshButton, elements.logoutButton].forEach((button) => {
+            if (!button) {
+                return;
+            }
+            const label = button.textContent.trim();
+            if (shouldShowTooltips) {
+                button.setAttribute("title", label);
+            } else {
+                button.removeAttribute("title");
+            }
+        });
     }
 
     function setLoginFeedback(message = "") {
@@ -679,7 +725,6 @@
         renderLanguageBreakdown(payload.language_breakdown || []);
         renderHeatmap(elements.hourlyHeatmap, payload.hourly_breakdown || []);
         renderHeatmap(elements.weekdayHeatmap, payload.weekday_breakdown || []);
-        renderQuestionInsights(payload.top_questions || []);
         renderResponsesTable(payload.latest_responses || []);
     }
 
@@ -857,53 +902,6 @@
                     <strong>${escapeHtml(formatNumber(item.count))}</strong>
                     <span>${escapeHtml(item.label)}</span>
                 </div>
-            `;
-        }).join("");
-    }
-
-    function renderQuestionInsights(items) {
-        if (!items.length) {
-            elements.questionInsights.innerHTML = buildEmptyState("Ainda nao ha respostas suficientes para gerar insights das perguntas.");
-            return;
-        }
-
-        elements.questionInsights.innerHTML = items.map((item) => {
-            const topAnswers = (item.top_answers || []).length
-                ? (item.top_answers || []).map((answer) => `
-                    <div class="answer-row">
-                        <div class="answer-row-head">
-                            <span>${escapeHtml(answer.label)}</span>
-                            <strong>${escapeHtml(formatNumber(answer.count))} | ${escapeHtml(formatPercent(answer.percent))}</strong>
-                        </div>
-                        <div class="stack-bar"><span style="width:${Math.max(8, answer.percent * 100)}%"></span></div>
-                    </div>
-                `).join("")
-                : buildEmptyState("Sem respostas estruturadas suficientes para ranking.");
-
-            const samples = (item.sample_answers || []).length
-                ? `
-                    <ul class="sample-list">
-                        ${(item.sample_answers || []).map((sample) => `<li>${escapeHtml(sample)}</li>`).join("")}
-                    </ul>
-                `
-                : "";
-
-            return `
-                <article class="question-card">
-                    <div class="stack-head">
-                        <div>
-                            <h4>${escapeHtml(item.question_label || item.question_key)}</h4>
-                            <span>${escapeHtml(item.question_key || "")}</span>
-                        </div>
-                        <div class="stack-count">${escapeHtml(formatNumber(item.response_count))}</div>
-                    </div>
-                    <div class="stack-meta">
-                        <span class="tag">${escapeHtml(item.question_type || "text")}</span>
-                        <span class="tag">${escapeHtml(formatNumber(item.distinct_answers || 0))} respostas distintas</span>
-                    </div>
-                    <div class="question-top-answers">${topAnswers}</div>
-                    ${samples}
-                </article>
             `;
         }).join("");
     }
@@ -1174,6 +1172,12 @@
             });
         }
 
+        if (elements.sidebarCollapseButton) {
+            elements.sidebarCollapseButton.addEventListener("click", () => {
+                setSidebarCollapsed(!state.sidebarCollapsed);
+            });
+        }
+
         elements.sidebarOverlay.addEventListener("click", () => {
             setSidebarOpen(false);
         });
@@ -1182,6 +1186,7 @@
             if (window.innerWidth > MOBILE_BREAKPOINT) {
                 setSidebarOpen(false);
             }
+            applySidebarTooltips();
         });
 
         document.addEventListener("keydown", (event) => {
@@ -1200,6 +1205,7 @@
 
     async function bootstrap() {
         applyTheme(state.theme);
+        setSidebarCollapsed(state.sidebarCollapsed);
         updateAutoRefreshState();
         bindEvents();
         bindSectionNavigation();

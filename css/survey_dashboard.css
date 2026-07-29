@@ -882,6 +882,128 @@ body[data-theme="dark"] .sidebar-button-primary{
   color:var(--danger);
 }
 
+.sidebar-collapse-toggle{
+  min-height:40px;
+  padding:0 12px;
+  margin:-4px 0 4px;
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  border-radius:12px;
+  border:1px solid transparent;
+  background:transparent;
+  color:var(--muted-soft);
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+  transition:border-color .18s ease, background-color .18s ease, color .18s ease;
+}
+
+.sidebar-collapse-toggle:hover{
+  border-color:var(--line);
+  background:var(--surface);
+  color:var(--text);
+}
+
+.sidebar-collapse-toggle i{
+  transition:transform .22s ease;
+}
+
+/* Sidebar retratil — aplica-se apenas em telas de desktop; no mobile o
+   comportamento continua sendo o off-canvas ja existente (sidebar-open). */
+@media (min-width:1101px){
+  .app-sidebar{
+    transition:width .22s ease;
+  }
+
+  .dashboard-shell.sidebar-collapsed{
+    grid-template-columns:88px minmax(0, 1fr);
+  }
+
+  .sidebar-collapsed .sidebar-inner{
+    padding:20px 14px;
+    align-items:center;
+  }
+
+  .sidebar-collapsed .sidebar-head{
+    flex-direction:column;
+    align-items:center;
+    gap:14px;
+  }
+
+  .sidebar-collapsed .brand-lockup-copy,
+  .sidebar-collapsed .theme-toggle-copy,
+  .sidebar-collapsed .nav-link-copy,
+  .sidebar-collapsed .sidebar-collapse-toggle span,
+  .sidebar-collapsed .sidebar-button span{
+    display:none;
+  }
+
+  .sidebar-collapsed .sidebar-head-tools{
+    flex-direction:column;
+  }
+
+  .sidebar-collapsed .sidebar-close{
+    display:none;
+  }
+
+  .sidebar-collapsed .theme-toggle-sidebar{
+    width:44px;
+    height:44px;
+    min-height:44px;
+    padding:0;
+    justify-content:center;
+    border-radius:14px;
+  }
+
+  .sidebar-collapsed .theme-toggle-sidebar .theme-toggle-track{
+    width:auto;
+    height:auto;
+    padding:0;
+    background:transparent;
+  }
+
+  .sidebar-collapsed .theme-toggle-sidebar .theme-toggle-thumb{
+    width:22px;
+    height:22px;
+    box-shadow:none;
+    background:transparent;
+    transform:none !important;
+  }
+
+  .sidebar-collapsed .sidebar-collapse-toggle{
+    justify-content:center;
+    width:100%;
+    padding:0;
+  }
+
+  .sidebar-collapsed .sidebar-collapse-toggle i{
+    transform:rotate(180deg);
+  }
+
+  .sidebar-collapsed .sidebar-nav,
+  .sidebar-collapsed .sidebar-actions{
+    width:100%;
+  }
+
+  .sidebar-collapsed .nav-link{
+    grid-template-columns:1fr;
+    justify-items:center;
+    padding:12px 4px;
+  }
+
+  .sidebar-collapsed .sidebar-button{
+    padding:0;
+    width:44px;
+    height:44px;
+    justify-self:center;
+  }
+
+  .sidebar-collapsed .app-main{
+    max-width:none;
+  }
+}
+
 .toggle-switch{
   width:62px;
   height:36px;
@@ -1075,7 +1197,7 @@ body[data-theme="dark"] .sidebar-button-primary{
 }
 
 .panel-wide{
-  margin-top:24px;
+  margin-top:40px;
 }
 
 .filters-panel{
@@ -1221,7 +1343,7 @@ body[data-theme="dark"] .range-pill.active{
 }
 
 .analytics-grid{
-  margin-top:24px;
+  margin-top:40px;
   display:grid;
   gap:16px;
   grid-template-columns:repeat(12, minmax(0, 1fr));
@@ -1294,7 +1416,6 @@ body[data-theme="dark"] .timeline-column{
   gap:10px;
   padding:16px;
   border-radius:18px;
-  border:1px solid var(--line);
   background:var(--surface-2);
 }
 
@@ -1415,7 +1536,6 @@ body[data-theme="dark"] .stack-bar > span{
 .question-card{
   padding:18px;
   border-radius:20px;
-  border:1px solid var(--line);
   background:var(--surface-2);
   display:grid;
   gap:14px;
@@ -1717,7 +1837,6 @@ body[data-theme="dark"] .funnel-bar-fill{
 .detail-field{
   padding:14px 16px;
   border-radius:16px;
-  border:1px solid var(--line);
   background:var(--surface-2);
 }
 
@@ -1744,8 +1863,7 @@ body[data-theme="dark"] .funnel-bar-fill{
 .answer-item{
   padding:16px;
   border-radius:18px;
-  border:1px solid var(--line);
-  background:var(--surface);
+  background:var(--surface-3);
 }
 
 .answer-item strong{

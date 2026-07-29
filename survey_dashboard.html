@@ -114,7 +114,7 @@
                 <div class="sidebar-head">
                     <div class="brand-lockup brand-lockup-sidebar">
                         <img src="img/logo_.png" alt="F91">
-                        <div>
+                        <div class="brand-lockup-copy">
                             <span class="brand-kicker">Admin</span>
                             <strong>Survey Analytics</strong>
                         </div>
@@ -134,6 +134,11 @@
                         </button>
                     </div>
                 </div>
+
+                <button type="button" class="sidebar-collapse-toggle" id="sidebarCollapseButton" aria-label="Recolher menu" aria-pressed="false">
+                    <i class="fa-solid fa-angles-left"></i>
+                    <span>Recolher menu</span>
+                </button>
 
                 <nav class="sidebar-nav">
                     <a href="#overview" class="nav-link">
@@ -157,13 +162,6 @@
                             <small>Todas as perguntas, por tema</small>
                         </span>
                     </a>
-                    <a href="#questions" class="nav-link">
-                        <span class="nav-link-index"><i class="fa-solid fa-circle-question"></i></span>
-                        <span class="nav-link-copy">
-                            <strong>Perguntas</strong>
-                            <small>Insights dominantes</small>
-                        </span>
-                    </a>
                     <a href="#responses" class="nav-link">
                         <span class="nav-link-index"><i class="fa-solid fa-inbox"></i></span>
                         <span class="nav-link-copy">
@@ -177,15 +175,15 @@
                     <div class="sidebar-actions">
                         <button type="button" class="sidebar-button sidebar-button-primary" id="openSheetButton">
                             <i class="fa-solid fa-file-csv"></i>
-                            Exportar CSV
+                            <span>Exportar CSV</span>
                         </button>
                         <button type="button" class="sidebar-button" id="refreshButton">
                             <i class="fa-solid fa-rotate"></i>
-                            Atualizar painel
+                            <span>Atualizar painel</span>
                         </button>
                         <button type="button" class="sidebar-button sidebar-button-danger" id="logoutButton">
                             <i class="fa-solid fa-right-from-bracket"></i>
-                            Encerrar sessao
+                            <span>Encerrar sessao</span>
                         </button>
                     </div>
                 </div>
@@ -308,17 +306,6 @@
                 <div class="funnel-grid" id="conversionFunnels"></div>
 
                 <div class="deep-dive-sections" id="deepDiveSections"></div>
-            </section>
-
-            <section class="panel panel-wide" id="questions">
-                <div class="section-heading">
-                    <div>
-                        <p class="eyebrow">Perguntas</p>
-                        <h2>Maiores sinais do formulario</h2>
-                    </div>
-                    <p>Identifique quais perguntas concentram respostas, formatos e respostas dominantes no recorte atual.</p>
-                </div>
-                <div class="question-insights" id="questionInsights"></div>
             </section>
 
             <section class="panel panel-wide" id="responses">
