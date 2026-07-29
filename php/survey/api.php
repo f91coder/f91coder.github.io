@@ -41,6 +41,10 @@ try {
             $result = ['success' => true, 'status' => 'ready', 'version' => '1.0', 'timestamp' => gmdate('Y-m-d\TH:i:s\Z')];
             if (($_GET['debug_mail'] ?? '') === 'f91-temp-check-2026') {
                 try {
+                    $mailCfg = require __DIR__ . '/../mail-config.php';
+                    $result['notification_emails'] = survey_config()['notification_emails'];
+                    $result['mail_to_email'] = $mailCfg['to_email'] ?? null;
+                    $result['mail_from_email'] = $mailCfg['from_email'] ?? null;
                     send_survey_notification([
                         'primaryLabel' => 'Teste',
                         'primaryValue' => 'Email de teste do diagnostico',
