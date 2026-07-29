@@ -150,6 +150,13 @@
                             <small>Survey, idioma e cadencia</small>
                         </span>
                     </a>
+                    <a href="#deep-dive" class="nav-link">
+                        <span class="nav-link-index"><i class="fa-solid fa-magnifying-glass-chart"></i></span>
+                        <span class="nav-link-copy">
+                            <strong>Analise por pesquisa</strong>
+                            <small>Todas as perguntas, por tema</small>
+                        </span>
+                    </a>
                     <a href="#questions" class="nav-link">
                         <span class="nav-link-index"><i class="fa-solid fa-circle-question"></i></span>
                         <span class="nav-link-copy">
@@ -282,6 +289,25 @@
                     </div>
                     <div class="heatmap heatmap-weekdays" id="weekdayHeatmap"></div>
                 </article>
+            </section>
+
+            <section class="panel panel-wide" id="deep-dive">
+                <div class="section-heading">
+                    <div>
+                        <p class="eyebrow">Analise por pesquisa</p>
+                        <h2>Todas as perguntas, organizadas por tema</h2>
+                    </div>
+                    <p>Cobertura completa de cada survey, agrupada por assunto, mais o funil de conversao de interesse ate piloto.</p>
+                </div>
+
+                <div class="survey-tabs" id="surveyTabs" role="tablist">
+                    <button type="button" class="survey-tab active" data-survey-slug="hotelaria" role="tab" aria-selected="true">Hotelaria</button>
+                    <button type="button" class="survey-tab" data-survey-slug="locacao-para-eventos" role="tab" aria-selected="false">Locacao para Eventos</button>
+                </div>
+
+                <div class="funnel-grid" id="conversionFunnels"></div>
+
+                <div class="deep-dive-sections" id="deepDiveSections"></div>
             </section>
 
             <section class="panel panel-wide" id="questions">

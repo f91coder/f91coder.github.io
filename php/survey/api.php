@@ -37,6 +37,10 @@ try {
             $result = get_response_detail($_GET);
             break;
 
+        case 'getSurveyQuestionCatalog':
+            $result = get_survey_question_catalog($_GET);
+            break;
+
         case 'status':
             $result = ['success' => true, 'status' => 'ready', 'version' => '1.0', 'timestamp' => gmdate('Y-m-d\TH:i:s\Z')];
             break;

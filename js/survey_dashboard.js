@@ -22,7 +22,8 @@
         refreshTimer: null,
         searchDebounce: null,
         theme: storedTheme || (preferredDark ? "dark" : "light"),
-        sidebarOpen: false
+        sidebarOpen: false,
+        deepDiveSurveySlug: "hotelaria"
     };
 
     const elements = {
@@ -44,6 +45,9 @@
         hourlyHeatmap: document.getElementById("hourlyHeatmap"),
         weekdayHeatmap: document.getElementById("weekdayHeatmap"),
         questionInsights: document.getElementById("questionInsights"),
+        surveyTabs: document.getElementById("surveyTabs"),
+        conversionFunnels: document.getElementById("conversionFunnels"),
+        deepDiveSections: document.getElementById("deepDiveSections"),
         responsesTableBody: document.getElementById("responsesTableBody"),
         rangeGroup: document.getElementById("rangeGroup"),
         surveyFilter: document.getElementById("surveyFilter"),
@@ -493,6 +497,7 @@
             state.dashboard = payload;
 
             renderDashboard(payload);
+            loadDeepDive({ silent: true });
 
             startAutoRefresh();
 
@@ -513,6 +518,142 @@
         } finally {
             setLoadingState(false);
         }
+    }
+
+    async function loadDeepDive(options = {}) {
+        if (!state.token) {
+            return;
+        }
+
+        try {
+            const payload = await apiGet("getSurveyQuestionCatalog", {
+                token: state.token,
+                survey_slug: state.deepDiveSurveySlug,
+                range: state.filters.range,
+                language: state.filters.language,
+                search: state.filters.search
+            });
+
+            renderFunnels(payload.funnel || []);
+            renderDeepDiveSections(payload.sections || []);
+        } catch (error) {
+            console.error(error);
+
+            if (/Nao autorizado|Sessao expirada|invalida/i.test(error.message)) {
+                handleUnauthorized("Sessao expirada ou invalida. Entre novamente.");
+                return;
+            }
+
+            if (!options.silent) {
+                showToast(error.message || "Nao foi possivel carregar a analise por pesquisa.");
+            }
+        }
+    }
+
+    function renderFunnels(funnels) {
+        if (!elements.conversionFunnels) {
+            return;
+        }
+
+        if (!funnels.length) {
+            elements.conversionFunnels.innerHTML = buildEmptyState("Sem dados de funil para este recorte.");
+            return;
+        }
+
+        elements.conversionFunnels.innerHTML = funnels.map((funnel) => {
+            const maxCount = Math.max(...funnel.stages.map((stage) => stage.count), 1);
+            const totalStages = funnel.stages.length || 1;
+
+            const stagesMarkup = funnel.stages.map((stage, index) => {
+                const widthPercent = Math.max(6, (stage.count / maxCount) * 100);
+                const intensity = 0.35 + ((totalStages - index) / totalStages) * 0.55;
+                return `
+                    <div class="funnel-stage">
+                        <div class="funnel-stage-head">
+                            <span>${escapeHtml(stage.label)}</span>
+                            <strong>${escapeHtml(formatNumber(stage.count))} | ${escapeHtml(formatPercent(stage.percent))}</strong>
+                        </div>
+                        <div class="funnel-bar-track">
+                            <span class="funnel-bar-fill" style="width:${widthPercent}%; opacity:${intensity}"></span>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            return `
+                <article class="panel funnel-panel">
+                    <div class="section-heading section-heading-tight">
+                        <div>
+                            <p class="eyebrow">Funil</p>
+                            <h2>${escapeHtml(funnel.question_label)}</h2>
+                        </div>
+                        <span class="stack-count">${escapeHtml(formatNumber(funnel.response_count))} respostas</span>
+                    </div>
+                    <div class="funnel-stages">${stagesMarkup}</div>
+                </article>
+            `;
+        }).join("");
+    }
+
+    function renderDeepDiveSections(sections) {
+        if (!elements.deepDiveSections) {
+            return;
+        }
+
+        if (!sections.length) {
+            elements.deepDiveSections.innerHTML = buildEmptyState("Sem perguntas cadastradas para este survey.");
+            return;
+        }
+
+        elements.deepDiveSections.innerHTML = sections.map((section) => {
+            const questionsMarkup = section.questions.map((question) => renderDeepDiveQuestionCard(question)).join("");
+            return `
+                <div class="deep-dive-section">
+                    <h3 class="deep-dive-section-title">${escapeHtml(section.title)}</h3>
+                    <div class="question-insights">${questionsMarkup}</div>
+                </div>
+            `;
+        }).join("");
+    }
+
+    function renderDeepDiveQuestionCard(item) {
+        const topAnswers = (item.top_answers || []).length
+            ? (item.top_answers || []).map((answer) => `
+                <div class="answer-row">
+                    <div class="answer-row-head">
+                        <span>${escapeHtml(answer.label)}</span>
+                        <strong>${escapeHtml(formatNumber(answer.count))} | ${escapeHtml(formatPercent(answer.percent))}</strong>
+                    </div>
+                    <div class="stack-bar"><span style="width:${Math.max(4, answer.percent * 100)}%"></span></div>
+                </div>
+            `).join("")
+            : buildEmptyState("Ainda sem respostas para esta pergunta no recorte atual.");
+
+        const samples = (item.sample_answers || []).length
+            ? `
+                <ul class="sample-list">
+                    ${(item.sample_answers || []).map((sample) => `<li>${escapeHtml(sample)}</li>`).join("")}
+                </ul>
+            `
+            : "";
+
+        return `
+            <article class="question-card">
+                <div class="stack-head">
+                    <div>
+                        <h4>${escapeHtml(item.question_label || item.question_key)}</h4>
+                        <span>${escapeHtml(item.question_key || "")}</span>
+                    </div>
+                    <div class="stack-count">${escapeHtml(formatNumber(item.response_count))}</div>
+                </div>
+                <div class="stack-meta">
+                    <span class="tag">${escapeHtml(item.question_type || "text")}</span>
+                    <span class="tag">${escapeHtml(formatNumber(item.distinct_answers || 0))} respostas distintas</span>
+                </div>
+                <div class="question-top-answers">${topAnswers}</div>
+                ${samples}
+            </article>
+        `;
     }
 
     function renderDashboard(payload) {
@@ -978,6 +1119,23 @@
             state.filters.survey_slug = elements.surveyFilter.value;
             loadDashboard();
         });
+
+        if (elements.surveyTabs) {
+            elements.surveyTabs.addEventListener("click", (event) => {
+                const button = event.target.closest("[data-survey-slug]");
+                if (!button) {
+                    return;
+                }
+
+                state.deepDiveSurveySlug = button.dataset.surveySlug;
+                elements.surveyTabs.querySelectorAll("[data-survey-slug]").forEach((item) => {
+                    const isActive = item.dataset.surveySlug === state.deepDiveSurveySlug;
+                    item.classList.toggle("active", isActive);
+                    item.setAttribute("aria-selected", String(isActive));
+                });
+                loadDeepDive();
+            });
+        }
 
         elements.languageFilter.addEventListener("change", () => {
             state.filters.language = elements.languageFilter.value;

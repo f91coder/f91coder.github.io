@@ -23,6 +23,70 @@ const CONTACT_NAME_KEYS = ['responsavel_nome', 'contact_name', 'full_name', 'nom
 const CONTACT_EMAIL_KEYS = ['responsavel_email', 'contact_email', 'work_email', 'email'];
 const CONTACT_PHONE_KEYS = ['responsavel_telefone', 'contact_phone', 'telefone', 'phone', 'whatsapp'];
 
+// Catálogo canônico de perguntas por survey — usado pela análise por pesquisa
+// do painel (getSurveyQuestionCatalog). Fonte única da verdade para label/tipo,
+// já que a tabela survey_answers só guarda o que foi enviado em cada resposta.
+const SURVEY_QUESTION_CATALOG = [
+    'hotelaria' => [
+        'nome_hotel' => ['type' => 'text', 'label' => 'Nome do hotel ou rede hoteleira'],
+        'cidade_estado' => ['type' => 'text', 'label' => 'Cidade / Estado'],
+        'categoria' => ['type' => 'select', 'label' => 'Categoria do hotel'],
+        'num_quartos' => ['type' => 'select', 'label' => 'Número aproximado de quartos'],
+        'possui_salas' => ['type' => 'select', 'label' => 'Possui salas de eventos / reuniões?'],
+        'trabalha_grupos' => ['type' => 'select', 'label' => 'Já trabalha com negociação de tarifa para grupos/eventos?'],
+        'como_recebe_solicitacoes' => ['type' => 'multiselect', 'label' => 'Como recebem solicitações de orçamento?'],
+        'frequencia_solicitacoes' => ['type' => 'select', 'label' => 'Frequência de solicitações de grupos'],
+        'tempo_ate_proposta' => ['type' => 'select', 'label' => 'Tempo até o envio da proposta'],
+        'maiores_desafios' => ['type' => 'multiselect', 'label' => 'Maiores desafios na negociação de grupos/eventos'],
+        'sistema_registro' => ['type' => 'multiselect', 'label' => 'Sistema/ferramenta usado hoje'],
+        'que_gostaria' => ['type' => 'multiselect', 'label' => 'Recursos desejados no sistema ideal'],
+        'interesse_teste' => ['type' => 'select', 'label' => 'Interesse em testar gratuitamente'],
+        'participar_piloto' => ['type' => 'select', 'label' => 'Interesse em ser hotel piloto'],
+    ],
+    'locacao-para-eventos' => [
+        'empresa_nome' => ['type' => 'text', 'label' => 'Nome da empresa'],
+        'cidade_estado' => ['type' => 'text', 'label' => 'Cidade / Estado'],
+        'tipo_operacao' => ['type' => 'multiselect', 'label' => 'O que mais loca para eventos'],
+        'orcamentos_mes' => ['type' => 'select', 'label' => 'Orçamentos/propostas enviados por mês'],
+        'canais_entrada' => ['type' => 'multiselect', 'label' => 'Canais de entrada dos pedidos'],
+        'como_monta_proposta' => ['type' => 'multiselect', 'label' => 'Como montam e enviam propostas hoje'],
+        'tempo_envio_proposta' => ['type' => 'select', 'label' => 'Tempo entre pedido e envio da proposta'],
+        'controle_status' => ['type' => 'multiselect', 'label' => 'Como controlam status das negociações'],
+        'principais_gargalos' => ['type' => 'multiselect', 'label' => 'Principais gargalos do processo comercial'],
+        'controle_disponibilidade' => ['type' => 'select', 'label' => 'Controlam disponibilidade por data em sistema?'],
+        'conflito_reserva' => ['type' => 'select', 'label' => 'Como evitam conflito de reserva sem sistema'],
+        'sistema_disponibilidade' => ['type' => 'select', 'label' => 'Solução usada para controlar disponibilidade'],
+        'info_proposta' => ['type' => 'multiselect', 'label' => 'O que precisa aparecer numa proposta'],
+        'integracao_areas' => ['type' => 'select', 'label' => 'Comercial/operação/estoque integrados?'],
+        'quebra_processo' => ['type' => 'select', 'label' => 'Onde o processo mais quebra'],
+        'recursos_desejados' => ['type' => 'multiselect', 'label' => 'Recursos de maior impacto numa solução ideal'],
+        'interesse_teste' => ['type' => 'select', 'label' => 'Faria sentido testar essa solução?'],
+        'participar_piloto' => ['type' => 'select', 'label' => 'Interesse em ser empresa piloto'],
+    ],
+];
+
+const SURVEY_QUESTION_SECTIONS = [
+    'hotelaria' => [
+        ['title' => 'Perfil do hotel', 'keys' => ['nome_hotel', 'cidade_estado', 'categoria', 'num_quartos', 'possui_salas']],
+        ['title' => 'Processo atual', 'keys' => ['trabalha_grupos', 'como_recebe_solicitacoes', 'frequencia_solicitacoes', 'tempo_ate_proposta']],
+        ['title' => 'Desafios e sistemas', 'keys' => ['maiores_desafios', 'sistema_registro']],
+        ['title' => 'Recursos desejados', 'keys' => ['que_gostaria']],
+        ['title' => 'Conversão', 'keys' => ['interesse_teste', 'participar_piloto']],
+    ],
+    'locacao-para-eventos' => [
+        ['title' => 'Perfil da empresa', 'keys' => ['empresa_nome', 'cidade_estado', 'tipo_operacao']],
+        ['title' => 'Processo atual', 'keys' => ['orcamentos_mes', 'canais_entrada', 'como_monta_proposta', 'tempo_envio_proposta', 'controle_status']],
+        ['title' => 'Desafios e controle', 'keys' => ['principais_gargalos', 'controle_disponibilidade', 'conflito_reserva', 'sistema_disponibilidade', 'info_proposta', 'integracao_areas', 'quebra_processo']],
+        ['title' => 'Recursos desejados', 'keys' => ['recursos_desejados']],
+        ['title' => 'Conversão', 'keys' => ['interesse_teste', 'participar_piloto']],
+    ],
+];
+
+const SURVEY_TITLES = [
+    'hotelaria' => 'F91 - Soluções Operacionais: Hotelaria',
+    'locacao-para-eventos' => 'F91 - Soluções Operacionais: Locação para Eventos',
+];
+
 // ─────────────────────────────────────────────────────────────────────────
 // Submissão de survey
 // ─────────────────────────────────────────────────────────────────────────
@@ -705,7 +769,13 @@ function build_weekday_breakdown(array $rows): array
     return array_values($buckets);
 }
 
-function build_top_questions(PDO $pdo, array $filters): array
+/**
+ * Busca e agrupa todas as respostas de survey_answers (filtradas) por
+ * question_key — base compartilhada por build_top_questions() (recorte "top 10"
+ * do painel geral) e build_question_breakdown_full() (catálogo completo por
+ * survey da aba "Análise por pesquisa").
+ */
+function fetch_question_answer_groups(PDO $pdo, array $filters): array
 {
     [$joinWhere, $joinParams] = build_dashboard_where($filters, 'sr');
 
@@ -745,34 +815,43 @@ function build_top_questions(PDO $pdo, array $filters): array
         }
     }
 
-    $result = [];
-    foreach ($grouped as $item) {
-        $answerCounts = $item['answer_counts'];
-        arsort($answerCounts);
-        $topAnswers = [];
-        $count = 0;
-        foreach ($answerCounts as $label => $answerCount) {
-            if ($count >= DASHBOARD_MAX_TOP_ANSWERS) {
-                break;
-            }
-            $topAnswers[] = [
-                'label' => $label,
-                'count' => $answerCount,
-                'percent' => $item['response_count'] ? $answerCount / $item['response_count'] : 0,
-            ];
-            $count++;
-        }
+    return $grouped;
+}
 
-        $result[] = [
-            'question_key' => $item['question_key'],
-            'question_label' => $item['question_label'],
-            'question_type' => $item['question_type'],
-            'response_count' => $item['response_count'],
-            'distinct_answers' => count($item['answer_counts']),
-            'top_answers' => $topAnswers,
-            'sample_answers' => $item['sample_answers'],
+function format_question_group(array $item, ?int $maxAnswers = DASHBOARD_MAX_TOP_ANSWERS): array
+{
+    $answerCounts = $item['answer_counts'];
+    arsort($answerCounts);
+    $topAnswers = [];
+    $count = 0;
+    foreach ($answerCounts as $label => $answerCount) {
+        if ($maxAnswers !== null && $count >= $maxAnswers) {
+            break;
+        }
+        $topAnswers[] = [
+            'label' => $label,
+            'count' => $answerCount,
+            'percent' => $item['response_count'] ? $answerCount / $item['response_count'] : 0,
         ];
+        $count++;
     }
+
+    return [
+        'question_key' => $item['question_key'],
+        'question_label' => $item['question_label'],
+        'question_type' => $item['question_type'],
+        'response_count' => $item['response_count'],
+        'distinct_answers' => count($item['answer_counts']),
+        'top_answers' => $topAnswers,
+        'sample_answers' => $item['sample_answers'],
+    ];
+}
+
+function build_top_questions(PDO $pdo, array $filters): array
+{
+    $grouped = fetch_question_answer_groups($pdo, $filters);
+
+    $result = array_map(static fn($item) => format_question_group($item, DASHBOARD_MAX_TOP_ANSWERS), array_values($grouped));
 
     usort($result, static fn($a, $b) => $b['response_count'] <=> $a['response_count']);
     return array_slice($result, 0, DASHBOARD_MAX_TOP_QUESTIONS);
@@ -858,4 +937,107 @@ function get_response_detail(array $params): array
         'response' => $response,
         'answers' => $answers,
     ];
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Análise por pesquisa (catálogo completo de perguntas + funil de conversão)
+// ─────────────────────────────────────────────────────────────────────────
+
+const FUNNEL_STAGE_ORDER = [
+    'hotelaria' => [
+        'interesse_teste' => ['Sim, claro!', 'Provavelmente sim.', 'Talvez...', 'Provavelmente não.', 'Não, definitivamente!'],
+        'participar_piloto' => ['Sim', 'Não'],
+    ],
+    'locacao-para-eventos' => [
+        'interesse_teste' => ['Sim, com certeza', 'Talvez', 'Não no momento'],
+        'participar_piloto' => ['Sim', 'Talvez', 'Não'],
+    ],
+];
+
+function get_survey_question_catalog(array $params): array
+{
+    $pdo = survey_pdo();
+    require_dashboard_session($pdo, (string) ($params['token'] ?? ''));
+
+    $surveySlug = sanitize_string($params['survey_slug'] ?? '', 60);
+    if (!isset(SURVEY_QUESTION_CATALOG[$surveySlug])) {
+        return ['success' => false, 'message' => 'survey_slug invalido.', '_code' => 400];
+    }
+
+    $filters = normalize_dashboard_filters($params);
+    $filters['survey_slug'] = $surveySlug;
+
+    $grouped = fetch_question_answer_groups($pdo, $filters);
+
+    $sections = [];
+    foreach (SURVEY_QUESTION_SECTIONS[$surveySlug] as $sectionDef) {
+        $questions = [];
+        foreach ($sectionDef['keys'] as $key) {
+            $meta = SURVEY_QUESTION_CATALOG[$surveySlug][$key] ?? ['type' => 'text', 'label' => humanize_key($key)];
+
+            $formatted = isset($grouped[$key])
+                ? format_question_group($grouped[$key], null)
+                : [
+                    'question_key' => $key,
+                    'question_label' => $meta['label'],
+                    'question_type' => $meta['type'],
+                    'response_count' => 0,
+                    'distinct_answers' => 0,
+                    'top_answers' => [],
+                    'sample_answers' => [],
+                ];
+
+            // O catálogo é a fonte estável do rótulo/tipo (o que foi gravado na
+            // resposta pode variar com o tempo se a pergunta mudar de texto).
+            $formatted['question_label'] = $meta['label'];
+            $formatted['question_type'] = $meta['type'];
+            $questions[] = $formatted;
+        }
+        $sections[] = ['title' => $sectionDef['title'], 'questions' => $questions];
+    }
+
+    return [
+        'success' => true,
+        'generated_at' => gmdate('Y-m-d\TH:i:s\Z'),
+        'survey_slug' => $surveySlug,
+        'survey_title' => SURVEY_TITLES[$surveySlug] ?? $surveySlug,
+        'sections' => $sections,
+        'funnel' => build_conversion_funnel($grouped, $surveySlug),
+    ];
+}
+
+function build_conversion_funnel(array $groupedByKey, string $surveySlug): array
+{
+    $stagesConfig = FUNNEL_STAGE_ORDER[$surveySlug] ?? [];
+    $funnel = [];
+
+    foreach (['interesse_teste', 'participar_piloto'] as $questionKey) {
+        if (!isset($stagesConfig[$questionKey])) {
+            continue;
+        }
+
+        $group = $groupedByKey[$questionKey] ?? null;
+        $responseCount = $group['response_count'] ?? 0;
+        $answerCounts = $group['answer_counts'] ?? [];
+
+        $stages = [];
+        foreach ($stagesConfig[$questionKey] as $label) {
+            $count = $answerCounts[$label] ?? 0;
+            $stages[] = [
+                'label' => $label,
+                'count' => $count,
+                'percent' => $responseCount ? $count / $responseCount : 0,
+            ];
+        }
+
+        $meta = SURVEY_QUESTION_CATALOG[$surveySlug][$questionKey] ?? null;
+        $funnel[] = [
+            'question_key' => $questionKey,
+            'question_label' => $meta['label'] ?? humanize_key($questionKey),
+            'response_count' => $responseCount,
+            'stages' => $stages,
+        ];
+    }
+
+    return $funnel;
 }
