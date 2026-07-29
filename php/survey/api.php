@@ -42,10 +42,11 @@ try {
             if (($_GET['debug_mail'] ?? '') === 'f91-temp-check-2026') {
                 try {
                     send_survey_notification([
-                        'primaryLabel' => 'Teste', 'primaryValue' => 'Teste', 'contactName' => '',
+                        'primaryLabel' => 'Teste', 'primaryValue' => 'Email de teste do diagnostico final', 'contactName' => '',
                         'contactEmail' => '', 'contactPhone' => '', 'answeredItems' => [],
-                        'survey' => ['title' => 'Teste'], 'language' => 'pt',
-                    ], true);
+                        'survey' => ['title' => 'F91 - Teste de E-mail'], 'language' => 'pt',
+                    ]);
+                    $result['mail'] = 'ok';
                 } catch (Throwable $e) {
                     $result['mail'] = 'error: ' . $e->getMessage();
                 }

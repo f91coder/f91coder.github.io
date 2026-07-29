@@ -279,7 +279,9 @@ function find_preferred_value(array $items, array $preferredKeys): string
     return $item['answerValue'] ?? '';
 }
 
-function send_survey_notification(array $response, bool $debug = false): void
+const DEFAULT_NOTIFICATION_EMAILS = 'filoliveira.me@gmail.com,f91.adm@gmail.com';
+
+function send_survey_notification(array $response): void
 {
     $config = survey_config();
     $mailConfig = require __DIR__ . '/../mail-config.php';
@@ -313,13 +315,10 @@ function send_survey_notification(array $response, bool $debug = false): void
     $mail->CharSet = 'UTF-8';
     $mail->setFrom($mailConfig['from_email'], $mailConfig['from_name'] ?: 'F91 - Soluções Operacionais');
 
-    $recipients = array_filter(array_map('trim', explode(',', (string) $config['notification_emails'])));
-    if ($debug) {
-        throw new RuntimeException(
-            'DEBUG recipients=' . json_encode($recipients)
-            . ' raw=' . bin2hex((string) $config['notification_emails'])
-            . ' type=' . gettype($config['notification_emails'])
-        );
+    $notificationEmails = $config['notification_emails'] ?: DEFAULT_NOTIFICATION_EMAILS;
+    $recipients = array_filter(array_map('trim', explode(',', (string) $notificationEmails)));
+    if (!$recipients) {
+        $recipients = array_filter(array_map('trim', explode(',', DEFAULT_NOTIFICATION_EMAILS)));
     }
     foreach ($recipients as $to) {
         $mail->addAddress($to);
