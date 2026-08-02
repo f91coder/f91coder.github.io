@@ -382,6 +382,13 @@
         </div>
     </div>
 
-    <script src="/js/fpv_planner.js?v=20260802-1"></script>
+    <div id="appToast" class="fixed bottom-6 right-6 z-[70] max-w-sm bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-center gap-3 translate-y-4 opacity-0 pointer-events-none transition-all duration-300 no-print" role="status" aria-live="polite">
+        <div class="w-9 h-9 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
+            <i class="ph-bold ph-check"></i>
+        </div>
+        <p id="appToastMessage" class="text-sm font-medium text-f91-navy"></p>
+    </div>
+
+    <script src="/js/fpv_planner.js?v=20260802-2"></script>
 </body>
 </html>

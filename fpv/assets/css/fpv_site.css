@@ -376,6 +376,27 @@ body.fpv-no-scroll{ overflow:hidden; }
 
 .fpv-field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
 
+.fpv-password-wrap{ position:relative; }
+.fpv-password-wrap input{ padding-right:44px !important; }
+
+.fpv-password-toggle{
+  position:absolute;
+  right:4px;
+  top:4px;
+  bottom:4px;
+  width:36px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px;
+  color:var(--muted-soft);
+  background:transparent;
+  transition:background-color .15s ease, color .15s ease;
+}
+
+.fpv-password-toggle:hover{ background:var(--surface-3, var(--border)); color:var(--navy); }
+.fpv-password-toggle svg{ display:block; }
+
 .fpv-avatar-picker{
   display:flex;
   align-items:center;

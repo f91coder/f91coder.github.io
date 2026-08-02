@@ -140,6 +140,16 @@ function fpv_send_password_reset_email(string $toEmail, string $name, string $re
     fpv_send_mail($toEmail, $name, 'Redefinir sua senha FPV91', $email['html'], $email['text']);
 }
 
+function fpv_send_welcome_email(string $toEmail, string $name): void
+{
+    $firstName = trim(explode(' ', $name)[0] ?? $name);
+    $bodyHtml = '<p style="margin:8px 0 22px;font-family:Arial,Helvetica,sans-serif;font-size:13.5px;line-height:1.7;color:' . FPV_EMAIL_MUTED . ';">' . fpv_email_esc($firstName) . ', sua conta foi confirmada com sucesso! Agora voce ja pode organizar as pecas, o orcamento e a meta de economia do seu proximo drone FPV.</p>'
+        . '<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:13.5px;line-height:1.7;color:' . FPV_EMAIL_MUTED . ';">De quebra, tambem da pra acompanhar os tutoriais e novidades no blog da FPV91.</p>';
+
+    $email = fpv_build_email('Conta confirmada', 'Bem-vindo(a) a FPV91!', $bodyHtml, "Sua conta foi confirmada com sucesso! Acesse: " . FPV_SITE_URL . "/planner", ['url' => FPV_SITE_URL . '/planner', 'label' => 'Abrir meu planner']);
+    fpv_send_mail($toEmail, $name, 'Bem-vindo(a) a FPV91!', $email['html'], $email['text']);
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // Cadastro / verificacao de e-mail
 // ─────────────────────────────────────────────────────────────────────────
@@ -265,7 +275,7 @@ function verify_fpv_email(array $input): array
     $email = strtolower(fpv_sanitize_string($input['email'] ?? '', 190));
     $code = fpv_sanitize_string($input['code'] ?? '', 4);
 
-    $stmt = $pdo->prepare('SELECT id FROM fpv_users WHERE email = :email');
+    $stmt = $pdo->prepare('SELECT id, name FROM fpv_users WHERE email = :email');
     $stmt->execute(['email' => $email]);
     $user = $stmt->fetch();
     if (!$user) {
@@ -284,6 +294,12 @@ function verify_fpv_email(array $input): array
     $pdo->prepare('DELETE FROM fpv_email_verifications WHERE user_id = :id')->execute(['id' => $user['id']]);
 
     fpv_start_session($pdo, (int) $user['id']);
+
+    try {
+        fpv_send_welcome_email($email, $user['name']);
+    } catch (Throwable $e) {
+        error_log('fpv verify: falha ao enviar e-mail de boas-vindas: ' . $e->getMessage());
+    }
 
     return ['success' => true];
 }

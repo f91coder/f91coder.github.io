@@ -125,30 +125,6 @@ try {
             $result = ['success' => true, 'status' => 'ready', 'timestamp' => gmdate('Y-m-d\TH:i:s\Z')];
             break;
 
-        case 'debugPeekCode':
-            if (($_GET['debug'] ?? '') !== 'f91tmp2026') {
-                fpv_json_response(['success' => false], 404);
-            }
-            $pdo = fpv_pdo();
-            $stmt = $pdo->prepare(
-                'SELECT v.code FROM fpv_email_verifications v JOIN fpv_users u ON u.id = v.user_id WHERE u.email = :email'
-            );
-            $stmt->execute(['email' => (string) ($_GET['email'] ?? '')]);
-            $result = ['success' => true, 'code' => $stmt->fetchColumn() ?: null];
-            break;
-
-        case 'debugTestMail':
-            if (($_GET['debug'] ?? '') !== 'f91tmp2026') {
-                fpv_json_response(['success' => false], 404);
-            }
-            try {
-                fpv_send_verification_email((string) ($_GET['email'] ?? ''), 'Debug', '0000');
-                $result = ['success' => true];
-            } catch (Throwable $e) {
-                $result = ['success' => false, 'message' => $e->getMessage(), 'file' => $e->getFile(), 'line' => $e->getLine()];
-            }
-            break;
-
         default:
             fpv_json_response(['success' => false, 'message' => 'Acao nao reconhecida: ' . $action], 400);
     }

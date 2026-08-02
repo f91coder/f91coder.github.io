@@ -30,8 +30,23 @@
         });
     }
 
+    function bindPasswordToggle(button) {
+        const input = document.getElementById(button.dataset.togglePassword);
+        if (!input) return;
+        const showIcon = button.querySelector(".icon-eye");
+        const hideIcon = button.querySelector(".icon-eye-off");
+        button.addEventListener("click", () => {
+            const willShow = input.type === "password";
+            input.type = willShow ? "text" : "password";
+            if (showIcon) showIcon.style.display = willShow ? "none" : "";
+            if (hideIcon) hideIcon.style.display = willShow ? "" : "none";
+            button.setAttribute("aria-label", willShow ? "Ocultar senha" : "Mostrar senha");
+        });
+    }
+
     document.addEventListener("DOMContentLoaded", () => {
         bindMask(document.getElementById("phone"), formatBrPhone);
         bindMask(document.getElementById("cpf"), formatCpf);
+        document.querySelectorAll("[data-toggle-password]").forEach(bindPasswordToggle);
     });
 })();

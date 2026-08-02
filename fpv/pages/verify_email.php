@@ -81,7 +81,7 @@
             if (!payload.success) {
                 throw new Error(payload.message || "Codigo invalido.");
             }
-            window.location.href = "/fpv/planner";
+            window.location.href = "/fpv/planner?welcome=1";
         } catch (error) {
             errorBox.textContent = error.message;
             errorBox.style.display = "block";

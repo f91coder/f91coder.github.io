@@ -55,6 +55,9 @@
 
         lightboxImg: document.getElementById("lightbox-img"),
         lightboxCaption: document.getElementById("lightbox-caption"),
+
+        appToast: document.getElementById("appToast"),
+        appToastMessage: document.getElementById("appToastMessage"),
     };
 
     // ── Helpers ──────────────────────────────────────────────────────────
@@ -609,8 +612,39 @@
         });
     }
 
+    // ── Toast pos-redirect (cadastro/login) ─────────────────────────────
+
+    let toastTimer = null;
+    function showAppToast(message) {
+        if (!el.appToast) return;
+        el.appToastMessage.textContent = message;
+        el.appToast.classList.remove("translate-y-4", "opacity-0", "pointer-events-none");
+        window.clearTimeout(toastTimer);
+        toastTimer = window.setTimeout(() => {
+            el.appToast.classList.add("translate-y-4", "opacity-0", "pointer-events-none");
+        }, 4500);
+    }
+
+    function checkRedirectToast() {
+        const params = new URLSearchParams(window.location.search);
+        let message = null;
+        if (params.get("welcome") === "1") {
+            message = "Conta criada com sucesso! Bem-vindo(a) a FPV91.";
+        } else if (params.get("login") === "1") {
+            message = "Login realizado com sucesso.";
+        }
+        if (!message) return;
+
+        showAppToast(message);
+        params.delete("welcome");
+        params.delete("login");
+        const query = params.toString();
+        window.history.replaceState({}, "", window.location.pathname + (query ? "?" + query : ""));
+    }
+
     async function bootstrap() {
         bindEvents();
+        checkRedirectToast();
         await loadBoard();
     }
 
