@@ -9,17 +9,52 @@ header('Content-Type: application/json; charset=utf-8');
 $action = $_GET['action'] ?? ($_POST['action'] ?? '');
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
+function fpv_require_post(string $method): void
+{
+    if ($method !== 'POST') {
+        fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
+    }
+}
+
 try {
     switch ($action) {
+        case 'registerFpvUser':
+            fpv_require_post($method);
+            $result = register_fpv_user($_POST, $_FILES['avatar'] ?? null);
+            break;
+
+        case 'resendFpvVerification':
+            fpv_require_post($method);
+            $result = resend_fpv_verification($_POST);
+            break;
+
+        case 'verifyFpvEmail':
+            fpv_require_post($method);
+            $result = verify_fpv_email($_POST);
+            break;
+
         case 'loginFpv':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = login_fpv($_POST);
             break;
 
         case 'logoutFpv':
-            $result = logout_fpv($method === 'POST' ? $_POST : $_GET);
+            $result = logout_fpv();
+            break;
+
+        case 'requestFpvPasswordReset':
+            fpv_require_post($method);
+            $result = request_fpv_password_reset($_POST);
+            break;
+
+        case 'resetFpvPassword':
+            fpv_require_post($method);
+            $result = reset_fpv_password($_POST);
+            break;
+
+        case 'updateFpvProfile':
+            fpv_require_post($method);
+            $result = update_fpv_profile($_POST, $_FILES['avatar'] ?? null);
             break;
 
         case 'getFpvBoard':
@@ -27,66 +62,63 @@ try {
             break;
 
         case 'addFpvCategory':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = add_fpv_category($_POST);
             break;
 
         case 'deleteFpvCategory':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = delete_fpv_category($_POST);
             break;
 
         case 'addFpvItem':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = add_fpv_item($_POST, $_FILES['image'] ?? null);
             break;
 
         case 'updateFpvItem':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = update_fpv_item($_POST, $_FILES['image'] ?? null);
             break;
 
         case 'deleteFpvItem':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = delete_fpv_item($_POST);
             break;
 
         case 'saveFpvPlanning':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = save_fpv_planning($_POST);
             break;
 
         case 'addFpvVideo':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = add_fpv_video($_POST);
             break;
 
         case 'deleteFpvVideo':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = delete_fpv_video($_POST);
             break;
 
         case 'resetFpvData':
-            if ($method !== 'POST') {
-                fpv_json_response(['success' => false, 'message' => 'Metodo invalido.'], 405);
-            }
+            fpv_require_post($method);
             $result = reset_fpv_data($_POST);
+            break;
+
+        case 'saveFpvPost':
+            fpv_require_post($method);
+            $result = save_fpv_post($_POST, $_FILES['cover'] ?? null);
+            break;
+
+        case 'deleteFpvPost':
+            fpv_require_post($method);
+            $result = delete_fpv_post($_POST);
+            break;
+
+        case 'addFpvInterestSignup':
+            fpv_require_post($method);
+            $result = add_fpv_interest_signup($_POST);
             break;
 
         case 'status':

@@ -1,0 +1,530 @@
+/* ── FPV91 — design tokens ────────────────────────────────────────────── */
+
+:root{
+  --navy:#08203e;
+  --navy-soft:#122c52;
+  --navy-softer:#1b3a68;
+  --lime:#bddc00;
+  --lime-dark:#a3be00;
+  --ink:#12142b;
+  --muted:#6c7089;
+  --muted-soft:#9598ad;
+  --border:#e7e9f2;
+  --surface:#ffffff;
+  --surface-2:#f7f8fb;
+  --bg:#f8fafc;
+  --radius-sm:10px;
+  --radius-md:14px;
+  --radius-lg:20px;
+  --shadow-sm:0 1px 2px rgba(8,32,62,.06), 0 1px 1px rgba(8,32,62,.04);
+  --shadow-md:0 8px 24px rgba(8,32,62,.10);
+  --shadow-lg:0 20px 48px rgba(8,32,62,.16);
+  --content-max:1180px;
+}
+
+*, *::before, *::after{ box-sizing:border-box; }
+
+html{ scroll-behavior:smooth; }
+
+body.fpv-site{
+  margin:0;
+  font-family:"Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.5;
+}
+
+img{ max-width:100%; display:block; }
+a{ color:inherit; text-decoration:none; }
+button{ font:inherit; cursor:pointer; }
+
+.fpv-container{
+  max-width:var(--content-max);
+  margin:0 auto;
+  padding:0 24px;
+}
+
+/* ── Topbar ───────────────────────────────────────────────────────────── */
+
+.fpv-nav{
+  position:fixed;
+  top:0; left:0; right:0;
+  z-index:100;
+  height:76px;
+  display:flex;
+  align-items:center;
+  background:transparent;
+  transition:background-color .25s ease, box-shadow .25s ease, backdrop-filter .25s ease;
+}
+
+.fpv-nav.is-scrolled{
+  background:rgba(8,32,62,0.82);
+  backdrop-filter:blur(14px);
+  box-shadow:0 1px 0 rgba(255,255,255,.06);
+}
+
+.fpv-nav-inner{
+  max-width:var(--content-max);
+  margin:0 auto;
+  width:100%;
+  padding:0 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+}
+
+.fpv-nav-logo img{ height:28px; width:auto; }
+
+.fpv-nav-links{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+.fpv-nav-links a{
+  padding:9px 14px;
+  border-radius:999px;
+  font-size:13.5px;
+  font-weight:600;
+  color:rgba(255,255,255,.82);
+  transition:background-color .15s ease, color .15s ease;
+}
+
+.fpv-nav-links a:hover, .fpv-nav-links a.is-active{
+  background:rgba(255,255,255,.1);
+  color:#fff;
+}
+
+.fpv-nav-actions{ display:flex; align-items:center; gap:10px; }
+
+.fpv-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:10px 20px;
+  border-radius:999px;
+  font-size:13.5px;
+  font-weight:700;
+  border:1px solid transparent;
+  transition:transform .15s ease, box-shadow .15s ease, background-color .15s ease, border-color .15s ease;
+  white-space:nowrap;
+}
+
+.fpv-btn:active{ transform:scale(.97); }
+
+.fpv-btn-lime{
+  background:var(--lime);
+  color:var(--navy);
+}
+
+.fpv-btn-lime:hover{ background:var(--lime-dark); box-shadow:var(--shadow-md); }
+
+.fpv-btn-ghost-light{
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  border-color:rgba(255,255,255,.18);
+}
+
+.fpv-btn-ghost-light:hover{ background:rgba(255,255,255,.16); }
+
+.fpv-btn-navy{
+  background:var(--navy);
+  color:#fff;
+}
+
+.fpv-btn-navy:hover{ background:var(--navy-soft); box-shadow:var(--shadow-md); }
+
+.fpv-btn-outline{
+  background:transparent;
+  color:var(--navy);
+  border-color:var(--border);
+}
+
+.fpv-btn-outline:hover{ border-color:var(--navy); }
+
+.fpv-btn-block{ width:100%; }
+
+.fpv-nav-user{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:6px 14px 6px 6px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  color:#fff;
+  font-size:13px;
+  font-weight:600;
+}
+
+.fpv-nav-user img{
+  width:30px; height:30px;
+  border-radius:999px;
+  object-fit:cover;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────── */
+
+.fpv-footer{
+  background:var(--navy);
+  color:rgba(255,255,255,.7);
+  padding:56px 0 28px;
+  margin-top:96px;
+}
+
+.fpv-footer-grid{
+  display:grid;
+  grid-template-columns:1.4fr repeat(3, 1fr);
+  gap:32px;
+  padding-bottom:32px;
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+.fpv-footer-brand img{ height:26px; margin-bottom:12px; }
+.fpv-footer-brand p{ font-size:13px; line-height:1.7; max-width:280px; color:rgba(255,255,255,.55); }
+
+.fpv-footer-col h4{
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:rgba(255,255,255,.4);
+  margin:0 0 14px;
+}
+
+.fpv-footer-col ul{ list-style:none; margin:0; padding:0; display:grid; gap:10px; }
+.fpv-footer-col a{ font-size:13.5px; color:rgba(255,255,255,.75); }
+.fpv-footer-col a:hover{ color:var(--lime); }
+
+.fpv-footer-bottom{
+  padding-top:24px;
+  font-size:12px;
+  color:rgba(255,255,255,.4);
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.fpv-mobile-toggle{
+  display:none;
+  width:38px; height:38px;
+  border-radius:10px;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.14);
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  color:#fff;
+}
+
+.fpv-mobile-toggle span{
+  display:block;
+  width:16px; height:1.5px;
+  background:currentColor;
+  position:relative;
+  transition:transform .2s ease, opacity .2s ease;
+}
+
+.fpv-mobile-toggle span::before, .fpv-mobile-toggle span::after{
+  content:"";
+  position:absolute;
+  left:0;
+  width:16px; height:1.5px;
+  background:currentColor;
+  transition:transform .2s ease, opacity .2s ease, top .2s ease;
+}
+
+.fpv-mobile-toggle span::before{ top:-5px; }
+.fpv-mobile-toggle span::after{ top:5px; }
+
+.fpv-mobile-toggle.is-open span{ background:transparent; }
+.fpv-mobile-toggle.is-open span::before{ top:0; transform:rotate(45deg); }
+.fpv-mobile-toggle.is-open span::after{ top:0; transform:rotate(-45deg); }
+
+.fpv-mobile-panel{
+  position:fixed;
+  top:76px; left:0; right:0;
+  max-height:0;
+  overflow:hidden;
+  background:rgba(8,32,62,.98);
+  backdrop-filter:blur(14px);
+  transition:max-height .3s cubic-bezier(.16,1,.3,1);
+  z-index:99;
+}
+
+.fpv-mobile-panel.is-open{ max-height:420px; }
+
+.fpv-mobile-panel-inner{ padding:12px 24px 28px; display:grid; gap:4px; }
+.fpv-mobile-panel a{
+  padding:13px 4px;
+  font-size:15px;
+  font-weight:600;
+  color:rgba(255,255,255,.85);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.fpv-mobile-panel .fpv-btn{ margin-top:14px; border-bottom:none; text-align:center; }
+
+body.fpv-no-scroll{ overflow:hidden; }
+
+@media (max-width:860px){
+  .fpv-footer-grid{ grid-template-columns:1fr 1fr; }
+  .fpv-nav-links{ display:none; }
+  .fpv-mobile-toggle{ display:inline-flex; }
+}
+
+/* ── Hero animation hooks (GSAP) ─────────────────────────────────────── */
+/* Note: intentionally NOT hiding .fpv-hero via CSS — if the GSAP CDN ever
+   fails to load, the hero must still render normally (JS only enhances). */
+
+.fpv-word{ display:inline-block; overflow:hidden; vertical-align:top; padding-bottom:.08em; margin-bottom:-.08em; }
+.fpv-word-inner{ display:inline-block; }
+
+/* ── Auth pages (cadastro/login/reset/perfil) ────────────────────────── */
+
+.fpv-auth-shell{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:120px 20px 60px;
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(189,220,0,.10), transparent),
+    linear-gradient(180deg, var(--navy) 0%, #0a1730 100%);
+}
+
+.fpv-auth-card{
+  width:100%;
+  max-width:460px;
+  background:var(--surface);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-lg);
+  padding:38px 36px;
+}
+
+.fpv-auth-card.is-wide{ max-width:560px; }
+
+.fpv-auth-head{ text-align:center; margin-bottom:26px; }
+.fpv-auth-head img{ height:40px; margin:0 auto 14px; }
+.fpv-auth-head h1{ font-size:22px; font-weight:800; margin:0 0 6px; letter-spacing:-.01em; }
+.fpv-auth-head p{ font-size:13.5px; color:var(--muted); margin:0; }
+
+.fpv-field{ margin-bottom:16px; }
+.fpv-field label{
+  display:block;
+  font-size:12.5px;
+  font-weight:700;
+  color:var(--navy);
+  margin-bottom:6px;
+}
+
+.fpv-field input[type=text],
+.fpv-field input[type=email],
+.fpv-field input[type=password],
+.fpv-field input[type=tel],
+.fpv-field input[type=date]{
+  width:100%;
+  padding:11px 14px;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border);
+  background:var(--surface-2);
+  font-size:14px;
+  font-family:inherit;
+  color:var(--ink);
+  transition:border-color .15s ease, background-color .15s ease;
+}
+
+.fpv-field input:focus{
+  outline:none;
+  border-color:var(--lime-dark);
+  background:var(--surface);
+}
+
+.fpv-field-hint{ font-size:11.5px; color:var(--muted-soft); margin-top:5px; }
+
+.fpv-field-row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+.fpv-avatar-picker{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:18px;
+}
+
+.fpv-avatar-picker .fpv-avatar-preview{
+  width:64px; height:64px;
+  border-radius:999px;
+  background:var(--surface-2);
+  border:1px dashed var(--border);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  flex-shrink:0;
+  color:var(--muted-soft);
+  font-size:22px;
+}
+
+.fpv-avatar-picker .fpv-avatar-preview img{ width:100%; height:100%; object-fit:cover; }
+
+.fpv-alert{
+  padding:12px 14px;
+  border-radius:var(--radius-sm);
+  font-size:13px;
+  font-weight:600;
+  margin-bottom:18px;
+}
+
+.fpv-alert-error{ background:#fdecec; color:#b42318; }
+.fpv-alert-success{ background:#e9f7e3; color:#2b7a1f; }
+
+.fpv-auth-foot{
+  text-align:center;
+  margin-top:20px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.fpv-auth-foot a{ font-weight:700; color:var(--navy); }
+.fpv-auth-foot a:hover{ color:var(--lime-dark); }
+
+.fpv-code-inputs{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin:22px 0;
+}
+
+.fpv-code-inputs input{
+  width:52px; height:60px;
+  text-align:center;
+  font-size:24px;
+  font-weight:800;
+  border-radius:var(--radius-sm);
+  border:1px solid var(--border);
+  background:var(--surface-2);
+}
+
+.fpv-code-inputs input:focus{ outline:none; border-color:var(--lime-dark); background:var(--surface); }
+
+/* ── Generic page shell (blog, coming-soon, etc) ─────────────────────── */
+
+.fpv-page-hero{
+  padding:150px 0 64px;
+  background:linear-gradient(180deg, var(--navy) 0%, #0a1730 100%);
+  color:#fff;
+}
+
+.fpv-page-hero .fpv-eyebrow{
+  display:inline-block;
+  padding:5px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.1);
+  color:var(--lime);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+
+.fpv-page-hero h1{ font-size:clamp(30px, 5vw, 48px); font-weight:800; letter-spacing:-.02em; margin:0 0 12px; }
+.fpv-page-hero p{ font-size:16px; color:rgba(255,255,255,.7); max-width:560px; margin:0; }
+
+.fpv-section{ padding:64px 0; }
+
+.fpv-grid-cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
+  gap:24px;
+}
+
+.fpv-post-card{
+  background:var(--surface);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  border:1px solid var(--border);
+  transition:transform .2s cubic-bezier(.16,1,.3,1), box-shadow .2s ease;
+}
+
+.fpv-post-card:hover{ transform:translateY(-4px); box-shadow:var(--shadow-md); }
+
+.fpv-post-card-cover{
+  aspect-ratio:16/9;
+  background:var(--surface-2) center/cover no-repeat;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--muted-soft);
+  font-size:28px;
+}
+
+.fpv-post-card-body{ padding:20px; }
+.fpv-post-card-body .fpv-post-type{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--lime-dark); }
+.fpv-post-card-body h3{ font-size:17px; font-weight:750; margin:8px 0 8px; letter-spacing:-.01em; }
+.fpv-post-card-body p{ font-size:13.5px; color:var(--muted); margin:0; line-height:1.6; }
+
+.fpv-empty-state{
+  text-align:center;
+  padding:64px 20px;
+  color:var(--muted);
+}
+
+.fpv-post-article{ max-width:720px; margin:0 auto; padding:0 24px; }
+.fpv-post-article .fpv-post-cover{ border-radius:var(--radius-lg); margin:-90px auto 32px; box-shadow:var(--shadow-lg); max-width:960px; }
+.fpv-post-article-content{ font-size:16px; line-height:1.8; color:var(--ink); }
+.fpv-post-article-content h2{ font-size:24px; margin-top:36px; letter-spacing:-.01em; }
+.fpv-post-article-content h3{ font-size:19px; margin-top:28px; }
+.fpv-post-article-content p{ margin:0 0 18px; }
+.fpv-post-article-content img{ border-radius:var(--radius-md); margin:20px 0; }
+.fpv-post-article-content a{ color:var(--navy); font-weight:700; text-decoration:underline; text-decoration-color:var(--lime); }
+.fpv-post-article-content code{ background:var(--surface-2); padding:2px 6px; border-radius:4px; font-size:14px; }
+.fpv-post-article-content pre{ background:var(--navy); color:#fff; padding:18px; border-radius:var(--radius-sm); overflow-x:auto; }
+.fpv-post-article-content blockquote{ margin:0 0 18px; padding:4px 20px; border-left:3px solid var(--lime); color:var(--muted); }
+
+/* ── Coming soon (comunidade/cursos) ─────────────────────────────────── */
+
+.fpv-coming-soon{
+  text-align:center;
+  padding:64px 24px 96px;
+  max-width:560px;
+  margin:0 auto;
+}
+
+.fpv-coming-soon-icon{
+  width:76px; height:76px;
+  border-radius:999px;
+  background:var(--surface-2);
+  display:flex; align-items:center; justify-content:center;
+  font-size:32px;
+  margin:0 auto 20px;
+}
+
+.fpv-coming-soon h2{ font-size:26px; font-weight:800; margin:0 0 12px; letter-spacing:-.01em; }
+.fpv-coming-soon p{ color:var(--muted); font-size:14.5px; line-height:1.7; margin:0 0 28px; }
+
+.fpv-interest-form{
+  display:flex;
+  gap:10px;
+  max-width:420px;
+  margin:0 auto;
+}
+
+.fpv-interest-form input{
+  flex:1;
+  padding:12px 16px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:var(--surface-2);
+  font-size:14px;
+}
+
+.fpv-interest-form input:focus{ outline:none; border-color:var(--lime-dark); background:var(--surface); }
+
+/* ── 404 ──────────────────────────────────────────────────────────────── */
+
+.fpv-404{ text-align:center; padding:180px 24px 120px; }
+.fpv-404 h1{ font-size:80px; font-weight:800; color:var(--navy); margin:0; letter-spacing:-.03em; }
+.fpv-404 p{ color:var(--muted); font-size:15px; margin:12px 0 28px; }

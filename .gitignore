@@ -16,7 +16,14 @@ php/fpv/config.local.php
 # Fotos enviadas pelos usuarios no FPV planner — nunca versionar (conteudo
 # gerado em runtime, excluido do deploy via rsync tambem, ver deploy.yml).
 img/fpv-uploads/*
+img/fpv-uploads/*/*
 !img/fpv-uploads/.gitkeep
+!img/fpv-uploads/avatars/
+!img/fpv-uploads/avatars/.gitkeep
+!img/fpv-uploads/items/
+!img/fpv-uploads/items/.gitkeep
+!img/fpv-uploads/posts/
+!img/fpv-uploads/posts/.gitkeep
 
 # Chave SSH de deploy gerada localmente — nunca versionar (apagar apos configurar)
 f91_deploy_key

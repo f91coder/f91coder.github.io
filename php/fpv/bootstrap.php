@@ -1,12 +1,15 @@
 <?php
 declare(strict_types=1);
 
-const FPV_SESSION_TTL_SECONDS = 60 * 60 * 12; // 12h
+const FPV_SESSION_TTL_SECONDS = 60 * 60 * 24 * 30; // 30 dias
 const FPV_LOGIN_MAX_ATTEMPTS = 8;
 const FPV_LOGIN_LOCKOUT_WINDOW_SECONDS = 15 * 60;
 const FPV_UPLOAD_MAX_BYTES = 5 * 1024 * 1024; // 5MB
 const FPV_UPLOAD_DIR = __DIR__ . '/../../img/fpv-uploads';
 const FPV_UPLOAD_PUBLIC_PATH = 'img/fpv-uploads';
+const FPV_SESSION_COOKIE_NAME = 'fpv_session';
+const FPV_EMAIL_VERIFICATION_TTL_SECONDS = 30 * 60; // 30 min
+const FPV_PASSWORD_RESET_TTL_SECONDS = 60 * 60 * 2; // 2h
 
 final class FpvAuthException extends RuntimeException
 {
@@ -100,24 +103,105 @@ function fpv_record_login_attempt(PDO $pdo, string $ipHash): void
     $stmt->execute(['ip_hash' => $ipHash]);
 }
 
-function require_fpv_session(PDO $pdo, string $token): void
+function fpv_is_https_request(): bool
 {
-    $token = fpv_sanitize_string($token, 128);
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+}
+
+function fpv_set_session_cookie(string $token): void
+{
+    setcookie(FPV_SESSION_COOKIE_NAME, $token, [
+        'expires' => time() + FPV_SESSION_TTL_SECONDS,
+        'path' => '/',
+        'secure' => fpv_is_https_request(),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+function fpv_clear_session_cookie(): void
+{
+    setcookie(FPV_SESSION_COOKIE_NAME, '', [
+        'expires' => time() - 3600,
+        'path' => '/',
+        'secure' => fpv_is_https_request(),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/** Cria uma sessao para o usuario, seta o cookie e devolve o token gerado (uso interno de login/verify). */
+function fpv_start_session(PDO $pdo, int $userId): string
+{
+    $token = bin2hex(random_bytes(32));
+    $tokenHash = hash('sha256', $token);
+    $stmt = $pdo->prepare(
+        'INSERT INTO fpv_sessions (user_id, token_hash, ip_hash, expires_at)
+         VALUES (:user_id, :token_hash, :ip_hash, (NOW() + INTERVAL ' . FPV_SESSION_TTL_SECONDS . ' SECOND))'
+    );
+    $stmt->execute(['user_id' => $userId, 'token_hash' => $tokenHash, 'ip_hash' => fpv_ip_hash()]);
+    fpv_set_session_cookie($token);
+    return $token;
+}
+
+/** Devolve o user_id da sessao atual (cookie), ou null se nao autenticado. Nao lanca excecao. */
+function fpv_session_user_id(PDO $pdo): ?int
+{
+    $token = fpv_sanitize_string($_COOKIE[FPV_SESSION_COOKIE_NAME] ?? '', 128);
     if ($token === '') {
-        throw new FpvAuthException('Nao autorizado.');
+        return null;
     }
 
     $tokenHash = hash('sha256', $token);
-    $stmt = $pdo->prepare('SELECT id FROM fpv_sessions WHERE token_hash = :token_hash AND expires_at > NOW()');
+    $stmt = $pdo->prepare('SELECT id, user_id FROM fpv_sessions WHERE token_hash = :token_hash AND expires_at > NOW()');
     $stmt->execute(['token_hash' => $tokenHash]);
     $session = $stmt->fetch();
 
-    if (!$session) {
-        throw new FpvAuthException('Sessao expirada ou invalida.');
+    if (!$session || $session['user_id'] === null) {
+        return null;
     }
 
     $update = $pdo->prepare(
         'UPDATE fpv_sessions SET last_seen_at = NOW(), expires_at = (NOW() + INTERVAL ' . FPV_SESSION_TTL_SECONDS . ' SECOND) WHERE id = :id'
     );
     $update->execute(['id' => $session['id']]);
+
+    return (int) $session['user_id'];
+}
+
+/** Igual fpv_session_user_id, mas lanca FpvAuthException se nao autenticado — uso nas actions da API. */
+function require_fpv_session(PDO $pdo): int
+{
+    $userId = fpv_session_user_id($pdo);
+    if ($userId === null) {
+        throw new FpvAuthException('Nao autorizado.');
+    }
+    return $userId;
+}
+
+function fpv_only_digits(string $value): string
+{
+    return preg_replace('/\D+/', '', $value) ?? '';
+}
+
+/** Validacao de CPF por digito verificador (modulo 11) — mesmo algoritmo usado no Quozell. */
+function fpv_validate_cpf(string $digits): bool
+{
+    if (strlen($digits) !== 11 || preg_match('/^(\d)\1{10}$/', $digits)) {
+        return false;
+    }
+
+    for ($pass = 9; $pass <= 10; $pass++) {
+        $sum = 0;
+        for ($i = 0; $i < $pass; $i++) {
+            $sum += (int) $digits[$i] * (($pass + 1) - $i);
+        }
+        $checkDigit = (($sum * 10) % 11) % 10;
+        if ((int) $digits[$pass] !== $checkDigit) {
+            return false;
+        }
+    }
+
+    return true;
 }

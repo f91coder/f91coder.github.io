@@ -1,23 +1,21 @@
+<?php
+/** @var array $currentUser */
+?>
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F91 | FPV Setup Planner Pro</title>
-    <link rel="icon" type="image/png" href="img/fpv_fav.png">
+    <title>Meu Planner | FPV91</title>
+    <link rel="icon" type="image/png" href="/img/fpv_fav.png">
 
-    <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Tailwind Config with F91 Colors -->
     <script>
         tailwind.config = {
             theme: {
@@ -43,13 +41,11 @@
     </script>
 
     <style>
-        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Hide number input arrows */
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
@@ -57,7 +53,6 @@
         .transition-all-smooth { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         .glass-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
 
-        /* Modal Transitions */
         .modal-enter { opacity: 0; pointer-events: none; }
         .modal-enter-active { opacity: 1; pointer-events: auto; transition: opacity 0.3s ease; }
         .modal-scale-enter { transform: scale(0.95); opacity: 0; }
@@ -66,7 +61,6 @@
         .calendar-dot { width: 8px; height: 8px; border-radius: 999px; background: #e2e8f0; }
         .calendar-dot.is-filled { background: #bddc00; }
 
-        /* Print Styles */
         @media print {
             body * { visibility: hidden; }
             #print-area, #print-area * { visibility: visible; }
@@ -77,60 +71,25 @@
 </head>
 <body class="bg-f91-bg text-f91-text font-sans antialiased min-h-screen flex flex-col">
 
-    <!-- Login Gate -->
-    <section id="loginScreen" class="min-h-screen w-full flex items-center justify-center bg-f91-navy p-4">
-        <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8">
-            <div class="flex flex-col items-center mb-6">
-                <img src="img/fpv_fav.png" alt="FPV91" class="w-16 h-16 object-contain mb-2">
-                <h1 class="text-xl font-bold text-f91-navy">FPV Setup Planner</h1>
-                <p class="text-sm text-f91-muted">Acesso restrito</p>
-            </div>
-            <form id="loginForm" class="space-y-4">
-                <div>
-                    <label class="block text-sm font-medium text-f91-navy mb-1">Senha de acesso</label>
-                    <div class="relative">
-                        <input type="password" id="loginPassword" required class="block w-full px-3 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-f91-lime focus:border-f91-lime outline-none bg-gray-50 focus:bg-white transition-all" placeholder="••••••••" autocomplete="current-password">
-                        <button type="button" id="toggleLoginPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-f91-muted hover:text-f91-navy">
-                            <i class="ph ph-eye text-lg"></i>
-                        </button>
-                    </div>
-                </div>
-                <p id="loginError" class="text-sm text-red-500 hidden"></p>
-                <button type="submit" id="loginButton" class="w-full py-2.5 bg-f91-navy hover:bg-f91-navyLight text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2">
-                    <span id="loginButtonLabel">Entrar</span>
-                </button>
-            </form>
-        </div>
-    </section>
-
-    <!-- App Shell (shown after login) -->
-    <div id="appShell" class="hidden flex-col flex-1">
-
-        <!-- Header -->
+    <div class="flex flex-col flex-1">
         <header class="glass-header sticky top-0 z-40 border-b border-gray-200 shadow-sm no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <img src="img/fpv_logo.png" alt="FPV91" class="h-8 sm:h-9 w-auto">
-                </div>
+                <a href="/fpv" class="flex items-center gap-3">
+                    <img src="/img/fpv_logo.png" alt="FPV91" class="h-8 sm:h-9 w-auto">
+                </a>
 
                 <div class="flex items-center gap-4">
-                    <!-- Videos Dropdown -->
                     <div class="relative">
                         <button id="btn-videos-menu" class="text-f91-navy hover:text-f91-limeDark transition-colors p-2 rounded-lg hover:bg-gray-100 flex items-center gap-2">
                             <i class="ph-fill ph-youtube-logo text-2xl text-red-600"></i>
                             <span class="hidden sm:block text-sm font-medium">Favoritos</span>
                         </button>
 
-                        <!-- Dropdown Content -->
                         <div id="videos-dropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 hidden z-50 flex-col">
                             <div class="p-3 border-b border-gray-100 bg-gray-50 rounded-t-xl flex justify-between items-center">
                                 <h3 class="text-sm font-semibold text-f91-navy">Vídeos Salvos</h3>
                             </div>
-
-                            <div class="p-2 max-h-64 overflow-y-auto" id="videos-list-container">
-                                <!-- Videos will be injected here -->
-                            </div>
-
+                            <div class="p-2 max-h-64 overflow-y-auto" id="videos-list-container"></div>
                             <div class="p-3 border-t border-gray-100">
                                 <form id="add-video-form" class="flex gap-2">
                                     <input type="url" id="new-video-url" placeholder="URL do YouTube" required class="flex-1 text-xs px-2 py-1.5 border border-gray-200 rounded focus:ring-1 focus:ring-f91-lime outline-none">
@@ -146,6 +105,11 @@
                         <i class="ph ph-printer"></i> <span class="hidden sm:inline">Lista</span>
                     </button>
 
+                    <a href="/fpv/perfil" class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-lg hover:bg-gray-100 transition-colors" title="Meu perfil">
+                        <img src="/<?= htmlspecialchars($currentUser['avatar_path']) ?>" alt="" class="w-8 h-8 rounded-full object-cover">
+                        <span class="hidden sm:block text-sm font-medium text-f91-navy"><?= htmlspecialchars(explode(' ', $currentUser['name'])[0]) ?></span>
+                    </a>
+
                     <button id="logoutButton" title="Sair" class="text-sm text-f91-muted hover:text-red-500 transition-colors p-2 rounded-lg hover:bg-gray-100">
                         <i class="ph ph-sign-out text-lg"></i>
                     </button>
@@ -153,13 +117,10 @@
             </div>
         </header>
 
-        <!-- Main Content -->
         <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full grid grid-cols-1 xl:grid-cols-12 gap-8 no-print">
 
-            <!-- Left Column: Dashboard & Planning -->
             <div class="xl:col-span-4 space-y-6">
 
-                <!-- Summary Card -->
                 <div class="bg-f91-card rounded-2xl p-6 shadow-sm border border-gray-100">
                     <h2 class="text-lg font-semibold text-f91-navy mb-4 flex items-center gap-2">
                         <i class="ph-fill ph-chart-pie-slice text-f91-lime"></i> Resumo Financeiro
@@ -171,7 +132,6 @@
                             <h3 class="text-3xl font-bold text-f91-navy" id="display-total-cost">R$ 0,00</h3>
                         </div>
 
-                        <!-- Progress Bar -->
                         <div class="pt-2">
                             <div class="flex justify-between text-xs font-medium mb-1">
                                 <span class="text-f91-navy">Progresso</span>
@@ -195,7 +155,6 @@
                     </div>
                 </div>
 
-                <!-- Planning Settings Card -->
                 <div class="bg-f91-card rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-4">
                         <h2 class="text-lg font-semibold text-f91-navy flex items-center gap-2">
@@ -220,7 +179,6 @@
                         </div>
                     </form>
 
-                    <!-- Calculation Result Detailed -->
                     <div class="mt-6 p-5 bg-f91-navy rounded-xl text-white relative overflow-hidden">
                         <div class="absolute -right-8 -top-8 w-32 h-32 bg-f91-lime rounded-full opacity-10"></div>
 
@@ -253,16 +211,12 @@
                         </div>
                     </div>
 
-                    <!-- Mini Calendar Visualizer -->
                     <div class="mt-4 pt-4 border-t border-gray-100">
                          <p class="text-xs text-f91-muted font-medium mb-2 text-center">Calendário de Progresso</p>
-                         <div class="flex flex-wrap justify-center gap-1" id="calendar-viz">
-                            <!-- Dots injected via JS -->
-                         </div>
+                         <div class="flex flex-wrap justify-center gap-1" id="calendar-viz"></div>
                     </div>
                 </div>
 
-                <!-- Categories Manager -->
                 <div class="bg-f91-card rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-semibold text-f91-navy uppercase tracking-wider flex items-center gap-2">
@@ -272,9 +226,7 @@
                             + Nova
                         </button>
                     </div>
-                    <div class="flex flex-wrap gap-2" id="categories-legend">
-                        <!-- Categories injected via JS -->
-                    </div>
+                    <div class="flex flex-wrap gap-2" id="categories-legend"></div>
                 </div>
 
                 <div class="text-center">
@@ -284,10 +236,8 @@
                 </div>
             </div>
 
-            <!-- Right Column: Wishlist / Items -->
             <div class="xl:col-span-8 bg-f91-card rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[calc(100vh-8rem)] xl:h-auto">
 
-                <!-- Add Item Section -->
                 <div class="p-6 border-b border-gray-100 bg-white rounded-t-2xl z-10">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-f91-navy flex items-center gap-2">
@@ -298,7 +248,6 @@
 
                     <form id="add-item-form" class="space-y-4">
                         <div class="flex flex-col md:flex-row gap-3 items-end">
-                            <!-- Photo Upload -->
                             <div class="w-full md:w-auto flex-shrink-0">
                                 <label class="cursor-pointer flex flex-col items-center justify-center w-full md:w-14 h-[38px] border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-f91-muted relative overflow-hidden group" title="Adicionar Foto">
                                     <i class="ph ph-camera text-lg group-hover:scale-110 transition-transform" id="image-placeholder-icon"></i>
@@ -312,9 +261,7 @@
                             </div>
 
                             <div class="w-full md:w-40">
-                                <select id="item-category" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime focus:border-f91-lime sm:text-sm outline-none bg-gray-50 focus:bg-white transition-all appearance-none cursor-pointer">
-                                    <!-- Populated via JS -->
-                                </select>
+                                <select id="item-category" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime focus:border-f91-lime sm:text-sm outline-none bg-gray-50 focus:bg-white transition-all appearance-none cursor-pointer"></select>
                             </div>
                         </div>
 
@@ -340,13 +287,9 @@
                     </form>
                 </div>
 
-                <!-- Items List -->
                 <div class="flex-grow overflow-y-auto p-4 sm:p-6 bg-gray-50 rounded-b-2xl">
-                    <ul id="items-container" class="space-y-3">
-                        <!-- Items will be injected here via JS -->
-                    </ul>
+                    <ul id="items-container" class="space-y-3"></ul>
 
-                    <!-- Empty State -->
                     <div id="empty-state" class="hidden flex-col items-center justify-center py-12 text-center h-full">
                         <div class="w-20 h-20 bg-white shadow-sm border border-gray-100 rounded-full flex items-center justify-center mb-4 text-f91-muted">
                             <i class="ph ph-drone text-4xl"></i>
@@ -361,7 +304,6 @@
 
     <!-- MODALS -->
 
-    <!-- Modal: Image Lightbox -->
     <div id="lightbox-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
         <div class="absolute inset-0 bg-black/80 backdrop-blur-sm cursor-pointer" onclick="closeModal('lightbox-modal')"></div>
         <div class="relative z-10 max-w-4xl max-h-[90vh] w-full flex flex-col items-center modal-scale-enter" id="lightbox-content">
@@ -371,7 +313,6 @@
         </div>
     </div>
 
-    <!-- Modal: Add Category -->
     <div id="category-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
         <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer" onclick="closeModal('category-modal')"></div>
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-md relative z-10 modal-scale-enter overflow-hidden">
@@ -407,7 +348,6 @@
         </div>
     </div>
 
-    <!-- Modal: Export / Print -->
     <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
         <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer no-print" onclick="closeModal('export-modal')"></div>
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg relative z-10 modal-scale-enter overflow-hidden max-h-[85vh] flex flex-col">
@@ -416,7 +356,7 @@
                 <button onclick="closeModal('export-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
             </div>
             <div class="overflow-y-auto p-6" id="print-area">
-                <h2 class="text-xl font-bold text-f91-navy mb-1">F91 FPV Setup — Lista de Compras</h2>
+                <h2 class="text-xl font-bold text-f91-navy mb-1">FPV91 — Lista de Compras</h2>
                 <p class="text-xs text-f91-muted mb-4" id="export-date"></p>
                 <table class="w-full text-sm">
                     <thead>
@@ -442,6 +382,6 @@
         </div>
     </div>
 
-    <script src="js/fpv_planner.js?v=20260801-1"></script>
+    <script src="/js/fpv_planner.js?v=20260802-1"></script>
 </body>
 </html>

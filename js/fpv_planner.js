@@ -1,9 +1,7 @@
 (() => {
-    const API_URL = "php/fpv/api.php";
-    const TOKEN_KEY = "f91_fpv_token";
+    const API_URL = "/php/fpv/api.php";
 
     const state = {
-        token: sessionStorage.getItem(TOKEN_KEY) || "",
         categories: [],
         items: [],
         planning: { saved_amount: 0, target_date: null },
@@ -11,14 +9,6 @@
     };
 
     const el = {
-        loginScreen: document.getElementById("loginScreen"),
-        loginForm: document.getElementById("loginForm"),
-        loginPassword: document.getElementById("loginPassword"),
-        loginError: document.getElementById("loginError"),
-        loginButton: document.getElementById("loginButton"),
-        loginButtonLabel: document.getElementById("loginButtonLabel"),
-        toggleLoginPassword: document.getElementById("toggleLoginPassword"),
-        appShell: document.getElementById("appShell"),
         logoutButton: document.getElementById("logoutButton"),
 
         displayTotalCost: document.getElementById("display-total-cost"),
@@ -88,14 +78,12 @@
 
         if (formData) {
             options.method = "POST";
-            formData.append("token", state.token);
             options.body = formData;
         } else if (method === "GET") {
-            const query = new URLSearchParams({ ...params, token: state.token });
-            url += `&${query.toString()}`;
+            const query = new URLSearchParams(params);
+            if ([...query].length) url += `&${query.toString()}`;
         } else {
-            const body = new URLSearchParams({ ...params, token: state.token });
-            options.body = body;
+            options.body = new URLSearchParams(params);
         }
 
         const response = await fetch(url, options);
@@ -133,58 +121,15 @@
         }
     };
 
-    // ── Auth ─────────────────────────────────────────────────────────────
-
-    function showApp() {
-        el.loginScreen.classList.add("hidden");
-        el.appShell.classList.remove("hidden");
-        el.appShell.classList.add("flex");
-    }
-
-    function showLogin() {
-        el.appShell.classList.add("hidden");
-        el.appShell.classList.remove("flex");
-        el.loginScreen.classList.remove("hidden");
-    }
-
-    async function handleLoginSubmit(event) {
-        event.preventDefault();
-        el.loginError.classList.add("hidden");
-        el.loginButton.disabled = true;
-        el.loginButtonLabel.textContent = "Entrando...";
-
-        try {
-            const body = new URLSearchParams({ password: el.loginPassword.value });
-            const response = await fetch(`${API_URL}?action=loginFpv`, { method: "POST", body });
-            const payload = await response.json();
-
-            if (!payload.success) {
-                throw new Error(payload.message || "Senha invalida.");
-            }
-
-            state.token = payload.token;
-            sessionStorage.setItem(TOKEN_KEY, state.token);
-            el.loginPassword.value = "";
-            showApp();
-            await loadBoard();
-        } catch (error) {
-            el.loginError.textContent = error.message;
-            el.loginError.classList.remove("hidden");
-        } finally {
-            el.loginButton.disabled = false;
-            el.loginButtonLabel.textContent = "Entrar";
-        }
-    }
+    // ── Auth (a sessao ja e garantida pelo router antes desta pagina carregar) ──
 
     async function handleLogout() {
         try {
             await apiRequest("logoutFpv", { method: "POST" });
         } catch (error) {
-            // Sessao ja pode ter expirado no servidor; segue o logout local mesmo assim.
+            // Sessao ja pode ter expirado no servidor; segue o logout mesmo assim.
         }
-        state.token = "";
-        sessionStorage.removeItem(TOKEN_KEY);
-        showLogin();
+        window.location.href = "/fpv";
     }
 
     // ── Board loading ────────────────────────────────────────────────────
@@ -199,9 +144,7 @@
             renderAll();
         } catch (error) {
             if (error.status === 401) {
-                state.token = "";
-                sessionStorage.removeItem(TOKEN_KEY);
-                showLogin();
+                window.location.href = "/fpv/login";
                 return;
             }
             alert("Erro ao carregar dados: " + error.message);
@@ -289,7 +232,7 @@
             const purchasedClasses = item.is_purchased ? "opacity-60" : "";
             const nameClasses = item.is_purchased ? "line-through text-f91-muted" : "text-f91-navy";
             const thumb = item.image_path
-                ? `<img src="${escapeHtml(item.image_path)}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover">`
+                ? `<img src="/${escapeHtml(item.image_path)}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover">`
                 : `<i class="ph ph-drone text-xl"></i>`;
 
             return `
@@ -395,7 +338,7 @@
         const item = state.items.find((it) => it.item_uuid === itemUuid);
 
         if (viewImageBtn && item && item.image_path) {
-            el.lightboxImg.src = item.image_path;
+            el.lightboxImg.src = "/" + item.image_path;
             el.lightboxCaption.textContent = item.name;
             window.openModal("lightbox-modal");
             return;
@@ -624,14 +567,6 @@
     // ── Wire up events ───────────────────────────────────────────────────
 
     function bindEvents() {
-        el.loginForm.addEventListener("submit", handleLoginSubmit);
-        el.toggleLoginPassword.addEventListener("click", () => {
-            const isPassword = el.loginPassword.type === "password";
-            el.loginPassword.type = isPassword ? "text" : "password";
-            el.toggleLoginPassword.innerHTML = isPassword
-                ? '<i class="ph ph-eye-slash text-lg"></i>'
-                : '<i class="ph ph-eye text-lg"></i>';
-        });
         el.logoutButton.addEventListener("click", handleLogout);
 
         el.addCategoryForm.addEventListener("submit", handleAddCategorySubmit);
@@ -676,12 +611,7 @@
 
     async function bootstrap() {
         bindEvents();
-        if (state.token) {
-            showApp();
-            await loadBoard();
-        } else {
-            showLogin();
-        }
+        await loadBoard();
     }
 
     bootstrap();
