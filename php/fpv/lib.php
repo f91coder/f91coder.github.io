@@ -160,7 +160,7 @@ function register_fpv_user(array $input, ?array $avatarFile): array
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         return ['success' => false, 'message' => 'E-mail invalido.', '_code' => 400];
     }
-    if (strlen($phone) < 10) {
+    if (!fpv_validate_br_phone($phone)) {
         return ['success' => false, 'message' => 'Informe um telefone/WhatsApp valido, com DDD.', '_code' => 400];
     }
     if (!fpv_validate_cpf($cpfDigits)) {
@@ -434,8 +434,11 @@ function update_fpv_profile(array $input, ?array $avatarFile): array
 
     $name = fpv_sanitize_string($input['name'] ?? '', 150);
     $phone = fpv_only_digits(fpv_sanitize_string($input['phone'] ?? '', 20));
-    if (mb_strlen($name) < 2 || strlen($phone) < 10) {
-        return ['success' => false, 'message' => 'Nome e telefone sao obrigatorios.', '_code' => 400];
+    if (mb_strlen($name) < 2) {
+        return ['success' => false, 'message' => 'Informe seu nome completo.', '_code' => 400];
+    }
+    if (!fpv_validate_br_phone($phone)) {
+        return ['success' => false, 'message' => 'Informe um telefone/WhatsApp valido, com DDD.', '_code' => 400];
     }
 
     try {

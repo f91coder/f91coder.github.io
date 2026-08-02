@@ -24,7 +24,10 @@
         <form id="registerForm" novalidate>
             <div class="fpv-avatar-picker">
                 <label class="fpv-avatar-preview" id="avatarPreviewWrap">
-                    <span id="avatarPlaceholder">Foto</span>
+                    <svg id="avatarPlaceholder" width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M4 8.5C4 7.67157 4.67157 7 5.5 7H7.17157C7.70201 7 8.21071 6.78929 8.58579 6.41421L9.41421 5.58579C9.78929 5.21071 10.298 5 10.8284 5H13.1716C13.702 5 14.2107 5.21071 14.5858 5.58579L15.4142 6.41421C15.7893 6.78929 16.298 7 16.8284 7H18.5C19.3284 7 20 7.67157 20 8.5V17.5C20 18.3284 19.3284 19 18.5 19H5.5C4.67157 19 4 18.3284 4 17.5V8.5Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+                        <circle cx="12" cy="13" r="3.25" stroke="currentColor" stroke-width="1.6"/>
+                    </svg>
                     <input type="file" id="avatar" accept="image/*" style="display:none;" required>
                 </label>
                 <div>
@@ -45,14 +48,14 @@
                 </div>
                 <div class="fpv-field">
                     <label for="phone">WhatsApp (com DDD)</label>
-                    <input type="tel" id="phone" placeholder="(11) 91234-5678" required>
+                    <input type="tel" id="phone" placeholder="(11) 9 1234-5678" required maxlength="17">
                 </div>
             </div>
 
             <div class="fpv-field-row">
                 <div class="fpv-field">
                     <label for="cpf">CPF</label>
-                    <input type="text" id="cpf" placeholder="000.000.000-00" required>
+                    <input type="text" id="cpf" placeholder="000.000.000-00" required maxlength="14">
                 </div>
                 <div class="fpv-field">
                     <label for="password">Senha</label>
@@ -68,6 +71,7 @@
     </div>
 </div>
 
+<script src="/fpv/assets/js/fpv_masks.js"></script>
 <script>
 (() => {
     const form = document.getElementById("registerForm");

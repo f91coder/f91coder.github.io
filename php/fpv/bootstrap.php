@@ -205,3 +205,38 @@ function fpv_validate_cpf(string $digits): bool
 
     return true;
 }
+
+const FPV_VALID_DDD = [
+    11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 24, 27, 28, 31, 32, 33, 34, 35, 37, 38,
+    41, 42, 43, 44, 45, 46, 47, 48, 49, 51, 53, 54, 55, 61, 62, 63, 64, 65, 66, 67, 68, 69,
+    71, 73, 74, 75, 77, 79, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 92, 93, 94, 95, 96, 97, 98, 99,
+];
+
+/**
+ * Validacao estrutural de telefone/WhatsApp brasileiro: 10 digitos (fixo) ou
+ * 11 digitos (celular, sempre comecando com 9 apos o DDD), com DDD real (lista
+ * ANATEL) e sem sequencias obviamente falsas. Nao confirma que o numero exista
+ * de fato — isso exigiria envio de codigo por SMS/WhatsApp, uma verificacao a
+ * parte que nao foi pedida aqui.
+ */
+function fpv_validate_br_phone(string $digits): bool
+{
+    if (!in_array(strlen($digits), [10, 11], true)) {
+        return false;
+    }
+    if (preg_match('/^(\d)\1+$/', $digits)) {
+        return false;
+    }
+
+    $ddd = (int) substr($digits, 0, 2);
+    if (!in_array($ddd, FPV_VALID_DDD, true)) {
+        return false;
+    }
+
+    $local = substr($digits, 2);
+    if (strlen($local) === 9 && $local[0] !== '9') {
+        return false;
+    }
+
+    return true;
+}

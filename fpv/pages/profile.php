@@ -44,7 +44,7 @@
             </div>
             <div class="fpv-field">
                 <label for="phone">WhatsApp (com DDD)</label>
-                <input type="tel" id="phone" value="<?= htmlspecialchars($currentUser['phone']) ?>" required>
+                <input type="tel" id="phone" value="<?= htmlspecialchars($currentUser['phone']) ?>" required maxlength="17">
             </div>
             <div class="fpv-field">
                 <label>E-mail</label>
@@ -60,6 +60,7 @@
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
 
+<script src="/fpv/assets/js/fpv_masks.js"></script>
 <script>
 (() => {
     const form = document.getElementById("profileForm");

@@ -310,7 +310,7 @@ body.fpv-no-scroll{ overflow:hidden; }
 .fpv-auth-card.is-wide{ max-width:560px; }
 
 .fpv-auth-head{ text-align:center; margin-bottom:26px; }
-.fpv-auth-head img{ height:40px; margin:0 auto 14px; }
+.fpv-auth-head img{ height:84px; width:auto; margin:0 auto 16px; }
 .fpv-auth-head h1{ font-size:22px; font-weight:800; margin:0 0 6px; letter-spacing:-.01em; }
 .fpv-auth-head p{ font-size:13.5px; color:var(--muted); margin:0; }
 
