@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+// Todo o site /fpv e dinamico e sensivel a sessao (mostra estado de login,
+// formularios de auth) — nunca deve ser cacheado por navegador/CDN, senao um
+// usuario pode acabar vendo uma versao antiga da pagina ou presa em estado
+// desatualizado ate dar um hard refresh.
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+
 require_once __DIR__ . '/../php/fpv/lib.php';
 
 $pdo = fpv_pdo();
