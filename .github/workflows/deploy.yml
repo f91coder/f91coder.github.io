@@ -28,6 +28,7 @@ jobs:
             --exclude='.env.*'
             --exclude='README.md'
             --exclude='*.local.php'
+            --exclude='img/fpv-uploads/*'
           path: ./
           remote_path: ${{ secrets.SSH_TARGET_PATH }}
           remote_host: ${{ secrets.SSH_HOST }}

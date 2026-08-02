@@ -10,6 +10,14 @@ php/mail-config.local.php
 # arquivos fora do Git; so o .local.php tem as credenciais reais.)
 php/survey/db-config.local.php
 
+# Credenciais reais do FPV planner — mesmo padrao acima.
+php/fpv/config.local.php
+
+# Fotos enviadas pelos usuarios no FPV planner — nunca versionar (conteudo
+# gerado em runtime, excluido do deploy via rsync tambem, ver deploy.yml).
+img/fpv-uploads/*
+!img/fpv-uploads/.gitkeep
+
 # Chave SSH de deploy gerada localmente — nunca versionar (apagar apos configurar)
 f91_deploy_key
 f91_deploy_key.pub
