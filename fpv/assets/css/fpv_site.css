@@ -59,9 +59,9 @@ button{ font:inherit; cursor:pointer; }
 }
 
 .fpv-nav.is-scrolled{
-  background:rgba(8,32,62,0.82);
+  background:rgba(255,255,255,.92);
   backdrop-filter:blur(14px);
-  box-shadow:0 1px 0 rgba(255,255,255,.06);
+  box-shadow:0 1px 0 rgba(8,32,62,.06), 0 8px 24px rgba(8,32,62,.06);
 }
 
 .fpv-nav-inner{
@@ -75,7 +75,13 @@ button{ font:inherit; cursor:pointer; }
   gap:24px;
 }
 
-.fpv-nav-logo img{ height:28px; width:auto; }
+.fpv-nav-logo img{
+  height:28px; width:auto;
+  filter:brightness(0) invert(1);
+  transition:filter .3s ease;
+}
+
+.fpv-nav.is-scrolled .fpv-nav-logo img{ filter:none; }
 
 .fpv-nav-links{
   display:flex;
@@ -98,6 +104,14 @@ button{ font:inherit; cursor:pointer; }
 .fpv-nav-links a:hover, .fpv-nav-links a.is-active{
   background:rgba(255,255,255,.1);
   color:#fff;
+}
+
+.fpv-nav.is-scrolled .fpv-nav-links a{ color:var(--muted); }
+
+.fpv-nav.is-scrolled .fpv-nav-links a:hover,
+.fpv-nav.is-scrolled .fpv-nav-links a.is-active{
+  background:var(--surface-2);
+  color:var(--navy);
 }
 
 .fpv-nav-actions{ display:flex; align-items:center; gap:10px; }
@@ -160,6 +174,12 @@ button{ font:inherit; cursor:pointer; }
   color:#fff;
   font-size:13px;
   font-weight:600;
+  transition:background-color .25s ease, color .25s ease;
+}
+
+.fpv-nav.is-scrolled .fpv-nav-user{
+  background:var(--surface-2);
+  color:var(--navy);
 }
 
 .fpv-nav-user img{
@@ -220,6 +240,13 @@ button{ font:inherit; cursor:pointer; }
   justify-content:center;
   flex-shrink:0;
   color:#fff;
+  transition:background-color .25s ease, border-color .25s ease, color .25s ease;
+}
+
+.fpv-nav.is-scrolled .fpv-mobile-toggle{
+  background:var(--surface-2);
+  border-color:var(--border);
+  color:var(--navy);
 }
 
 .fpv-mobile-toggle span{

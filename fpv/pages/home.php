@@ -18,7 +18,7 @@ $recentTutorials = list_fpv_posts('tutorial', 3);
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <style>
     .fpv-hero{
-        min-height:92vh;
+        min-height:100vh;
         display:flex;
         align-items:center;
         background:

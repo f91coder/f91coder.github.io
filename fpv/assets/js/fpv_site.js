@@ -2,8 +2,20 @@
     const nav = document.querySelector(".fpv-nav");
     if (!nav) return;
 
+    // Pages with a dark hero (.fpv-hero on home, .fpv-page-hero elsewhere) start
+    // with a transparent nav + white logo so it reads over the dark background,
+    // and only switch to the light/solid nav once scrolled past that hero. Pages
+    // with no hero (profile, admin) have a light background right under the nav
+    // from the start, so they skip straight to the light nav state.
+    const heroEl = document.querySelector(".fpv-hero, .fpv-page-hero");
+
     function updateNavState() {
-        nav.classList.toggle("is-scrolled", window.scrollY > 24);
+        if (!heroEl) {
+            nav.classList.add("is-scrolled");
+            return;
+        }
+        const threshold = Math.max(heroEl.offsetHeight - 80, 24);
+        nav.classList.toggle("is-scrolled", window.scrollY > threshold);
     }
 
     updateNavState();
