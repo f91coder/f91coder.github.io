@@ -100,9 +100,6 @@ try {
     fpv_json_response(['success' => false, 'message' => $e->getMessage()], 401);
 } catch (Throwable $e) {
     error_log('fpv/api.php [' . $action . ']: ' . $e->getMessage());
-    if (($_GET['debug'] ?? '') === 'f91tmp2026') {
-        fpv_json_response(['success' => false, 'message' => $e->getMessage(), 'debug_file' => $e->getFile(), 'debug_line' => $e->getLine()], 500);
-    }
     fpv_json_response(['success' => false, 'message' => 'Erro interno do servidor.'], 500);
 }
 
