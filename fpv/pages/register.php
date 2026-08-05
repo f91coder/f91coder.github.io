@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Criar conta | FPV91</title>
-<link rel="icon" type="image/png" href="/img/fpv_fav.png">
+<link rel="icon" type="image/png" href="/<?= fpv_asset_v('img/fpv_fav.png') ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
 <div class="fpv-auth-shell">
     <div class="fpv-auth-card is-wide">
         <div class="fpv-auth-head">
-            <img src="/img/fpv_fav.png" alt="FPV91">
+            <img src="/<?= fpv_asset_v('img/fpv_fav.png') ?>" alt="FPV91">
             <h1>Criar sua conta</h1>
             <p>Monte seu setup, acompanhe seu orcamento e faca parte da comunidade FPV91.</p>
         </div>

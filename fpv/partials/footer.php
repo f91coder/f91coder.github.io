@@ -2,7 +2,7 @@
     <div class="fpv-container">
         <div class="fpv-footer-grid">
             <div class="fpv-footer-brand">
-                <img src="/img/fpv_logo.png" alt="FPV91">
+                <img src="/<?= fpv_asset_v('img/fpv_logo.png') ?>" alt="FPV91">
                 <p>Conteudo, comunidade e ferramentas para quem monta o proprio drone FPV do zero.</p>
             </div>
             <div class="fpv-footer-col">

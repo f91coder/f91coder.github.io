@@ -9,7 +9,7 @@ $recentTutorials = list_fpv_posts('tutorial', 3);
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FPV91 — Monte seu drone FPV do zero</title>
 <meta name="description" content="Conteudo, tutoriais e ferramentas para quem quer montar o proprio drone FPV do zero.">
-<link rel="icon" type="image/png" href="/img/fpv_fav.png">
+<link rel="icon" type="image/png" href="/<?= fpv_asset_v('img/fpv_fav.png') ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -56,7 +56,7 @@ $recentTutorials = list_fpv_posts('tutorial', 3);
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
 <section class="fpv-hero">
-    <img src="/img/fpv_logo.png" alt="" class="fpv-hero-drone">
+    <img src="/<?= fpv_asset_v('img/fpv_logo.png') ?>" alt="" class="fpv-hero-drone">
     <div class="fpv-hero-inner">
         <span class="fpv-eyebrow" style="display:inline-block;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.1);color:var(--lime);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">FPV91 by F91</span>
         <h1>Monte seu <span class="fpv-hero-highlight">drone FPV</span> do zero, com quem entende do assunto.</h1>

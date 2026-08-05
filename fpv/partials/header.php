@@ -12,7 +12,7 @@ $fpvNavLinks = [
 <header class="fpv-nav" id="fpvNav">
     <div class="fpv-nav-inner">
         <a href="/fpv" class="fpv-nav-logo">
-            <img src="/img/fpv_logo.png" alt="FPV91">
+            <img src="/<?= fpv_asset_v('img/fpv_logo.png') ?>" alt="FPV91">
         </a>
 
         <ul class="fpv-nav-links">

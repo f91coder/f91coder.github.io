@@ -21,6 +21,18 @@ function fpv_seed_default_categories(PDO $pdo, int $userId): void
     }
 }
 
+/**
+ * Adiciona um parametro de versao (baseado no mtime do arquivo) a assets
+ * estaticos como logo/favicon, para forcar o CDN/navegador a buscar a versao
+ * nova sempre que o conteudo do arquivo mudar, mesmo mantendo o mesmo nome.
+ */
+function fpv_asset_v(string $publicPath): string
+{
+    $full = __DIR__ . '/../../' . ltrim($publicPath, '/');
+    $mtime = @filemtime($full);
+    return $publicPath . ($mtime ? '?v=' . $mtime : '');
+}
+
 // ─────────────────────────────────────────────────────────────────────────
 // E-mail (clona o padrao de php/survey/lib.php, cores FPV91)
 // ─────────────────────────────────────────────────────────────────────────

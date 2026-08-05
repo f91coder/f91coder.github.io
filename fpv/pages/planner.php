@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Meu Planner | FPV91</title>
-    <link rel="icon" type="image/png" href="/img/fpv_fav.png">
+    <link rel="icon" type="image/png" href="/<?= fpv_asset_v('img/fpv_fav.png') ?>">
 
     <script>
         (function () {
@@ -154,8 +154,8 @@
         <header class="glass-header sticky top-0 z-40 border-b border-gray-200 shadow-sm no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <a href="/fpv" class="flex items-center gap-3">
-                    <img src="/img/fpv_logo.png" alt="FPV91" class="h-8 sm:h-9 w-auto brand-logo brand-logo-light">
-                    <img src="/img/fpv_logo_.png" alt="FPV91" class="h-8 sm:h-9 w-auto brand-logo brand-logo-dark">
+                    <img src="/<?= fpv_asset_v('img/fpv_logo.png') ?>" alt="FPV91" class="h-8 sm:h-9 w-auto brand-logo brand-logo-light">
+                    <img src="/<?= fpv_asset_v('img/fpv_logo_.png') ?>" alt="FPV91" class="h-8 sm:h-9 w-auto brand-logo brand-logo-dark">
                 </a>
 
                 <div class="flex items-center gap-4">

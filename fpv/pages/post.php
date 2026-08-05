@@ -13,7 +13,7 @@ $typeLabel = $post['type'] === 'tutorial' ? 'Tutorial' : 'Blog';
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= htmlspecialchars($post['title']) ?> | FPV91</title>
 <meta name="description" content="<?= htmlspecialchars($post['excerpt']) ?>">
-<link rel="icon" type="image/png" href="/img/fpv_fav.png">
+<link rel="icon" type="image/png" href="/<?= fpv_asset_v('img/fpv_fav.png') ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
