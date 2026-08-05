@@ -27,7 +27,7 @@ function fpv_seed_default_categories(PDO $pdo, int $userId): void
 
 const FPV_EMAIL_NAVY = '#171515';
 const FPV_EMAIL_NAVY_SOFT = '#2a2626';
-const FPV_EMAIL_LIME = '#ffc400';
+const FPV_EMAIL_LIME = '#ff6829';
 const FPV_EMAIL_INK = '#12142b';
 const FPV_EMAIL_MUTED = '#6c7089';
 const FPV_EMAIL_BORDER = '#e7e9f2';

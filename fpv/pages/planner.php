@@ -61,8 +61,8 @@
         :root{
             --f91-navy:#171515;
             --f91-navy-light:#2a2626;
-            --f91-lime:#ffc400;
-            --f91-lime-dark:#e0ac00;
+            --f91-lime:#ff6829;
+            --f91-lime-dark:#cc5321;
             --f91-bg:#f8fafc;
             --f91-card:#ffffff;
             --f91-text:#334155;
@@ -78,8 +78,8 @@
         html.dark{
             --f91-navy:#171515;
             --f91-navy-light:#332f2e;
-            --f91-lime:#ffc400;
-            --f91-lime-dark:#ffd23f;
+            --f91-lime:#ff6829;
+            --f91-lime-dark:#ff8e5e;
             --f91-bg:#121110;
             --f91-card:#1e1c1b;
             --f91-text:#f1efec;
@@ -119,6 +119,17 @@
         html:not(.dark) .theme-toggle-icon.is-dark{ display:block; }
         html.dark .theme-toggle-icon.is-light{ display:block; }
 
+        .brand-logo{ display:none; }
+        html:not(.dark) .brand-logo-light{ display:block; }
+        html.dark .brand-logo-dark{ display:block; }
+
+        .avatar-fallback{
+            width:32px; height:32px; border-radius:999px;
+            display:flex; align-items:center; justify-content:center;
+            background:linear-gradient(135deg, var(--f91-navy), var(--f91-lime));
+            color:#fff; font-size:13px; font-weight:800; flex-shrink:0;
+        }
+
         [draggable="true"]{ cursor: grab; }
         .item-drag-handle{ cursor: grab; touch-action: none; }
         li.is-dragging{ opacity: .4; }
@@ -143,7 +154,8 @@
         <header class="glass-header sticky top-0 z-40 border-b border-gray-200 shadow-sm no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <a href="/fpv" class="flex items-center gap-3">
-                    <img src="/img/fpv_logo.png" alt="FPV91" class="h-8 sm:h-9 w-auto">
+                    <img src="/img/fpv_logo.png" alt="FPV91" class="h-8 sm:h-9 w-auto brand-logo brand-logo-light">
+                    <img src="/img/fpv_logo_.png" alt="FPV91" class="h-8 sm:h-9 w-auto brand-logo brand-logo-dark">
                 </a>
 
                 <div class="flex items-center gap-4">
@@ -179,7 +191,11 @@
                     </button>
 
                     <a href="/fpv/perfil" class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-lg hover:bg-gray-100 transition-colors" title="Meu perfil">
-                        <img src="/<?= htmlspecialchars($currentUser['avatar_path']) ?>" alt="" class="w-8 h-8 rounded-full object-cover">
+                        <?php if (!empty($currentUser['avatar_path'])): ?>
+                            <img src="/<?= htmlspecialchars($currentUser['avatar_path']) ?>" alt="" class="w-8 h-8 rounded-full object-cover" onerror="this.outerHTML='<span class=&quot;avatar-fallback&quot;><?= htmlspecialchars(mb_strtoupper(mb_substr($currentUser['name'], 0, 1))) ?></span>';">
+                        <?php else: ?>
+                            <span class="avatar-fallback"><?= htmlspecialchars(mb_strtoupper(mb_substr($currentUser['name'], 0, 1))) ?></span>
+                        <?php endif; ?>
                         <span class="hidden sm:block text-sm font-medium text-f91-text"><?= htmlspecialchars(explode(' ', $currentUser['name'])[0]) ?></span>
                     </a>
 

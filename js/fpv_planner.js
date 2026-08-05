@@ -104,6 +104,12 @@
 
     // ── Cotacoes (USD/BRL/PYG) ───────────────────────────────────────────
 
+    const FLAG_SVG = {
+        US: `<svg viewBox="0 0 24 16" width="20" height="14" style="border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.08);flex-shrink:0;"><rect width="24" height="16" fill="#B22234"/><rect y="1.23" width="24" height="1.23" fill="#fff"/><rect y="3.69" width="24" height="1.23" fill="#fff"/><rect y="6.15" width="24" height="1.23" fill="#fff"/><rect y="8.62" width="24" height="1.23" fill="#fff"/><rect y="11.08" width="24" height="1.23" fill="#fff"/><rect y="13.54" width="24" height="1.23" fill="#fff"/><rect width="10" height="8.62" fill="#3C3B6E"/></svg>`,
+        BR: `<svg viewBox="0 0 24 16" width="20" height="14" style="border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.08);flex-shrink:0;"><rect width="24" height="16" fill="#009B3A"/><polygon points="12,2 22,8 12,14 2,8" fill="#FEDF00"/><circle cx="12" cy="8" r="3.2" fill="#002776"/></svg>`,
+        PY: `<svg viewBox="0 0 24 16" width="20" height="14" style="border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.08);flex-shrink:0;"><rect width="24" height="16" fill="#D52B1E"/><rect y="5.33" width="24" height="5.33" fill="#fff"/><rect y="10.67" width="24" height="5.33" fill="#0038A8"/></svg>`,
+    };
+
     async function fetchExchangeRates(force) {
         if (!force) {
             const cached = localStorage.getItem(RATES_CACHE_KEY);
@@ -148,17 +154,17 @@
         }
 
         const rows = [
-            { flag: "🇺🇸", label: "Dólar (USD)", value: `R$ ${rates.BRL.toFixed(2).replace(".", ",")}` },
-            { flag: "🇧🇷", label: "Real (BRL)", value: "Moeda base" },
+            { flag: FLAG_SVG.US, label: "Dólar (USD)", value: `R$ ${rates.BRL.toFixed(2).replace(".", ",")}` },
+            { flag: FLAG_SVG.BR, label: "Real (BRL)", value: "Moeda base" },
         ];
         if (rates.PYG) {
             const pygPer1000 = (1000 / rates.PYG) * rates.BRL;
-            rows.push({ flag: "🇵🇾", label: "Guarani (₲ 1.000)", value: `R$ ${pygPer1000.toFixed(2).replace(".", ",")}` });
+            rows.push({ flag: FLAG_SVG.PY, label: "Guarani (₲ 1.000)", value: `R$ ${pygPer1000.toFixed(2).replace(".", ",")}` });
         }
 
         el.currencyRatesList.innerHTML = rows.map((row) => `
             <div class="flex items-center justify-between py-1.5">
-                <span class="text-sm text-f91-muted flex items-center gap-2"><span>${row.flag}</span> ${escapeHtml(row.label)}</span>
+                <span class="text-sm text-f91-muted flex items-center gap-2">${row.flag} ${escapeHtml(row.label)}</span>
                 <span class="text-sm font-bold text-f91-text">${escapeHtml(row.value)}</span>
             </div>
         `).join("");

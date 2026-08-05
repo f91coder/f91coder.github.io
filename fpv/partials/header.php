@@ -25,7 +25,9 @@ $fpvNavLinks = [
             <?php if (!empty($currentUser)): ?>
                 <a href="/fpv/planner" class="fpv-nav-user">
                     <?php if (!empty($currentUser['avatar_path'])): ?>
-                        <img src="/<?= htmlspecialchars($currentUser['avatar_path']) ?>" alt="">
+                        <img src="/<?= htmlspecialchars($currentUser['avatar_path']) ?>" alt="" onerror="this.outerHTML='<span class=&quot;avatar-fallback&quot;><?= htmlspecialchars(mb_strtoupper(mb_substr($currentUser['name'], 0, 1))) ?></span>';">
+                    <?php else: ?>
+                        <span class="avatar-fallback"><?= htmlspecialchars(mb_strtoupper(mb_substr($currentUser['name'], 0, 1))) ?></span>
                     <?php endif; ?>
                     <?= htmlspecialchars(explode(' ', $currentUser['name'])[0]) ?>
                 </a>

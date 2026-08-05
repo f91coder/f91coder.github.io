@@ -4,8 +4,8 @@
   --navy:#171515;
   --navy-soft:#2a2626;
   --navy-softer:#3d3737;
-  --lime:#ffc400;
-  --lime-dark:#e0ac00;
+  --lime:#ff6829;
+  --lime-dark:#cc5321;
   --ink:#12142b;
   --muted:#6c7089;
   --muted-soft:#9598ad;
@@ -182,10 +182,17 @@ button{ font:inherit; cursor:pointer; }
   color:var(--navy);
 }
 
-.fpv-nav-user img{
+.fpv-nav-user img,
+.fpv-nav-user .avatar-fallback{
   width:30px; height:30px;
   border-radius:999px;
   object-fit:cover;
+}
+
+.fpv-nav-user .avatar-fallback{
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, var(--navy), var(--lime));
+  color:#fff; font-size:13px; font-weight:800; flex-shrink:0;
 }
 
 /* ── Footer ───────────────────────────────────────────────────────────── */
@@ -321,7 +328,7 @@ body.fpv-no-scroll{ overflow:hidden; }
   justify-content:center;
   padding:120px 20px 60px;
   background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(255,196,0,.10), transparent),
+    radial-gradient(1200px 600px at 15% -10%, rgba(255,104,41,.10), transparent),
     linear-gradient(180deg, var(--navy) 0%, #050404 100%);
 }
 
@@ -417,6 +424,13 @@ body.fpv-no-scroll{ overflow:hidden; }
 }
 
 .fpv-avatar-picker .fpv-avatar-preview img{ width:100%; height:100%; object-fit:cover; }
+
+.fpv-avatar-picker .fpv-avatar-preview .avatar-fallback{
+  width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  background:linear-gradient(135deg, var(--navy), var(--lime));
+  color:#fff; font-size:24px; font-weight:800;
+}
 
 .fpv-alert{
   padding:12px 14px;

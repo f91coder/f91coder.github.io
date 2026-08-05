@@ -29,7 +29,11 @@
         <form id="profileForm" novalidate>
             <div class="fpv-avatar-picker">
                 <label class="fpv-avatar-preview" id="avatarPreviewWrap">
-                    <img src="/<?= htmlspecialchars($currentUser['avatar_path']) ?>" alt="">
+                    <?php if (!empty($currentUser['avatar_path'])): ?>
+                        <img src="/<?= htmlspecialchars($currentUser['avatar_path']) ?>" alt="" onerror="this.outerHTML='<span class=&quot;avatar-fallback&quot;><?= htmlspecialchars(mb_strtoupper(mb_substr($currentUser['name'], 0, 1))) ?></span>';">
+                    <?php else: ?>
+                        <span class="avatar-fallback"><?= htmlspecialchars(mb_strtoupper(mb_substr($currentUser['name'], 0, 1))) ?></span>
+                    <?php endif; ?>
                     <input type="file" id="avatar" accept="image/*" style="display:none;">
                 </label>
                 <div>
@@ -75,12 +79,10 @@
         if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            let img = avatarWrap.querySelector("img");
-            if (!img) {
-                img = document.createElement("img");
-                avatarWrap.prepend(img);
-            }
+            avatarWrap.querySelector("img, .avatar-fallback")?.remove();
+            const img = document.createElement("img");
             img.src = e.target.result;
+            avatarWrap.prepend(img);
         };
         reader.readAsDataURL(file);
     });
