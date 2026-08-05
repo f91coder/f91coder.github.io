@@ -1,11 +1,19 @@
 (() => {
     const API_URL = "/php/fpv/api.php";
 
+    const THEME_STORAGE_KEY = "f91_fpv_theme";
+    const RATES_API_URL = "https://open.er-api.com/v6/latest/USD";
+    const RATES_CACHE_KEY = "f91_fpv_rates_cache";
+    const RATES_CACHE_TTL_MS = 30 * 60 * 1000;
+
     const state = {
         categories: [],
         items: [],
         planning: { saved_amount: 0, target_date: null },
         videos: [],
+        currency: "BRL",
+        exchangeRates: null,
+        dragUuid: null,
     };
 
     const el = {
@@ -58,6 +66,12 @@
 
         appToast: document.getElementById("appToast"),
         appToastMessage: document.getElementById("appToastMessage"),
+
+        themeToggleButton: document.getElementById("themeToggleButton"),
+        currencySwitchButtons: Array.from(document.querySelectorAll(".currency-switch-btn")),
+        currencyRatesList: document.getElementById("currencyRatesList"),
+        currencyUpdatedAt: document.getElementById("currencyUpdatedAt"),
+        refreshRatesButton: document.getElementById("refreshRatesButton"),
     };
 
     // ── Helpers ──────────────────────────────────────────────────────────
@@ -73,6 +87,149 @@
 
     function formatCurrency(value) {
         return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(Number(value) || 0);
+    }
+
+    function convertBrlToUsd(brlValue) {
+        if (!state.exchangeRates || !state.exchangeRates.BRL) return brlValue;
+        return brlValue / state.exchangeRates.BRL;
+    }
+
+    function formatDisplayCurrency(value) {
+        const brlValue = Number(value) || 0;
+        if (state.currency === "USD" && state.exchangeRates) {
+            return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(convertBrlToUsd(brlValue));
+        }
+        return formatCurrency(brlValue);
+    }
+
+    // ── Cotacoes (USD/BRL/PYG) ───────────────────────────────────────────
+
+    async function fetchExchangeRates(force) {
+        if (!force) {
+            const cached = localStorage.getItem(RATES_CACHE_KEY);
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (parsed && Date.now() - parsed.fetchedAt < RATES_CACHE_TTL_MS) {
+                        state.exchangeRates = parsed;
+                        return parsed;
+                    }
+                } catch (error) {
+                    // cache corrompido, ignora e busca de novo
+                }
+            }
+        }
+
+        const response = await fetch(RATES_API_URL);
+        if (!response.ok) throw new Error("Nao foi possivel buscar a cotacao.");
+        const data = await response.json();
+        if (data.result !== "success" || !data.rates || !data.rates.BRL) {
+            throw new Error("Cotacao indisponivel no momento.");
+        }
+
+        const rates = {
+            USD: 1,
+            BRL: data.rates.BRL,
+            PYG: data.rates.PYG || null,
+            fetchedAt: Date.now(),
+        };
+        state.exchangeRates = rates;
+        localStorage.setItem(RATES_CACHE_KEY, JSON.stringify(rates));
+        return rates;
+    }
+
+    function renderCurrencyCard() {
+        if (!el.currencyRatesList) return;
+        const rates = state.exchangeRates;
+
+        if (!rates) {
+            el.currencyRatesList.innerHTML = `<div class="flex items-center justify-between py-2"><span class="text-sm text-f91-muted">Nao foi possivel carregar as cotacoes.</span></div>`;
+            return;
+        }
+
+        const rows = [
+            { flag: "🇺🇸", label: "Dólar (USD)", value: `R$ ${rates.BRL.toFixed(2).replace(".", ",")}` },
+            { flag: "🇧🇷", label: "Real (BRL)", value: "Moeda base" },
+        ];
+        if (rates.PYG) {
+            const pygPer1000 = (1000 / rates.PYG) * rates.BRL;
+            rows.push({ flag: "🇵🇾", label: "Guarani (₲ 1.000)", value: `R$ ${pygPer1000.toFixed(2).replace(".", ",")}` });
+        }
+
+        el.currencyRatesList.innerHTML = rows.map((row) => `
+            <div class="flex items-center justify-between py-1.5">
+                <span class="text-sm text-f91-muted flex items-center gap-2"><span>${row.flag}</span> ${escapeHtml(row.label)}</span>
+                <span class="text-sm font-bold text-f91-text">${escapeHtml(row.value)}</span>
+            </div>
+        `).join("");
+
+        if (el.currencyUpdatedAt) {
+            const updated = new Date(rates.fetchedAt);
+            el.currencyUpdatedAt.textContent = `Atualizado as ${updated.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
+        }
+    }
+
+    function refreshDisplayedPrices() {
+        document.querySelectorAll(".item-price").forEach((priceEl) => {
+            const price = parseFloat(priceEl.dataset.price) || 0;
+            priceEl.textContent = formatDisplayCurrency(price);
+        });
+    }
+
+    function setCurrency(currency) {
+        if (currency === state.currency) return;
+        if (currency === "USD" && !state.exchangeRates) return;
+        state.currency = currency;
+        el.currencySwitchButtons.forEach((btn) => {
+            btn.setAttribute("aria-pressed", btn.dataset.currency === currency ? "true" : "false");
+        });
+        refreshDisplayedPrices();
+        renderSummary();
+        renderPlanningCalc();
+    }
+
+    async function initCurrency() {
+        el.currencySwitchButtons.forEach((btn) => {
+            btn.addEventListener("click", () => setCurrency(btn.dataset.currency));
+        });
+        if (el.refreshRatesButton) {
+            el.refreshRatesButton.addEventListener("click", async () => {
+                el.refreshRatesButton.classList.add("animate-spin");
+                try {
+                    await fetchExchangeRates(true);
+                    renderCurrencyCard();
+                    refreshDisplayedPrices();
+                    renderSummary();
+                    renderPlanningCalc();
+                } catch (error) {
+                    showAppToast("Nao foi possivel atualizar a cotacao agora.");
+                } finally {
+                    el.refreshRatesButton.classList.remove("animate-spin");
+                }
+            });
+        }
+
+        try {
+            await fetchExchangeRates(false);
+            renderCurrencyCard();
+        } catch (error) {
+            renderCurrencyCard();
+        }
+    }
+
+    // ── Tema claro/escuro ────────────────────────────────────────────────
+
+    function applyTheme(theme) {
+        document.documentElement.classList.toggle("dark", theme === "dark");
+    }
+
+    function initTheme() {
+        if (!el.themeToggleButton) return;
+        el.themeToggleButton.addEventListener("click", () => {
+            const next = document.documentElement.classList.contains("dark") ? "light" : "dark";
+            applyTheme(next);
+            localStorage.setItem(THEME_STORAGE_KEY, next);
+        });
     }
 
     async function apiRequest(action, { params = {}, formData = null, method = "GET" } = {}) {
@@ -233,13 +390,16 @@
         el.itemsContainer.innerHTML = state.items.map((item) => {
             const category = categoryById(item.category_id);
             const purchasedClasses = item.is_purchased ? "opacity-60" : "";
-            const nameClasses = item.is_purchased ? "line-through text-f91-muted" : "text-f91-navy";
+            const nameClasses = item.is_purchased ? "line-through text-f91-muted" : "text-f91-text";
             const thumb = item.image_path
                 ? `<img src="/${escapeHtml(item.image_path)}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover">`
                 : `<i class="ph ph-drone text-xl"></i>`;
 
             return `
-                <li class="flex items-center gap-3 sm:gap-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all-smooth ${purchasedClasses}" data-item-uuid="${item.item_uuid}">
+                <li class="flex items-center gap-2 sm:gap-4 bg-white dark:bg-f91-card p-3 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all-smooth ${purchasedClasses}" data-item-uuid="${item.item_uuid}" draggable="true">
+                    <span class="item-drag-handle text-gray-300 hover:text-f91-text transition-colors flex-shrink-0 px-1" title="Arraste para reordenar">
+                        <i class="ph-bold ph-dots-six-vertical text-lg"></i>
+                    </span>
                     <button type="button" class="w-14 h-14 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0 flex items-center justify-center text-f91-muted" data-action="view-image" ${item.image_path ? "" : "disabled"}>
                         ${thumb}
                     </button>
@@ -247,10 +407,10 @@
                         <p class="font-medium truncate ${nameClasses}">${escapeHtml(item.name)}</p>
                         <div class="flex items-center gap-2 mt-1 flex-wrap">
                             ${category ? `<span class="text-[11px] px-2 py-0.5 rounded-full font-medium ${escapeHtml(category.color_class)}">${escapeHtml(category.name)}</span>` : ""}
-                            ${item.store_url ? `<a href="${escapeHtml(item.store_url)}" target="_blank" rel="noopener" class="text-[11px] text-f91-muted hover:text-f91-navy flex items-center gap-1"><i class="ph ph-link"></i> Loja</a>` : ""}
+                            ${item.store_url ? `<a href="${escapeHtml(item.store_url)}" target="_blank" rel="noopener" class="text-[11px] text-f91-muted hover:text-f91-text flex items-center gap-1"><i class="ph ph-link"></i> Loja</a>` : ""}
                         </div>
                     </div>
-                    <p class="font-bold text-f91-navy text-sm sm:text-base flex-shrink-0 whitespace-nowrap">${formatCurrency(item.price)}</p>
+                    <p class="font-bold text-f91-text text-sm sm:text-base flex-shrink-0 whitespace-nowrap item-price" data-price="${item.price}">${formatDisplayCurrency(item.price)}</p>
                     <label class="flex items-center flex-shrink-0 cursor-pointer" title="Marcar como comprado">
                         <input type="checkbox" data-action="toggle-purchased" ${item.is_purchased ? "checked" : ""} class="w-5 h-5 rounded border-gray-300 text-f91-lime focus:ring-f91-lime cursor-pointer">
                     </label>
@@ -359,6 +519,67 @@
         handleTogglePurchased(li.dataset.itemUuid, event.target.checked);
     }
 
+    // ── Arrastar para reordenar ──────────────────────────────────────────
+
+    function clearDragOverClasses() {
+        el.itemsContainer.querySelectorAll("li[data-item-uuid]").forEach((li) => {
+            li.classList.remove("drag-over-top", "drag-over-bottom");
+        });
+    }
+
+    function handleItemsDragStart(event) {
+        const li = event.target.closest("li[data-item-uuid]");
+        if (!li) return;
+        state.dragUuid = li.dataset.itemUuid;
+        li.classList.add("is-dragging");
+        event.dataTransfer.effectAllowed = "move";
+        event.dataTransfer.setData("text/plain", li.dataset.itemUuid);
+    }
+
+    function handleItemsDragOver(event) {
+        const li = event.target.closest("li[data-item-uuid]");
+        if (!li || !state.dragUuid || li.dataset.itemUuid === state.dragUuid) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+
+        const rect = li.getBoundingClientRect();
+        const isTopHalf = event.clientY < rect.top + rect.height / 2;
+        clearDragOverClasses();
+        li.classList.toggle("drag-over-top", isTopHalf);
+        li.classList.toggle("drag-over-bottom", !isTopHalf);
+    }
+
+    async function handleItemsDrop(event) {
+        const li = event.target.closest("li[data-item-uuid]");
+        clearDragOverClasses();
+        if (!li || !state.dragUuid || li.dataset.itemUuid === state.dragUuid) return;
+        event.preventDefault();
+
+        const draggedLi = el.itemsContainer.querySelector(`li[data-item-uuid="${state.dragUuid}"]`);
+        if (!draggedLi) return;
+
+        const rect = li.getBoundingClientRect();
+        const isTopHalf = event.clientY < rect.top + rect.height / 2;
+        li.insertAdjacentElement(isTopHalf ? "beforebegin" : "afterend", draggedLi);
+
+        const newOrder = Array.from(el.itemsContainer.querySelectorAll("li[data-item-uuid]")).map((node) => node.dataset.itemUuid);
+        state.items.sort((a, b) => newOrder.indexOf(a.item_uuid) - newOrder.indexOf(b.item_uuid));
+
+        try {
+            const body = new URLSearchParams();
+            newOrder.forEach((uuid) => body.append("order[]", uuid));
+            await fetch(`${API_URL}?action=reorderFpvItems`, { method: "POST", body });
+        } catch (error) {
+            showAppToast("Nao foi possivel salvar a nova ordem.");
+        }
+    }
+
+    function handleItemsDragEnd() {
+        state.dragUuid = null;
+        clearDragOverClasses();
+        el.itemsContainer.querySelectorAll("li.is-dragging").forEach((li) => li.classList.remove("is-dragging"));
+    }
+
     // ── Financial summary ────────────────────────────────────────────────
 
     function totalCost() {
@@ -371,9 +592,9 @@
         const remaining = Math.max(total - saved, 0);
         const progressPct = total > 0 ? Math.min(100, (saved / total) * 100) : 0;
 
-        el.displayTotalCost.textContent = formatCurrency(total);
-        el.displaySaved.textContent = formatCurrency(saved);
-        el.displayRemaining.textContent = formatCurrency(remaining);
+        el.displayTotalCost.textContent = formatDisplayCurrency(total);
+        el.displaySaved.textContent = formatDisplayCurrency(saved);
+        el.displayRemaining.textContent = formatDisplayCurrency(remaining);
         el.displayProgressPct.textContent = `${Math.round(progressPct)}%`;
         el.progressBar.style.width = `${progressPct}%`;
     }
@@ -391,9 +612,9 @@
 
         if (!targetDate || Number.isNaN(targetDate.getTime())) {
             el.displayTimeLeft.textContent = "--";
-            el.displayMonthly.textContent = formatCurrency(0);
-            el.displayWeekly.textContent = formatCurrency(0);
-            el.displayDaily.textContent = formatCurrency(0);
+            el.displayMonthly.textContent = formatDisplayCurrency(0);
+            el.displayWeekly.textContent = formatDisplayCurrency(0);
+            el.displayDaily.textContent = formatDisplayCurrency(0);
             renderCalendar(0, 0);
             return;
         }
@@ -405,18 +626,18 @@
 
         if (remaining <= 0) {
             el.displayTimeLeft.textContent = "Meta atingida!";
-            el.displayMonthly.textContent = formatCurrency(0);
-            el.displayWeekly.textContent = formatCurrency(0);
-            el.displayDaily.textContent = formatCurrency(0);
+            el.displayMonthly.textContent = formatDisplayCurrency(0);
+            el.displayWeekly.textContent = formatDisplayCurrency(0);
+            el.displayDaily.textContent = formatDisplayCurrency(0);
             renderCalendar(1, 1);
             return;
         }
 
         if (daysLeft <= 0) {
             el.displayTimeLeft.textContent = "Data vencida";
-            el.displayMonthly.textContent = formatCurrency(remaining);
-            el.displayWeekly.textContent = formatCurrency(remaining);
-            el.displayDaily.textContent = formatCurrency(remaining);
+            el.displayMonthly.textContent = formatDisplayCurrency(remaining);
+            el.displayWeekly.textContent = formatDisplayCurrency(remaining);
+            el.displayDaily.textContent = formatDisplayCurrency(remaining);
             renderCalendar(0, 1);
             return;
         }
@@ -425,9 +646,9 @@
         const monthsLeft = Math.max(1, Math.ceil(daysLeft / 30));
 
         el.displayTimeLeft.textContent = daysLeft === 1 ? "1 dia" : `${daysLeft} dias`;
-        el.displayMonthly.textContent = formatCurrency(remaining / monthsLeft);
-        el.displayWeekly.textContent = formatCurrency(remaining / weeksLeft);
-        el.displayDaily.textContent = formatCurrency(remaining / daysLeft);
+        el.displayMonthly.textContent = formatDisplayCurrency(remaining / monthsLeft);
+        el.displayWeekly.textContent = formatDisplayCurrency(remaining / weeksLeft);
+        el.displayDaily.textContent = formatDisplayCurrency(remaining / daysLeft);
 
         const savedFraction = total > 0 ? Math.min(1, saved / total) : 0;
         renderCalendar(savedFraction, Math.min(52, weeksLeft + 1));
@@ -490,7 +711,7 @@
                 <a href="${escapeHtml(video.url)}" target="_blank" rel="noopener" class="flex-shrink-0">
                     <img src="https://img.youtube.com/vi/${escapeHtml(video.video_id)}/mqdefault.jpg" alt="" class="w-16 h-10 object-cover rounded-md bg-gray-100">
                 </a>
-                <a href="${escapeHtml(video.url)}" target="_blank" rel="noopener" class="flex-grow min-w-0 text-xs font-medium text-f91-navy hover:text-f91-limeDark truncate">
+                <a href="${escapeHtml(video.url)}" target="_blank" rel="noopener" class="flex-grow min-w-0 text-xs font-medium text-f91-text hover:text-f91-limeDark truncate">
                     ${escapeHtml(video.title || video.url)}
                 </a>
                 <button type="button" data-action="delete-video" data-video-id="${video.id}" class="opacity-0 group-hover:opacity-100 text-gray-300 hover:text-red-500 transition-opacity flex-shrink-0">
@@ -582,6 +803,10 @@
         el.addItemForm.addEventListener("submit", handleAddItemSubmit);
         el.itemsContainer.addEventListener("click", handleItemsContainerClick);
         el.itemsContainer.addEventListener("change", handleItemsContainerChange);
+        el.itemsContainer.addEventListener("dragstart", handleItemsDragStart);
+        el.itemsContainer.addEventListener("dragover", handleItemsDragOver);
+        el.itemsContainer.addEventListener("drop", handleItemsDrop);
+        el.itemsContainer.addEventListener("dragend", handleItemsDragEnd);
 
         el.inputSaved.addEventListener("input", handlePlanningSavedInput);
         el.inputDate.addEventListener("change", handlePlanningDateInput);
@@ -644,6 +869,8 @@
 
     async function bootstrap() {
         bindEvents();
+        initTheme();
+        initCurrency();
         checkRedirectToast();
         await loadBoard();
     }

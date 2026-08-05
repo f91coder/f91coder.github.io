@@ -86,6 +86,11 @@ try {
             $result = delete_fpv_item($_POST);
             break;
 
+        case 'reorderFpvItems':
+            fpv_require_post($method);
+            $result = reorder_fpv_items($_POST);
+            break;
+
         case 'saveFpvPlanning':
             fpv_require_post($method);
             $result = save_fpv_planning($_POST);

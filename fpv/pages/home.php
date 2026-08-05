@@ -22,8 +22,8 @@ $recentTutorials = list_fpv_posts('tutorial', 3);
         display:flex;
         align-items:center;
         background:
-            radial-gradient(900px 500px at 85% 10%, rgba(189,220,0,.12), transparent),
-            linear-gradient(180deg, var(--navy) 0%, #0a1730 100%);
+            radial-gradient(900px 500px at 85% 10%, rgba(255,196,0,.12), transparent),
+            linear-gradient(180deg, var(--navy) 0%, #050404 100%);
         color:#fff;
         position:relative;
         overflow:hidden;

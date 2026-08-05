@@ -1,11 +1,11 @@
 /* ── FPV91 — design tokens ────────────────────────────────────────────── */
 
 :root{
-  --navy:#08203e;
-  --navy-soft:#122c52;
-  --navy-softer:#1b3a68;
-  --lime:#bddc00;
-  --lime-dark:#a3be00;
+  --navy:#171515;
+  --navy-soft:#2a2626;
+  --navy-softer:#3d3737;
+  --lime:#ffc400;
+  --lime-dark:#e0ac00;
   --ink:#12142b;
   --muted:#6c7089;
   --muted-soft:#9598ad;
@@ -16,9 +16,9 @@
   --radius-sm:10px;
   --radius-md:14px;
   --radius-lg:20px;
-  --shadow-sm:0 1px 2px rgba(8,32,62,.06), 0 1px 1px rgba(8,32,62,.04);
-  --shadow-md:0 8px 24px rgba(8,32,62,.10);
-  --shadow-lg:0 20px 48px rgba(8,32,62,.16);
+  --shadow-sm:0 1px 2px rgba(23,21,21,.06), 0 1px 1px rgba(23,21,21,.04);
+  --shadow-md:0 8px 24px rgba(23,21,21,.10);
+  --shadow-lg:0 20px 48px rgba(23,21,21,.16);
   --content-max:1180px;
 }
 
@@ -61,7 +61,7 @@ button{ font:inherit; cursor:pointer; }
 .fpv-nav.is-scrolled{
   background:rgba(255,255,255,.92);
   backdrop-filter:blur(14px);
-  box-shadow:0 1px 0 rgba(8,32,62,.06), 0 8px 24px rgba(8,32,62,.06);
+  box-shadow:0 1px 0 rgba(23,21,21,.06), 0 8px 24px rgba(23,21,21,.06);
 }
 
 .fpv-nav-inner{
@@ -278,7 +278,7 @@ button{ font:inherit; cursor:pointer; }
   top:76px; left:0; right:0;
   max-height:0;
   overflow:hidden;
-  background:rgba(8,32,62,.98);
+  background:rgba(23,21,21,.98);
   backdrop-filter:blur(14px);
   transition:max-height .3s cubic-bezier(.16,1,.3,1);
   z-index:99;
@@ -321,8 +321,8 @@ body.fpv-no-scroll{ overflow:hidden; }
   justify-content:center;
   padding:120px 20px 60px;
   background:
-    radial-gradient(1200px 600px at 15% -10%, rgba(189,220,0,.10), transparent),
-    linear-gradient(180deg, var(--navy) 0%, #0a1730 100%);
+    radial-gradient(1200px 600px at 15% -10%, rgba(255,196,0,.10), transparent),
+    linear-gradient(180deg, var(--navy) 0%, #050404 100%);
 }
 
 .fpv-auth-card{
@@ -462,7 +462,7 @@ body.fpv-no-scroll{ overflow:hidden; }
 
 .fpv-page-hero{
   padding:150px 0 64px;
-  background:linear-gradient(180deg, var(--navy) 0%, #0a1730 100%);
+  background:linear-gradient(180deg, var(--navy) 0%, #050404 100%);
   color:#fff;
 }
 

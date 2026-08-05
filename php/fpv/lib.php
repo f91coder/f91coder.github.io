@@ -25,9 +25,9 @@ function fpv_seed_default_categories(PDO $pdo, int $userId): void
 // E-mail (clona o padrao de php/survey/lib.php, cores FPV91)
 // ─────────────────────────────────────────────────────────────────────────
 
-const FPV_EMAIL_NAVY = '#08203e';
-const FPV_EMAIL_NAVY_SOFT = '#122c52';
-const FPV_EMAIL_LIME = '#bddc00';
+const FPV_EMAIL_NAVY = '#171515';
+const FPV_EMAIL_NAVY_SOFT = '#2a2626';
+const FPV_EMAIL_LIME = '#ffc400';
 const FPV_EMAIL_INK = '#12142b';
 const FPV_EMAIL_MUTED = '#6c7089';
 const FPV_EMAIL_BORDER = '#e7e9f2';
@@ -797,6 +797,36 @@ function delete_fpv_item(array $input): array
 
     if ($row && $row['image_path']) {
         fpv_delete_image_file($row['image_path']);
+    }
+
+    return ['success' => true];
+}
+
+function reorder_fpv_items(array $input): array
+{
+    $pdo = fpv_pdo();
+    $userId = require_fpv_session($pdo);
+
+    $order = $input['order'] ?? [];
+    if (!is_array($order) || !$order) {
+        return ['success' => false, 'message' => 'Ordem invalida.', '_code' => 400];
+    }
+
+    $update = $pdo->prepare('UPDATE fpv_items SET sort_order = :sort_order WHERE item_uuid = :item_uuid AND user_id = :user_id');
+
+    $pdo->beginTransaction();
+    try {
+        foreach (array_values($order) as $index => $itemUuid) {
+            $update->execute([
+                'sort_order' => $index + 1,
+                'item_uuid' => fpv_sanitize_string((string) $itemUuid, 64),
+                'user_id' => $userId,
+            ]);
+        }
+        $pdo->commit();
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        throw $e;
     }
 
     return ['success' => true];
