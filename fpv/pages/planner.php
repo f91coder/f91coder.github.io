@@ -494,6 +494,58 @@
         </div>
     </div>
 
+    <div id="edit-item-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
+        <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer" onclick="closeModal('edit-item-modal')"></div>
+        <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-md relative z-10 modal-scale-enter overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-semibold text-f91-text">Editar Item</h3>
+                <button onclick="closeModal('edit-item-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
+            </div>
+            <form id="edit-item-form" class="p-6 space-y-4">
+                <input type="hidden" id="edit-item-uuid">
+                <div class="flex gap-3 items-end">
+                    <div class="flex-shrink-0">
+                        <label class="cursor-pointer flex flex-col items-center justify-center w-16 h-16 border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-f91-muted relative overflow-hidden group" title="Trocar foto">
+                            <i class="ph ph-camera text-lg group-hover:scale-110 transition-transform" id="edit-image-placeholder-icon"></i>
+                            <input type="file" id="edit-item-image" accept="image/*" class="hidden">
+                            <div id="edit-image-preview" class="absolute inset-0 bg-cover bg-center hidden z-10"></div>
+                        </label>
+                    </div>
+                    <div class="flex-grow">
+                        <label class="block text-sm font-medium text-f91-text mb-1">Nome</label>
+                        <input type="text" id="edit-item-name" required class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-f91-text mb-1">Categoria</label>
+                    <select id="edit-item-category" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 cursor-pointer"></select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-f91-text mb-1">Link da loja</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="ph ph-link text-gray-400"></i>
+                        </div>
+                        <input type="url" id="edit-item-url" class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="https://...">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-f91-text mb-1">Preço</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <span class="text-gray-400 text-sm">R$</span>
+                        </div>
+                        <input type="number" id="edit-item-price" required step="0.01" min="0" class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all">
+                    </div>
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('edit-item-modal')" class="px-4 py-2 text-sm text-f91-text hover:bg-gray-100 rounded-lg transition-colors">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 text-sm bg-f91-navy hover:bg-f91-navyLight text-white rounded-lg transition-colors font-medium">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <div id="appToast" class="fixed bottom-6 right-6 z-[70] max-w-sm bg-white dark:bg-f91-card rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-center gap-3 translate-y-4 opacity-0 pointer-events-none transition-all duration-300 no-print" role="status" aria-live="polite">
         <div class="w-9 h-9 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
             <i class="ph-bold ph-check"></i>
@@ -501,6 +553,6 @@
         <p id="appToastMessage" class="text-sm font-medium text-f91-text"></p>
     </div>
 
-    <script src="/js/fpv_planner.js?v=20260802-2"></script>
+    <script src="/js/fpv_planner.js?v=20260806-1"></script>
 </body>
 </html>

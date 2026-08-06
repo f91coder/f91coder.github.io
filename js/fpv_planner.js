@@ -50,6 +50,16 @@
         itemsContainer: document.getElementById("items-container"),
         emptyState: document.getElementById("empty-state"),
 
+        editItemForm: document.getElementById("edit-item-form"),
+        editItemUuid: document.getElementById("edit-item-uuid"),
+        editItemImage: document.getElementById("edit-item-image"),
+        editImagePreview: document.getElementById("edit-image-preview"),
+        editImagePlaceholderIcon: document.getElementById("edit-image-placeholder-icon"),
+        editItemName: document.getElementById("edit-item-name"),
+        editItemCategorySelect: document.getElementById("edit-item-category"),
+        editItemUrl: document.getElementById("edit-item-url"),
+        editItemPrice: document.getElementById("edit-item-price"),
+
         btnVideosMenu: document.getElementById("btn-videos-menu"),
         videosDropdown: document.getElementById("videos-dropdown"),
         videosListContainer: document.getElementById("videos-list-container"),
@@ -345,6 +355,7 @@
         const options = [`<option value="">Sem categoria</option>`]
             .concat(state.categories.map((cat) => `<option value="${cat.id}">${escapeHtml(cat.name)}</option>`));
         el.itemCategorySelect.innerHTML = options.join("");
+        el.editItemCategorySelect.innerHTML = options.join("");
     }
 
     async function handleAddCategorySubmit(event) {
@@ -420,7 +431,10 @@
                     <label class="flex items-center flex-shrink-0 cursor-pointer" title="Marcar como comprado">
                         <input type="checkbox" data-action="toggle-purchased" ${item.is_purchased ? "checked" : ""} class="w-5 h-5 rounded border-gray-300 text-f91-lime focus:ring-f91-lime cursor-pointer">
                     </label>
-                    <button type="button" data-action="delete-item" class="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0">
+                    <button type="button" data-action="edit-item" class="text-gray-300 hover:text-f91-text transition-colors flex-shrink-0" title="Editar item">
+                        <i class="ph ph-pencil-simple text-lg"></i>
+                    </button>
+                    <button type="button" data-action="delete-item" class="text-gray-300 hover:text-red-500 transition-colors flex-shrink-0" title="Remover item">
                         <i class="ph ph-trash text-lg"></i>
                     </button>
                 </li>
@@ -476,6 +490,70 @@
         }
     }
 
+    function openEditItemModal(item) {
+        el.editItemUuid.value = item.item_uuid;
+        el.editItemName.value = item.name;
+        el.editItemPrice.value = item.price;
+        el.editItemUrl.value = item.store_url || "";
+        el.editItemCategorySelect.value = item.category_id || "";
+        el.editItemImage.value = "";
+
+        if (item.image_path) {
+            el.editImagePreview.style.backgroundImage = `url(/${item.image_path})`;
+            el.editImagePreview.classList.remove("hidden");
+            el.editImagePlaceholderIcon.classList.add("hidden");
+        } else {
+            el.editImagePreview.classList.add("hidden");
+            el.editImagePreview.style.backgroundImage = "";
+            el.editImagePlaceholderIcon.classList.remove("hidden");
+        }
+
+        window.openModal("edit-item-modal");
+    }
+
+    function handleEditImagePreview() {
+        const file = el.editItemImage.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            el.editImagePreview.style.backgroundImage = `url(${e.target.result})`;
+            el.editImagePreview.classList.remove("hidden");
+            el.editImagePlaceholderIcon.classList.add("hidden");
+        };
+        reader.readAsDataURL(file);
+    }
+
+    async function handleEditItemSubmit(event) {
+        event.preventDefault();
+        const itemUuid = el.editItemUuid.value;
+        const name = el.editItemName.value.trim();
+        const price = parseFloat(el.editItemPrice.value);
+        if (!itemUuid || !name || Number.isNaN(price)) return;
+
+        const formData = new FormData();
+        formData.append("item_uuid", itemUuid);
+        formData.append("name", name);
+        formData.append("price", String(price));
+        formData.append("category_id", el.editItemCategorySelect.value);
+        formData.append("store_url", el.editItemUrl.value.trim());
+        if (el.editItemImage.files[0]) {
+            formData.append("image", el.editItemImage.files[0]);
+        }
+
+        const submitButton = el.editItemForm.querySelector("button[type=submit]");
+        submitButton.disabled = true;
+
+        try {
+            await apiRequest("updateFpvItem", { formData });
+            window.closeModal("edit-item-modal");
+            await loadBoard();
+        } catch (error) {
+            alert("Erro ao salvar item: " + error.message);
+        } finally {
+            submitButton.disabled = false;
+        }
+    }
+
     async function handleTogglePurchased(itemUuid, isPurchased) {
         try {
             await apiRequest("updateFpvItem", { method: "POST", params: { item_uuid: itemUuid, is_purchased: isPurchased ? "1" : "0" } });
@@ -500,6 +578,7 @@
 
     function handleItemsContainerClick(event) {
         const viewImageBtn = event.target.closest('[data-action="view-image"]');
+        const editBtn = event.target.closest('[data-action="edit-item"]');
         const deleteBtn = event.target.closest('[data-action="delete-item"]');
         const li = event.target.closest("li[data-item-uuid]");
         if (!li) return;
@@ -510,6 +589,11 @@
             el.lightboxImg.src = "/" + item.image_path;
             el.lightboxCaption.textContent = item.name;
             window.openModal("lightbox-modal");
+            return;
+        }
+
+        if (editBtn && item) {
+            openEditItemModal(item);
             return;
         }
 
@@ -807,6 +891,8 @@
 
         el.itemImage.addEventListener("change", handleImagePreview);
         el.addItemForm.addEventListener("submit", handleAddItemSubmit);
+        el.editItemImage.addEventListener("change", handleEditImagePreview);
+        el.editItemForm.addEventListener("submit", handleEditItemSubmit);
         el.itemsContainer.addEventListener("click", handleItemsContainerClick);
         el.itemsContainer.addEventListener("change", handleItemsContainerChange);
         el.itemsContainer.addEventListener("dragstart", handleItemsDragStart);
@@ -838,7 +924,7 @@
 
         document.addEventListener("keydown", (event) => {
             if (event.key === "Escape") {
-                ["lightbox-modal", "category-modal", "export-modal"].forEach((id) => window.closeModal(id));
+                ["lightbox-modal", "category-modal", "export-modal", "edit-item-modal"].forEach((id) => window.closeModal(id));
             }
         });
     }
