@@ -152,11 +152,6 @@
                 left: 0;
                 top: 0;
                 width: 100%;
-                --f91-text: #334155;
-                --f91-muted: #94a3b8;
-                --f91-navy: #171515;
-                --f91-gray-100: #f3f4f6;
-                --f91-gray-200: #e5e7eb;
                 color: #334155;
             }
             .no-print { display: none !important; }
@@ -477,32 +472,30 @@
 
     <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4">
         <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer no-print" onclick="closeModal('export-modal')"></div>
-        <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-lg relative z-10 modal-scale-enter overflow-hidden max-h-[85vh] flex flex-col">
+        <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-xl relative z-10 modal-scale-enter overflow-hidden max-h-[85vh] flex flex-col">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 no-print">
                 <h3 class="text-lg font-semibold text-f91-text">Lista de Compras</h3>
                 <button onclick="closeModal('export-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
             </div>
-            <div class="overflow-y-auto p-6 flex-1 min-h-0" id="print-area">
-                <h2 class="text-xl font-bold text-f91-text mb-1">FPV91 — Lista de Compras</h2>
-                <p class="text-xs text-f91-muted mb-4" id="export-date"></p>
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="text-left text-f91-muted border-b border-gray-200">
-                            <th class="py-2 font-medium">Item</th>
-                            <th class="py-2 font-medium">Categoria</th>
-                            <th class="py-2 font-medium text-right">Preço</th>
-                            <th class="py-2 font-medium text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="export-table-body"></tbody>
-                </table>
-                <div class="flex justify-between font-bold text-f91-text border-t-2 border-gray-200 mt-2 pt-3">
-                    <span>Total</span><span id="export-total">R$ 0,00</span>
+            <div class="overflow-y-auto p-6 sm:p-8 flex-1 min-h-0 bg-white" id="print-area">
+                <div class="flex items-center justify-between mb-1">
+                    <div class="flex items-center gap-2">
+                        <img src="/<?= fpv_asset_v('img/fpv_logo.png') ?>" alt="FPV91" class="h-6 w-auto">
+                        <h2 class="text-lg font-bold text-slate-800">Lista de Compras</h2>
+                    </div>
+                    <span class="text-xs font-semibold text-slate-400" id="export-item-count"></span>
+                </div>
+                <p class="text-xs text-slate-400 mb-5" id="export-date"></p>
+
+                <div id="export-table-body" class="divide-y divide-slate-100"></div>
+
+                <div class="flex justify-between items-center font-bold text-slate-800 border-t-2 border-slate-200 mt-2 pt-4">
+                    <span>Total</span><span id="export-total" class="text-lg">R$ 0,00</span>
                 </div>
             </div>
             <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-2 no-print">
                 <button onclick="closeModal('export-modal')" class="px-4 py-2 text-sm text-f91-text hover:bg-gray-100 rounded-lg transition-colors">Fechar</button>
-                <button onclick="window.print()" class="px-4 py-2 text-sm bg-f91-navy hover:bg-f91-navyLight text-white rounded-lg transition-colors font-medium flex items-center gap-2">
+                <button onclick="printShoppingList()" id="printShoppingListButton" class="px-4 py-2 text-sm bg-f91-navy hover:bg-f91-navyLight text-white rounded-lg transition-colors font-medium flex items-center gap-2">
                     <i class="ph ph-printer"></i> Imprimir
                 </button>
             </div>
@@ -568,6 +561,6 @@
         <p id="appToastMessage" class="text-sm font-medium text-f91-text"></p>
     </div>
 
-    <script src="/js/fpv_planner.js?v=20260806-1"></script>
+    <script src="/js/fpv_planner.js?v=20260806-2"></script>
 </body>
 </html>

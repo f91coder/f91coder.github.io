@@ -68,6 +68,7 @@
 
         exportButton: document.getElementById("exportButton"),
         exportDate: document.getElementById("export-date"),
+        exportItemCount: document.getElementById("export-item-count"),
         exportTableBody: document.getElementById("export-table-body"),
         exportTotal: document.getElementById("export-total"),
 
@@ -851,20 +852,59 @@
 
     function openExportModal() {
         el.exportDate.textContent = new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(new Date());
+        el.exportItemCount.textContent = `${state.items.length} ${state.items.length === 1 ? "item" : "itens"}`;
+
         el.exportTableBody.innerHTML = state.items.map((item) => {
             const category = categoryById(item.category_id);
+            const thumb = item.image_path
+                ? `<img src="/${escapeHtml(item.image_path)}" alt="" class="w-full h-full object-cover">`
+                : `<i class="ph ph-drone text-lg"></i>`;
+            const statusLabel = item.is_purchased
+                ? `<span class="text-green-600">Comprado</span>`
+                : `<span class="text-slate-400">Pendente</span>`;
+
             return `
-                <tr class="border-b border-gray-100">
-                    <td class="py-2 pr-2">${escapeHtml(item.name)}</td>
-                    <td class="py-2 pr-2 text-f91-muted">${category ? escapeHtml(category.name) : "-"}</td>
-                    <td class="py-2 text-right whitespace-nowrap">${formatCurrency(item.price)}</td>
-                    <td class="py-2 text-center">${item.is_purchased ? "<span class=\"text-green-600\">Comprado</span>" : "<span class=\"text-f91-muted\">Pendente</span>"}</td>
-                </tr>
+                <div class="flex items-center gap-3 py-3">
+                    <div class="w-12 h-12 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0 flex items-center justify-center text-slate-300">
+                        ${thumb}
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <p class="font-medium text-slate-800 truncate">${escapeHtml(item.name)}</p>
+                        ${category ? `<span class="inline-block text-[11px] px-2 py-0.5 rounded-full font-medium mt-1 ${escapeHtml(category.color_class)}">${escapeHtml(category.name)}</span>` : ""}
+                    </div>
+                    <div class="text-right flex-shrink-0 pl-2">
+                        <p class="font-bold text-slate-800 whitespace-nowrap">${formatCurrency(item.price)}</p>
+                        <span class="text-[11px]">${statusLabel}</span>
+                    </div>
+                </div>
             `;
-        }).join("") || `<tr><td colspan="4" class="py-4 text-center text-f91-muted">Nenhum item na lista.</td></tr>`;
+        }).join("") || `<p class="py-6 text-center text-slate-400 text-sm">Nenhum item na lista.</p>`;
+
         el.exportTotal.textContent = formatCurrency(totalCost());
         window.openModal("export-modal");
     }
+
+    async function waitForImagesToLoad(container) {
+        const images = Array.from(container.querySelectorAll("img"));
+        await Promise.all(images.map((img) => {
+            if (img.complete) return Promise.resolve();
+            return new Promise((resolve) => {
+                img.addEventListener("load", resolve, { once: true });
+                img.addEventListener("error", resolve, { once: true });
+            });
+        }));
+    }
+
+    window.printShoppingList = async function printShoppingList() {
+        const button = document.getElementById("printShoppingListButton");
+        if (button) button.disabled = true;
+        try {
+            await waitForImagesToLoad(document.getElementById("print-area"));
+            window.print();
+        } finally {
+            if (button) button.disabled = false;
+        }
+    };
 
     // ── Reset ────────────────────────────────────────────────────────────
 
