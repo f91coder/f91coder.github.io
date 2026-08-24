@@ -141,16 +141,31 @@
         html.dark .currency-switch-btn[aria-pressed="true"]{ color: var(--f91-lime); }
 
         @media print {
+            @page { margin: 1.5cm; }
+            body { background: #fff !important; }
             body * { visibility: hidden; }
             #print-area, #print-area * { visibility: visible; }
-            #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+            #export-modal, #export-modal * { overflow: visible !important; max-height: none !important; }
+            #export-modal { position: static !important; }
+            #print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                --f91-text: #334155;
+                --f91-muted: #94a3b8;
+                --f91-navy: #171515;
+                --f91-gray-100: #f3f4f6;
+                --f91-gray-200: #e5e7eb;
+                color: #334155;
+            }
             .no-print { display: none !important; }
         }
     </style>
 </head>
 <body class="bg-f91-bg text-f91-text font-sans antialiased min-h-screen flex flex-col transition-colors duration-300">
 
-    <div class="flex flex-col flex-1">
+    <div class="flex flex-col flex-1 no-print">
         <header class="glass-header sticky top-0 z-40 border-b border-gray-200 shadow-sm no-print">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
                 <a href="/fpv" class="flex items-center gap-3">
@@ -460,14 +475,14 @@
         </div>
     </div>
 
-    <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
+    <div id="export-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4">
         <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer no-print" onclick="closeModal('export-modal')"></div>
         <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-lg relative z-10 modal-scale-enter overflow-hidden max-h-[85vh] flex flex-col">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50 no-print">
                 <h3 class="text-lg font-semibold text-f91-text">Lista de Compras</h3>
                 <button onclick="closeModal('export-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
             </div>
-            <div class="overflow-y-auto p-6" id="print-area">
+            <div class="overflow-y-auto p-6 flex-1 min-h-0" id="print-area">
                 <h2 class="text-xl font-bold text-f91-text mb-1">FPV91 — Lista de Compras</h2>
                 <p class="text-xs text-f91-muted mb-4" id="export-date"></p>
                 <table class="w-full text-sm">
