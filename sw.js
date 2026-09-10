@@ -1,4 +1,4 @@
-const CACHE_NAME = 'f91-static-v1';
+const CACHE_NAME = 'f91-static-v2';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -11,11 +11,11 @@ const PRECACHE_URLS = [
   './js/i18n.js',
   './js/btn-menu-mob.js',
   './js/manifest.json',
-  './img/favicon.png',
-  './img/logo.png',
-  './img/logo_.png',
-  './img/icon-192.png',
-  './img/icon-512.png'
+  './img/favicon.png?v=20260910',
+  './img/logo.png?v=20260910',
+  './img/logo_.png?v=20260910',
+  './img/icon-192.png?v=20260910',
+  './img/icon-512.png?v=20260910'
 ];
 
 self.addEventListener('install', (event) => {
