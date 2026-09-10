@@ -4,7 +4,7 @@
     const FORM_RENDERED_AT = Date.now();
     const SURVEY_CONFIG = {
         slug: "locacao-para-eventos",
-        title: "F91 - Soluções Operacionais: Locação para Eventos",
+        title: "F91 - Inteligência Operacional: Locação para Eventos",
         niche: "Locação para Eventos",
         version: "2026-03-31",
         sourceFile: "survey_event_rental.html"
@@ -15,13 +15,13 @@
 
     const translations = {
         pt: {
-            brand_alt: "F91 - Soluções Operacionais",
+            brand_alt: "F91 - Inteligência Operacional",
             meta_description: "Pesquisa da F91 para validar uma solução operacional voltada à locação para eventos, com foco em propostas, negociações, disponibilidade e eficiência comercial.",
             meta_keywords: "F91, locação para eventos, pesquisa, orçamento para eventos, propostas comerciais, locação de equipamentos, locação de itens, operação de eventos",
-            og_title: "F91 - Soluções Operacionais: Locação para Eventos",
+            og_title: "F91 - Inteligência Operacional: Locação para Eventos",
             og_description: "Validação de uma solução operacional da F91 para empresas de locação para eventos.",
             survey_eyebrow: "Pesquisa de validação",
-            survey_title: "F91 - Soluções Operacionais: Locação para Eventos",
+            survey_title: "F91 - Inteligência Operacional: Locação para Eventos",
             survey_subtitle: "Ajude-nos a desenhar a solução operacional ideal para empresas de locação de equipamentos e itens para eventos.",
             estimated_time: "Tempo estimado: 3 minutos",
             back_btn: "Voltar",
@@ -47,13 +47,13 @@
             error_connection: "Falha ao enviar. Verifique sua conexão."
         },
         en: {
-            brand_alt: "F91 - Operational Solutions",
+            brand_alt: "F91 - Operational Intelligence",
             meta_description: "F91 survey to validate an operational solution for event rental companies, focused on proposals, negotiations, availability, and commercial efficiency.",
             meta_keywords: "F91, event rental, survey, event quotes, commercial proposals, equipment rental, event items, event operations",
-            og_title: "F91 - Operational Solutions: Event Rentals",
+            og_title: "F91 - Operational Intelligence: Event Rentals",
             og_description: "Validation of an F91 operational solution for event rental companies.",
             survey_eyebrow: "Validation survey",
-            survey_title: "F91 - Operational Solutions: Event Rentals",
+            survey_title: "F91 - Operational Intelligence: Event Rentals",
             survey_subtitle: "Help us design the ideal operational solution for companies that rent equipment and event items.",
             estimated_time: "Estimated time: 3 minutes",
             back_btn: "Back",
@@ -79,13 +79,13 @@
             error_connection: "Failed to send. Check your connection."
         },
         es: {
-            brand_alt: "F91 - Soluciones Operativas",
+            brand_alt: "F91 - Inteligencia Operacional",
             meta_description: "Encuesta de F91 para validar una solución operativa para empresas de alquiler para eventos, con foco en propuestas, negociaciones, disponibilidad y eficiencia comercial.",
             meta_keywords: "F91, alquiler para eventos, encuesta, presupuestos, propuestas comerciales, alquiler de equipos, artículos para eventos, operaciones de eventos",
-            og_title: "F91 - Soluciones Operativas: Alquiler para Eventos",
+            og_title: "F91 - Inteligencia Operacional: Alquiler para Eventos",
             og_description: "Validación de una solución operativa de F91 para empresas de alquiler para eventos.",
             survey_eyebrow: "Encuesta de validación",
-            survey_title: "F91 - Soluciones Operativas: Alquiler para Eventos",
+            survey_title: "F91 - Inteligencia Operacional: Alquiler para Eventos",
             survey_subtitle: "Ayúdanos a diseñar la solución operativa ideal para empresas que alquilan equipos y artículos para eventos.",
             estimated_time: "Tiempo estimado: 3 minutos",
             back_btn: "Atrás",

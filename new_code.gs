@@ -200,7 +200,7 @@ function openSpreadsheet() {
   if (SPREADSHEET_ID && SPREADSHEET_ID.trim()) {
     return SpreadsheetApp.openById(SPREADSHEET_ID);
   }
-  return SpreadsheetApp.create("F91 - Soluções Operacionais");
+  return SpreadsheetApp.create("F91 - Inteligência Operacional");
 }
 
 function ensureSheetWithHeaders(ss, sheetName, headers, headerRow) {
@@ -371,7 +371,7 @@ function normalizeSurveyMeta(data) {
 
   return {
     slug: sanitizeString(data.survey_slug) || sanitizeString(survey.slug) || "geral",
-    title: sanitizeString(data.survey_title) || sanitizeString(survey.title) || "F91 - Soluções Operacionais",
+    title: sanitizeString(data.survey_title) || sanitizeString(survey.title) || "F91 - Inteligência Operacional",
     niche: sanitizeString(data.survey_niche) || sanitizeString(survey.niche),
     version: sanitizeString(data.survey_version) || sanitizeString(survey.version),
     sourceFile: sanitizeString(data.source_file) || sanitizeString(survey.sourceFile),
@@ -670,7 +670,7 @@ function enviarEmailNotificacao(response) {
   const textBody = [
     "Nova resposta recebida",
     "",
-    "Pesquisa: " + (response.survey.title || "F91 - Soluções Operacionais"),
+    "Pesquisa: " + (response.survey.title || "F91 - Inteligência Operacional"),
     "Nicho: " + (response.survey.niche || "Não informado"),
     "Idioma: " + getLanguageLabel(response.language),
     "Recebida em: " + receivedAt,
@@ -1830,7 +1830,7 @@ function testarNotificacao() {
     submittedAt: new Date().toISOString(),
     language: "pt",
     survey: {
-      title: "F91 - Soluções Operacionais: Hotelaria",
+      title: "F91 - Inteligência Operacional: Hotelaria",
       niche: "Hotelaria"
     },
     primaryLabel: "Nome do hotel ou rede hoteleira",

@@ -83,8 +83,8 @@ const SURVEY_QUESTION_SECTIONS = [
 ];
 
 const SURVEY_TITLES = [
-    'hotelaria' => 'F91 - Soluções Operacionais: Hotelaria',
-    'locacao-para-eventos' => 'F91 - Soluções Operacionais: Locação para Eventos',
+    'hotelaria' => 'F91 - Inteligência Operacional: Hotelaria',
+    'locacao-para-eventos' => 'F91 - Inteligência Operacional: Locação para Eventos',
 ];
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -194,7 +194,7 @@ function normalize_survey_payload(array $data): array
 
     $survey = [
         'slug' => sanitize_string($data['survey_slug'] ?? ($surveyMeta['slug'] ?? ''), 60) ?: 'geral',
-        'title' => sanitize_string($data['survey_title'] ?? ($surveyMeta['title'] ?? ''), 200) ?: 'F91 - Soluções Operacionais',
+        'title' => sanitize_string($data['survey_title'] ?? ($surveyMeta['title'] ?? ''), 200) ?: 'F91 - Inteligência Operacional',
         'niche' => sanitize_string($data['survey_niche'] ?? ($surveyMeta['niche'] ?? ''), 120),
         'version' => sanitize_string($data['survey_version'] ?? ($surveyMeta['version'] ?? ''), 30),
         'sourceFile' => sanitize_string($data['source_file'] ?? ($surveyMeta['sourceFile'] ?? ''), 120),
@@ -386,7 +386,7 @@ function send_survey_notification(array $response): void
     }
 
     $mail->CharSet = 'UTF-8';
-    $mail->setFrom($mailConfig['from_email'], $mailConfig['from_name'] ?: 'F91 - Soluções Operacionais');
+    $mail->setFrom($mailConfig['from_email'], $mailConfig['from_name'] ?: 'F91 - Inteligência Operacional');
 
     $notificationEmails = $config['notification_emails'] ?: DEFAULT_NOTIFICATION_EMAILS;
     $recipients = array_filter(array_map('trim', explode(',', (string) $notificationEmails)));
@@ -533,7 +533,7 @@ function build_notification_email(array $response): array
 
         // Rodapé
         . '<tr><td style="padding:20px 32px;background:' . EMAIL_SURFACE . ';border-top:1px solid ' . EMAIL_BORDER . ';">'
-        . '<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.6;color:' . EMAIL_MUTED . ';">F91 - Soluções Operacionais &middot; www.f91.tech<br>Você recebeu este e-mail porque está na lista de notificação de respostas de survey do F91.</p>'
+        . '<p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.6;color:' . EMAIL_MUTED . ';">F91 - Inteligência Operacional &middot; www.f91.tech<br>Você recebeu este e-mail porque está na lista de notificação de respostas de survey do F91.</p>'
         . '</td></tr>'
 
         . '</table>'

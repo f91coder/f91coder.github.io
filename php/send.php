@@ -105,7 +105,7 @@ try {
     }
 
     $mail->CharSet = 'UTF-8';
-    $mail->setFrom($config['from_email'], $config['from_name'] ?: 'F91 - Soluções Operacionais');
+    $mail->setFrom($config['from_email'], $config['from_name'] ?: 'F91 - Inteligência Operacional');
     $mail->addAddress($config['to_email']);
     $mail->addReplyTo($email, $nome);
 

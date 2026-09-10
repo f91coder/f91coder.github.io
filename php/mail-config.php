@@ -8,7 +8,7 @@ $config = [
     'port' => getenv('SMTP_PORT') ?: '587',
     'encryption' => getenv('SMTP_ENCRYPTION') ?: 'tls',
     'from_email' => getenv('SMTP_FROM') ?: (getenv('SMTP_USER') ?: ''),
-    'from_name' => getenv('SMTP_FROM_NAME') ?: 'F91 - Soluções Operacionais',
+    'from_name' => getenv('SMTP_FROM_NAME') ?: 'F91 - Inteligência Operacional',
     'to_email' => getenv('SMTP_TO') ?: (getenv('SMTP_USER') ?: ''),
 ];
 
