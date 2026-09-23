@@ -134,51 +134,55 @@ $config = [
             </nav>
         <?php endif; ?>
 
-        <section class="sh-grid" id="shItems">
+        <section class="sh-list" id="shItems" aria-label="Itens da lista">
             <?php foreach ($items as $item):
                 $category = $item['category_id'] !== null ? ($categoriesById[$item['category_id']] ?? null) : null;
+                $hasPrice = $showPrices && $item['price'] !== null && (float) $item['price'] > 0;
+                $hasStore = $item['store_url'] !== '';
             ?>
-                <article class="sh-card" data-uuid="<?= $e($item['uuid']) ?>" data-category="<?= $item['category_id'] !== null ? (int) $item['category_id'] : '' ?>" data-name="<?= $e($item['name']) ?>">
-                    <?php if ($item['image_path'] !== ''): ?>
-                        <button type="button" class="sh-photo" data-full="/<?= $e($item['image_path']) ?>" data-caption="<?= $e($item['name']) ?>" aria-label="Ampliar foto de <?= $e($item['name']) ?>">
-                            <img src="/<?= $e($item['image_path']) ?>" alt="<?= $e($item['name']) ?>" loading="lazy">
-                        </button>
-                    <?php else: ?>
-                        <div class="sh-photo is-empty" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8 8l8 8M16 8l-8 8"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="sh-card-body">
-                        <div class="sh-card-top">
-                            <?php if ($category): ?>
-                                <span class="sh-cat" data-tone="<?= $e($toneOf($category)) ?>"><?= $e($category['name']) ?></span>
-                            <?php else: ?>
-                                <span></span>
-                            <?php endif; ?>
-                            <span class="sh-status<?= $item['is_purchased'] ? ' is-bought' : '' ?>"><?= $item['is_purchased'] ? 'Já comprei' : 'Ainda vou comprar' ?></span>
-                        </div>
-
-                        <h2 class="sh-name"><?= $e($item['name']) ?></h2>
-
-                        <?php if ($showPrices && $item['price'] !== null): ?>
-                            <p class="sh-price"><?= $e($formatBrl((float) $item['price'])) ?></p>
-                        <?php endif; ?>
-
-                        <?php if ($item['store_url'] !== ''): ?>
-                            <a class="sh-store" href="<?= $e($item['store_url']) ?>" target="_blank" rel="noopener noreferrer nofollow">Ver na loja ↗</a>
-                        <?php endif; ?>
-
-                        <?php if ($allowFeedback): ?>
-                            <div class="sh-react" role="group" aria-label="Sua opinião sobre <?= $e($item['name']) ?>">
-                                <button type="button" data-reaction="like"><span class="emoji">👍</span> Curti</button>
-                                <button type="button" data-reaction="doubt"><span class="emoji">🤔</span> Tenho dúvidas</button>
-                                <button type="button" data-reaction="dislike"><span class="emoji">👎</span> Não curti</button>
-                                <button type="button" data-reaction="comment"><span class="emoji">💬</span> Comentar</button>
+                <article class="sh-card<?= $item['is_purchased'] ? ' is-bought' : '' ?>" data-uuid="<?= $e($item['uuid']) ?>" data-category="<?= $item['category_id'] !== null ? (int) $item['category_id'] : '' ?>" data-name="<?= $e($item['name']) ?>">
+                    <div class="sh-row">
+                        <?php if ($item['image_path'] !== ''): ?>
+                            <button type="button" class="sh-photo" data-full="/<?= $e($item['image_path']) ?>" data-caption="<?= $e($item['name']) ?>" aria-label="Ampliar foto de <?= $e($item['name']) ?>">
+                                <img src="/<?= $e($item['image_path']) ?>" alt="<?= $e($item['name']) ?>" loading="lazy">
+                            </button>
+                        <?php else: ?>
+                            <div class="sh-photo is-empty" aria-hidden="true">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8 8l8 8M16 8l-8 8"/><rect x="10" y="10" width="4" height="4" rx="1"/></svg>
                             </div>
-                            <p class="sh-fb-done" hidden></p>
+                        <?php endif; ?>
+
+                        <div class="sh-info">
+                            <div class="sh-meta">
+                                <?php if ($category): ?>
+                                    <span class="sh-cat" data-tone="<?= $e($toneOf($category)) ?>"><?= $e($category['name']) ?></span>
+                                <?php endif; ?>
+                                <span class="sh-status<?= $item['is_purchased'] ? ' is-bought' : '' ?>"><?= $item['is_purchased'] ? '✓ Já comprei' : 'Ainda vou comprar' ?></span>
+                            </div>
+                            <h2 class="sh-name"><?= $e($item['name']) ?></h2>
+                        </div>
+
+                        <?php if ($hasPrice || $hasStore): ?>
+                            <div class="sh-side">
+                                <?php if ($hasPrice): ?>
+                                    <p class="sh-price"><?= $e($formatBrl((float) $item['price'])) ?></p>
+                                <?php endif; ?>
+                                <?php if ($hasStore): ?>
+                                    <a class="sh-store" href="<?= $e($item['store_url']) ?>" target="_blank" rel="noopener noreferrer nofollow">Ver na loja ↗</a>
+                                <?php endif; ?>
+                            </div>
                         <?php endif; ?>
                     </div>
+
+                    <?php if ($allowFeedback): ?>
+                        <div class="sh-react" role="group" aria-label="Sua opinião sobre <?= $e($item['name']) ?>">
+                            <button type="button" data-reaction="like"><span class="emoji">👍</span> Curti</button>
+                            <button type="button" data-reaction="doubt"><span class="emoji">🤔</span> Tenho dúvidas</button>
+                            <button type="button" data-reaction="dislike"><span class="emoji">👎</span> Não curti</button>
+                            <button type="button" data-reaction="comment"><span class="emoji">💬</span> Comentar</button>
+                        </div>
+                        <p class="sh-fb-done" hidden></p>
+                    <?php endif; ?>
                 </article>
             <?php endforeach; ?>
         </section>
