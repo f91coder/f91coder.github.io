@@ -84,6 +84,7 @@ $config = [
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer">
 <link rel="stylesheet" href="/<?= fpv_asset_v('fpv/assets/css/fpv_share.css') ?>">
 </head>
 <body class="share-page">
@@ -143,20 +144,31 @@ $config = [
         <?php if ($showCategoryFilter || $showStatusFilter): ?>
             <div class="sh-filterbar" id="shFilters">
                 <?php if ($showCategoryFilter): ?>
-                    <label class="sh-filter-field">
-                        <span class="sh-filter-label">Categoria</span>
-                        <span class="sh-select">
-                            <select id="shFilterCategory" aria-label="Filtrar por categoria">
-                                <option value="all">Todas (<?= $itemCount ?>)</option>
+                    <div class="sh-filter-field">
+                        <span class="sh-filter-label" id="shCategoryLabel">Categoria</span>
+                        <div class="sh-multi" id="shFilterCategory" data-total="<?= $itemCount ?>">
+                            <button type="button" class="sh-multi-btn" id="shCategoryBtn" aria-haspopup="true" aria-expanded="false" aria-controls="shCategoryPanel" aria-labelledby="shCategoryLabel shCategoryValue">
+                                <span class="sh-multi-value" id="shCategoryValue">Todas (<?= $itemCount ?>)</span>
+                            </button>
+                            <div class="sh-multi-panel" id="shCategoryPanel" role="group" aria-labelledby="shCategoryLabel" hidden>
                                 <?php foreach ($usedCategories as $categoryId => $count): ?>
-                                    <option value="<?= (int) $categoryId ?>"><?= $e($categoriesById[$categoryId]['name']) ?> (<?= $count ?>)</option>
+                                    <label class="sh-check">
+                                        <input type="checkbox" value="<?= (int) $categoryId ?>" data-label="<?= $e($categoriesById[$categoryId]['name']) ?>">
+                                        <span class="sh-check-name"><span class="sh-cat" data-tone="<?= $e($toneOf($categoriesById[$categoryId])) ?>"><?= $e($categoriesById[$categoryId]['name']) ?></span></span>
+                                        <span class="sh-check-count"><?= $count ?></span>
+                                    </label>
                                 <?php endforeach; ?>
                                 <?php if ($uncategorizedCount > 0 && count($usedCategories) > 0): ?>
-                                    <option value="none">Sem categoria (<?= $uncategorizedCount ?>)</option>
+                                    <label class="sh-check">
+                                        <input type="checkbox" value="none" data-label="Sem categoria">
+                                        <span class="sh-check-name">Sem categoria</span>
+                                        <span class="sh-check-count"><?= $uncategorizedCount ?></span>
+                                    </label>
                                 <?php endif; ?>
-                            </select>
-                        </span>
-                    </label>
+                                <button type="button" class="sh-multi-clear" id="shCategoryClear">Limpar seleção</button>
+                            </div>
+                        </div>
+                    </div>
                 <?php endif; ?>
                 <?php if ($showStatusFilter): ?>
                     <label class="sh-filter-field">
@@ -221,10 +233,10 @@ $config = [
 
                     <?php if ($allowFeedback): ?>
                         <div class="sh-react" role="group" aria-label="Sua opinião sobre <?= $e($item['name']) ?>">
-                            <button type="button" data-reaction="like"><span class="emoji">👍</span> Curti</button>
-                            <button type="button" data-reaction="doubt"><span class="emoji">🤔</span> Tenho dúvidas</button>
-                            <button type="button" data-reaction="dislike"><span class="emoji">👎</span> Não curti</button>
-                            <button type="button" data-reaction="comment"><span class="emoji">💬</span> Comentar</button>
+                            <button type="button" class="is-icon is-like" data-reaction="like" aria-label="Curti" title="Curti"><i class="fa-regular fa-thumbs-up" aria-hidden="true"></i></button>
+                            <button type="button" class="is-icon is-dislike" data-reaction="dislike" aria-label="Não curti" title="Não curti"><i class="fa-regular fa-thumbs-down" aria-hidden="true"></i></button>
+                            <button type="button" class="is-doubt" data-reaction="doubt"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Sei não!</button>
+                            <button type="button" class="is-comment" data-reaction="comment"><i class="fa-regular fa-comment" aria-hidden="true"></i> Comentar</button>
                         </div>
                         <p class="sh-fb-done" hidden></p>
                     <?php endif; ?>

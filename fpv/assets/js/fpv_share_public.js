@@ -5,7 +5,7 @@
 (() => {
     const config = window.FPV_SHARE || {};
     const NAME_KEY = "fpv_share_visitor_name";
-    const REACTION_LABELS = { like: "👍 Curti", doubt: "🤔 Tenho dúvidas", dislike: "👎 Não curti", comment: "💬 Comentário" };
+    const REACTION_LABELS = { like: "Curti", doubt: "Sei não!", dislike: "Não curti", comment: "Comentário" };
 
     const toast = document.getElementById("shToast");
     let toastTimer = null;
@@ -52,38 +52,83 @@
         }
     }
 
-    // ── Filtros (categoria + situacao) ───────────────────────────────────
-    const categorySelect = document.getElementById("shFilterCategory");
+    // ── Filtros (categoria com multipla escolha + situacao) ──────────────
+    const categoryBox = document.getElementById("shFilterCategory");
+    const categoryButton = document.getElementById("shCategoryBtn");
+    const categoryPanel = document.getElementById("shCategoryPanel");
+    const categoryValue = document.getElementById("shCategoryValue");
+    const categoryClear = document.getElementById("shCategoryClear");
+    const categoryChecks = categoryPanel ? Array.from(categoryPanel.querySelectorAll("input[type=checkbox]")) : [];
     const statusSelect = document.getElementById("shFilterStatus");
     const filterCount = document.getElementById("shFilterCount");
     const noResults = document.getElementById("shNoResults");
     const clearFilters = document.getElementById("shClearFilters");
     const list = document.getElementById("shItems");
 
+    const selectedCategories = () => categoryChecks.filter((c) => c.checked);
+
+    function renderCategorySummary() {
+        if (!categoryValue) return;
+        const chosen = selectedCategories();
+        if (chosen.length === 0) categoryValue.textContent = `Todas (${categoryBox.dataset.total || ""})`;
+        else if (chosen.length <= 2) categoryValue.textContent = chosen.map((c) => c.dataset.label).join(", ");
+        else categoryValue.textContent = `${chosen.length} categorias`;
+        if (categoryClear) categoryClear.disabled = chosen.length === 0;
+    }
+
+    function setCategoryOpen(open) {
+        if (!categoryPanel) return;
+        categoryPanel.hidden = !open;
+        categoryButton.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
     function applyFilters() {
         if (!list) return;
-        const category = categorySelect ? categorySelect.value : "all";
+        const chosen = new Set(selectedCategories().map((c) => c.value));
         const status = statusSelect ? statusSelect.value : "all";
         const cards = Array.from(list.querySelectorAll(".sh-card"));
         let shown = 0;
         cards.forEach((card) => {
-            const visible = (category === "all" || card.dataset.category === category)
+            const visible = (chosen.size === 0 || chosen.has(card.dataset.category))
                 && (status === "all" || card.dataset.status === status);
             card.hidden = !visible;
             if (visible) shown += 1;
         });
-        const filtered = category !== "all" || status !== "all";
+        const filtered = chosen.size > 0 || status !== "all";
         if (filterCount) {
             filterCount.hidden = !filtered;
             filterCount.textContent = filtered ? `Mostrando ${shown} de ${cards.length} ${cards.length === 1 ? "item" : "itens"}` : "";
         }
         if (noResults) noResults.hidden = shown !== 0;
         list.hidden = shown === 0;
+        renderCategorySummary();
     }
-    [categorySelect, statusSelect].forEach((select) => select && select.addEventListener("change", applyFilters));
+
+    if (categoryButton && categoryPanel) {
+        categoryButton.addEventListener("click", () => setCategoryOpen(categoryPanel.hidden));
+        categoryChecks.forEach((check) => check.addEventListener("change", applyFilters));
+        if (categoryClear) categoryClear.addEventListener("click", () => {
+            categoryChecks.forEach((c) => { c.checked = false; });
+            applyFilters();
+        });
+        // Fecha ao clicar fora ou com Esc (devolvendo o foco ao botao).
+        document.addEventListener("click", (event) => {
+            if (!categoryPanel.hidden && !categoryBox.contains(event.target)) setCategoryOpen(false);
+        });
+        categoryBox.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && !categoryPanel.hidden) {
+                setCategoryOpen(false);
+                categoryButton.focus();
+            }
+        });
+        categoryBox.addEventListener("focusout", (event) => {
+            if (!categoryPanel.hidden && event.relatedTarget && !categoryBox.contains(event.relatedTarget)) setCategoryOpen(false);
+        });
+    }
+    if (statusSelect) statusSelect.addEventListener("change", applyFilters);
     if (clearFilters) {
         clearFilters.addEventListener("click", () => {
-            if (categorySelect) categorySelect.value = "all";
+            categoryChecks.forEach((c) => { c.checked = false; });
             if (statusSelect) statusSelect.value = "all";
             applyFilters();
         });
