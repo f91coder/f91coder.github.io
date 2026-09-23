@@ -1,5 +1,5 @@
 /**
- * FPV91 — interacoes da lista publica: filtro por categoria, ampliar foto e enviar opiniao.
+ * FPV91 — interacoes da lista publica: tema claro/escuro, filtros, ampliar foto e enviar opiniao.
  * Sem dependencias. Todo texto de visitante e inserido via textContent (nunca innerHTML).
  */
 (() => {
@@ -26,17 +26,70 @@
     const savedName = () => storageGet(NAME_KEY) || "";
     const reactedKey = (uuid) => `fpv_share_${config.token}_${uuid || "general"}`;
 
-    // ── Filtro por categoria ────────────────────────────────────────────
-    const filters = Array.from(document.querySelectorAll(".sh-filter"));
-    filters.forEach((button) => {
-        button.addEventListener("click", () => {
-            const value = button.dataset.filter;
-            filters.forEach((b) => b.setAttribute("aria-pressed", b === button ? "true" : "false"));
-            document.querySelectorAll(".sh-card").forEach((card) => {
-                card.hidden = value !== "all" && card.dataset.category !== value;
-            });
+    // ── Tema claro/escuro (mesma chave do planner) ───────────────────────
+    const THEME_KEY = "f91_fpv_theme";
+    const root = document.documentElement;
+    const themeToggle = document.getElementById("shThemeToggle");
+    if (themeToggle) {
+        const isDark = () => root.getAttribute("data-theme") === "dark";
+        const syncLabel = () => themeToggle.setAttribute("title", isDark() ? "Mudar para modo claro" : "Mudar para modo escuro");
+        syncLabel();
+        themeToggle.addEventListener("click", () => {
+            const next = isDark() ? "light" : "dark";
+            root.setAttribute("data-theme", next);
+            storageSet(THEME_KEY, next);
+            syncLabel();
         });
-    });
+        // Sem preferencia salva, acompanha o sistema em tempo real.
+        if (window.matchMedia) {
+            const media = window.matchMedia("(prefers-color-scheme: dark)");
+            const onSystemChange = (event) => {
+                if (storageGet(THEME_KEY)) return;
+                root.setAttribute("data-theme", event.matches ? "dark" : "light");
+                syncLabel();
+            };
+            if (media.addEventListener) media.addEventListener("change", onSystemChange);
+        }
+    }
+
+    // ── Filtros (categoria + situacao) ───────────────────────────────────
+    const categorySelect = document.getElementById("shFilterCategory");
+    const statusSelect = document.getElementById("shFilterStatus");
+    const filterCount = document.getElementById("shFilterCount");
+    const noResults = document.getElementById("shNoResults");
+    const clearFilters = document.getElementById("shClearFilters");
+    const list = document.getElementById("shItems");
+
+    function applyFilters() {
+        if (!list) return;
+        const category = categorySelect ? categorySelect.value : "all";
+        const status = statusSelect ? statusSelect.value : "all";
+        const cards = Array.from(list.querySelectorAll(".sh-card"));
+        let shown = 0;
+        cards.forEach((card) => {
+            const visible = (category === "all" || card.dataset.category === category)
+                && (status === "all" || card.dataset.status === status);
+            card.hidden = !visible;
+            if (visible) shown += 1;
+        });
+        const filtered = category !== "all" || status !== "all";
+        if (filterCount) {
+            filterCount.hidden = !filtered;
+            filterCount.textContent = filtered ? `Mostrando ${shown} de ${cards.length} ${cards.length === 1 ? "item" : "itens"}` : "";
+        }
+        if (noResults) noResults.hidden = shown !== 0;
+        list.hidden = shown === 0;
+    }
+    [categorySelect, statusSelect].forEach((select) => select && select.addEventListener("change", applyFilters));
+    if (clearFilters) {
+        clearFilters.addEventListener("click", () => {
+            if (categorySelect) categorySelect.value = "all";
+            if (statusSelect) statusSelect.value = "all";
+            applyFilters();
+        });
+    }
+    // Navegador pode restaurar a selecao ao voltar para a pagina.
+    applyFilters();
 
     // ── Foto ampliada ────────────────────────────────────────────────────
     document.addEventListener("click", (event) => {

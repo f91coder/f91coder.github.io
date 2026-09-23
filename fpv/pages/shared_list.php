@@ -21,6 +21,18 @@ $categoriesById = [];
 foreach ($sharedList['categories'] as $category) {
     $categoriesById[$category['id']] = $category;
 }
+$usedCategories = [];
+$uncategorizedCount = 0;
+foreach ($items as $item) {
+    if ($item['category_id'] !== null && isset($categoriesById[$item['category_id']])) {
+        $usedCategories[$item['category_id']] = ($usedCategories[$item['category_id']] ?? 0) + 1;
+    } else {
+        $uncategorizedCount++;
+    }
+}
+$pendingCount = $itemCount - $purchased;
+$showCategoryFilter = count($usedCategories) > 1 || (count($usedCategories) === 1 && $uncategorizedCount > 0);
+$showStatusFilter = $purchased > 0 && $pendingCount > 0;
 $toneOf = static function (?array $category): string {
     if ($category && preg_match('/bg-([a-z]+)-\d{2,3}/', (string) $category['color_class'], $m)) {
         return $m[1];
@@ -59,6 +71,16 @@ $config = [
 <meta property="og:image" content="<?= $e($ogImage) ?>">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="/<?= fpv_asset_v('img/fpv_fav.png') ?>">
+<script>
+    (function () {
+        var theme = null;
+        try { theme = localStorage.getItem('f91_fpv_theme'); } catch (e) {}
+        if (theme !== 'dark' && theme !== 'light') {
+            theme = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+    })();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -72,7 +94,13 @@ $config = [
             <img src="/<?= fpv_asset_v('img/fpv_logo.png') ?>" alt="FPV91" class="logo-light">
             <img src="/<?= fpv_asset_v('img/fpv_logo_.png') ?>" alt="FPV91" class="logo-dark">
         </a>
-        <a href="/fpv/cadastro" class="sh-cta">Criar minha lista</a>
+        <div class="sh-header-actions">
+            <button type="button" class="sh-theme" id="shThemeToggle" aria-label="Alternar entre modo claro e escuro" title="Alternar tema">
+                <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+                <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            </button>
+            <a href="/fpv/cadastro" class="sh-cta">Criar minha lista</a>
+        </div>
     </div>
 </header>
 
@@ -111,28 +139,45 @@ $config = [
                 <p class="sh-progress-label"><?= $purchasedPct ?>% do setup já foi comprado</p>
             </div>
         <?php endif; ?>
+
+        <?php if ($showCategoryFilter || $showStatusFilter): ?>
+            <div class="sh-filterbar" id="shFilters">
+                <?php if ($showCategoryFilter): ?>
+                    <label class="sh-filter-field">
+                        <span class="sh-filter-label">Categoria</span>
+                        <span class="sh-select">
+                            <select id="shFilterCategory" aria-label="Filtrar por categoria">
+                                <option value="all">Todas (<?= $itemCount ?>)</option>
+                                <?php foreach ($usedCategories as $categoryId => $count): ?>
+                                    <option value="<?= (int) $categoryId ?>"><?= $e($categoriesById[$categoryId]['name']) ?> (<?= $count ?>)</option>
+                                <?php endforeach; ?>
+                                <?php if ($uncategorizedCount > 0 && count($usedCategories) > 0): ?>
+                                    <option value="none">Sem categoria (<?= $uncategorizedCount ?>)</option>
+                                <?php endif; ?>
+                            </select>
+                        </span>
+                    </label>
+                <?php endif; ?>
+                <?php if ($showStatusFilter): ?>
+                    <label class="sh-filter-field">
+                        <span class="sh-filter-label">Situação</span>
+                        <span class="sh-select">
+                            <select id="shFilterStatus" aria-label="Filtrar por situação">
+                                <option value="all">Todos (<?= $itemCount ?>)</option>
+                                <option value="pending">A comprar (<?= $pendingCount ?>)</option>
+                                <option value="bought">Comprados (<?= $purchased ?>)</option>
+                            </select>
+                        </span>
+                    </label>
+                <?php endif; ?>
+                <p class="sh-filter-count" id="shFilterCount" aria-live="polite" hidden></p>
+            </div>
+        <?php endif; ?>
     </section>
 
     <?php if ($itemCount === 0): ?>
         <div class="sh-empty">Esta lista ainda não tem itens. Volte em breve!</div>
     <?php else: ?>
-
-        <?php
-        $usedCategories = [];
-        foreach ($items as $item) {
-            if ($item['category_id'] !== null && isset($categoriesById[$item['category_id']])) {
-                $usedCategories[$item['category_id']] = ($usedCategories[$item['category_id']] ?? 0) + 1;
-            }
-        }
-        ?>
-        <?php if (count($usedCategories) > 1): ?>
-            <nav class="sh-filters" aria-label="Filtrar por categoria">
-                <button type="button" class="sh-filter" data-filter="all" aria-pressed="true">Todos (<?= $itemCount ?>)</button>
-                <?php foreach ($usedCategories as $categoryId => $count): ?>
-                    <button type="button" class="sh-filter" data-filter="<?= (int) $categoryId ?>" aria-pressed="false"><?= $e($categoriesById[$categoryId]['name']) ?> (<?= $count ?>)</button>
-                <?php endforeach; ?>
-            </nav>
-        <?php endif; ?>
 
         <section class="sh-list" id="shItems" aria-label="Itens da lista">
             <?php foreach ($items as $item):
@@ -140,7 +185,7 @@ $config = [
                 $hasPrice = $showPrices && $item['price'] !== null && (float) $item['price'] > 0;
                 $hasStore = $item['store_url'] !== '';
             ?>
-                <article class="sh-card<?= $item['is_purchased'] ? ' is-bought' : '' ?>" data-uuid="<?= $e($item['uuid']) ?>" data-category="<?= $item['category_id'] !== null ? (int) $item['category_id'] : '' ?>" data-name="<?= $e($item['name']) ?>">
+                <article class="sh-card<?= $item['is_purchased'] ? ' is-bought' : '' ?>" data-uuid="<?= $e($item['uuid']) ?>" data-category="<?= $item['category_id'] !== null && isset($categoriesById[$item['category_id']]) ? (int) $item['category_id'] : 'none' ?>" data-status="<?= $item['is_purchased'] ? 'bought' : 'pending' ?>" data-name="<?= $e($item['name']) ?>">
                     <div class="sh-row">
                         <?php if ($item['image_path'] !== ''): ?>
                             <button type="button" class="sh-photo" data-full="/<?= $e($item['image_path']) ?>" data-caption="<?= $e($item['name']) ?>" aria-label="Ampliar foto de <?= $e($item['name']) ?>">
@@ -186,6 +231,10 @@ $config = [
                 </article>
             <?php endforeach; ?>
         </section>
+        <div class="sh-empty" id="shNoResults" hidden>
+            Nenhum item com esses filtros.
+            <button type="button" class="sh-linkbtn" id="shClearFilters">Limpar filtros</button>
+        </div>
 
     <?php endif; ?>
 
