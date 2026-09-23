@@ -96,6 +96,46 @@ try {
             $result = save_fpv_planning($_POST);
             break;
 
+        case 'importFpvProduct':
+            fpv_require_post($method);
+            $result = import_fpv_product($_POST);
+            break;
+
+        case 'getFpvShare':
+            $result = get_fpv_share($_GET);
+            break;
+
+        case 'saveFpvShare':
+            fpv_require_post($method);
+            $result = save_fpv_share($_POST);
+            break;
+
+        case 'markFpvFeedbackRead':
+            fpv_require_post($method);
+            $result = mark_fpv_feedback_read($_POST);
+            break;
+
+        case 'deleteFpvFeedback':
+            fpv_require_post($method);
+            $result = delete_fpv_feedback($_POST);
+            break;
+
+        case 'addFpvFeedback':
+            // PUBLICA (visitantes da lista compartilhada): nao exige sessao.
+            fpv_require_post($method);
+            $result = add_fpv_feedback($_POST);
+            break;
+
+        case 'addFpvWalletEntry':
+            fpv_require_post($method);
+            $result = add_fpv_wallet_entry($_POST);
+            break;
+
+        case 'deleteFpvWalletEntry':
+            fpv_require_post($method);
+            $result = delete_fpv_wallet_entry($_POST);
+            break;
+
         case 'addFpvVideo':
             fpv_require_post($method);
             $result = add_fpv_video($_POST);

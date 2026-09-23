@@ -45,6 +45,18 @@ switch ($page) {
         }
         break;
 
+    case 'lista':
+        // Lista publica compartilhada: /fpv/lista/<token> (32 hex). Token invalido/desativado => 404 generico.
+        $shareToken = $segments[1] ?? '';
+        $sharedList = fpv_public_share_load($shareToken, $currentUserId);
+        if (!$sharedList || count($segments) > 2) {
+            http_response_code(404);
+            require __DIR__ . '/pages/not_found.php';
+            break;
+        }
+        require __DIR__ . '/pages/shared_list.php';
+        break;
+
     case 'comunidade':
     case 'cursos':
         $topic = $page;

@@ -195,6 +195,11 @@
                         <i class="ph ph-printer"></i> <span class="hidden sm:inline">Lista</span>
                     </button>
 
+                    <button id="shareButton" type="button" title="Compartilhar minha lista" class="relative text-sm text-f91-text hover:text-f91-limeDark transition-colors flex items-center gap-1 font-medium bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-lg">
+                        <i class="ph ph-share-network"></i> <span class="hidden sm:inline">Compartilhar</span>
+                        <span id="shareBadge" class="hidden absolute -top-1.5 -right-1.5 min-w-[18px] h-[18px] px-1 rounded-full bg-f91-lime text-white text-[10px] font-bold items-center justify-center"></span>
+                    </button>
+
                     <button id="themeToggleButton" title="Alternar tema" class="text-f91-muted hover:text-f91-text transition-colors p-2 rounded-lg hover:bg-gray-100">
                         <i class="ph-fill ph-sun theme-toggle-icon is-light text-lg"></i>
                         <i class="ph-fill ph-moon theme-toggle-icon is-dark text-lg"></i>
@@ -225,56 +230,96 @@
                         <h2 class="text-lg font-semibold text-f91-text flex items-center gap-2">
                             <i class="ph-fill ph-chart-pie-slice text-f91-lime"></i> Resumo Financeiro
                         </h2>
-                        <div class="flex items-center gap-0.5 bg-gray-100 rounded-full p-0.5 text-xs font-bold" role="group" aria-label="Moeda de exibicao">
-                            <button type="button" data-currency="BRL" class="currency-switch-btn px-2.5 py-1 rounded-full transition-colors" aria-pressed="true">BRL</button>
-                            <button type="button" data-currency="USD" class="currency-switch-btn px-2.5 py-1 rounded-full transition-colors" aria-pressed="false">USD</button>
-                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-5">
+                        <span class="text-xs text-f91-muted font-medium">Exibir valores em</span>
+                        <div id="currency-switch" class="flex items-center gap-0.5 bg-gray-100 rounded-full p-0.5 text-xs font-bold" role="group" aria-label="Moeda de exibição"></div>
                     </div>
 
                     <div class="space-y-4">
                         <div>
-                            <p class="text-sm text-f91-muted font-medium mb-1">Custo Total do Setup</p>
+                            <p class="text-sm text-f91-muted font-medium mb-1">Custo total do setup</p>
                             <h3 class="text-3xl font-bold text-f91-text" id="display-total-cost">R$ 0,00</h3>
                         </div>
 
-                        <div class="pt-2">
-                            <div class="flex justify-between text-xs font-medium mb-1">
-                                <span class="text-f91-text">Progresso</span>
+                        <div class="pt-1">
+                            <div class="flex justify-between text-xs font-medium mb-1.5">
+                                <span class="text-f91-text">Progresso da compra</span>
                                 <span id="display-progress-pct" class="text-f91-limeDark font-bold">0%</span>
                             </div>
-                            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
-                                <div id="progress-bar" class="bg-f91-lime h-3 rounded-full transition-all duration-700 ease-out" style="width: 0%"></div>
+                            <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden flex" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track">
+                                <div id="progress-bar" class="bg-f91-lime h-3 transition-all duration-700 ease-out" style="width: 0%"></div>
+                                <div id="progress-bar-covered" class="bg-f91-lime opacity-40 h-3 transition-all duration-700 ease-out" style="width: 0%"></div>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-[11px] text-f91-muted">
+                                <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-f91-lime"></span> Comprado <strong id="legend-purchased-pct" class="text-f91-text">0%</strong></span>
+                                <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-f91-lime opacity-40"></span> Coberto pela carteira <strong id="legend-covered-pct" class="text-f91-text">0%</strong></span>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4 pt-4 border-t border-gray-100">
                             <div>
-                                <p class="text-xs text-f91-muted font-medium mb-1">Valor Guardado</p>
-                                <p class="text-lg font-semibold text-green-600" id="display-saved">R$ 0,00</p>
+                                <p class="text-xs text-f91-muted font-medium mb-1">Já comprado</p>
+                                <p class="text-lg font-semibold text-green-600" id="display-purchased">R$ 0,00</p>
                             </div>
                             <div>
-                                <p class="text-xs text-f91-muted font-medium mb-1">Falta Juntar</p>
+                                <p class="text-xs text-f91-muted font-medium mb-1">Falta comprar</p>
+                                <p class="text-lg font-semibold text-f91-text" id="display-to-buy">R$ 0,00</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-f91-muted font-medium mb-1">Na carteira</p>
+                                <p class="text-lg font-semibold text-f91-text" id="display-saved">R$ 0,00</p>
+                            </div>
+                            <div>
+                                <p class="text-xs text-f91-muted font-medium mb-1">Falta juntar</p>
                                 <p class="text-lg font-semibold text-red-500" id="display-remaining">R$ 0,00</p>
                             </div>
                         </div>
+
+                        <p class="text-xs text-f91-muted leading-relaxed min-h-[16px]" id="summary-note"></p>
                     </div>
                 </div>
 
-                <div class="bg-f91-card rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div class="bg-f91-card rounded-2xl p-6 shadow-sm border border-gray-100" id="wallet-card">
                     <div class="flex items-center justify-between mb-4">
                         <h2 class="text-lg font-semibold text-f91-text flex items-center gap-2">
-                            <i class="ph-fill ph-currency-circle-dollar text-f91-lime"></i> Cotações
+                            <i class="ph-fill ph-wallet text-f91-lime"></i> Carteira
                         </h2>
-                        <button type="button" id="refreshRatesButton" title="Atualizar cotações" class="text-f91-muted hover:text-f91-text transition-colors p-1.5 rounded-lg hover:bg-gray-100">
-                            <i class="ph ph-arrows-clockwise text-base"></i>
+                    </div>
+
+                    <p class="text-sm text-f91-muted font-medium mb-1">Saldo disponível</p>
+                    <h3 class="text-3xl font-bold text-green-600" id="display-wallet-balance">R$ 0,00</h3>
+                    <p class="text-xs text-f91-muted mt-1 min-h-[16px]" id="wallet-balance-hint"></p>
+
+                    <div class="grid grid-cols-2 gap-2 mt-4">
+                        <button type="button" id="wallet-add-button" class="px-3 py-2 bg-f91-navy hover:bg-f91-navyLight text-white text-sm font-medium rounded-xl transition-colors flex items-center justify-center gap-1.5">
+                            <i class="ph-bold ph-plus"></i> Adicionar
+                        </button>
+                        <button type="button" id="wallet-withdraw-button" class="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-f91-text text-sm font-medium rounded-xl transition-colors flex items-center justify-center gap-1.5">
+                            <i class="ph-bold ph-minus"></i> Retirar
                         </button>
                     </div>
-                    <div class="space-y-1" id="currencyRatesList">
-                        <div class="flex items-center justify-between py-2">
-                            <span class="text-sm text-f91-muted">Carregando cotações...</span>
+
+                    <div class="grid grid-cols-3 gap-2 mt-4 text-center">
+                        <div class="bg-gray-50 rounded-xl py-2 px-1">
+                            <p class="text-[10px] uppercase tracking-wider text-f91-muted">Entradas</p>
+                            <p class="text-xs font-bold text-f91-text mt-0.5" id="wallet-stat-in">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl py-2 px-1">
+                            <p class="text-[10px] uppercase tracking-wider text-f91-muted">Compras</p>
+                            <p class="text-xs font-bold text-f91-text mt-0.5" id="wallet-stat-purchases">R$ 0,00</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl py-2 px-1">
+                            <p class="text-[10px] uppercase tracking-wider text-f91-muted">Retiradas</p>
+                            <p class="text-xs font-bold text-f91-text mt-0.5" id="wallet-stat-out">R$ 0,00</p>
                         </div>
                     </div>
-                    <p class="text-[10px] text-f91-muted mt-3" id="currencyUpdatedAt"></p>
+
+                    <div class="mt-4 pt-4 border-t border-gray-100">
+                        <p class="text-xs font-semibold uppercase tracking-wider text-f91-muted mb-2 flex items-center gap-1.5"><i class="ph ph-list-bullets"></i> Extrato</p>
+                        <ul id="wallet-statement" class="space-y-1 max-h-64 overflow-y-auto pr-1"></ul>
+                    </div>
                 </div>
 
                 <div class="bg-f91-card rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -284,24 +329,15 @@
                         </h2>
                     </div>
 
-                    <form id="planning-form" class="space-y-4">
+                    <form id="planning-form" class="space-y-4" onsubmit="return false;">
                         <div>
-                            <label class="block text-sm font-medium text-f91-text mb-1">Valor em caixa (R$)</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-f91-muted sm:text-sm">R$</span>
-                                </div>
-                                <input type="number" id="input-saved" step="0.01" min="0" class="block w-full pl-10 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime focus:border-f91-lime sm:text-sm transition-all outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200" placeholder="0.00">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-medium text-f91-text mb-1">Data Meta</label>
+                            <label class="block text-sm font-medium text-f91-text mb-1">Data meta</label>
                             <input type="date" id="input-date" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime focus:border-f91-lime sm:text-sm transition-all outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 text-f91-text">
+                            <p class="text-[11px] text-f91-muted mt-1.5">O cálculo considera o que falta comprar menos o saldo da carteira.</p>
                         </div>
                     </form>
 
-                    <div class="mt-6 p-5 bg-f91-navy rounded-xl text-white relative overflow-hidden">
+                    <div class="mt-5 p-5 bg-f91-navy rounded-xl text-white relative overflow-hidden">
                         <div class="absolute -right-8 -top-8 w-32 h-32 bg-f91-lime rounded-full opacity-10"></div>
 
                         <div class="relative z-10 flex flex-col gap-3">
@@ -340,6 +376,23 @@
                 </div>
 
                 <div class="bg-f91-card rounded-2xl p-6 shadow-sm border border-gray-100">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-f91-text flex items-center gap-2">
+                            <i class="ph-fill ph-currency-circle-dollar text-f91-lime"></i> Cotações
+                        </h2>
+                        <button type="button" id="refreshRatesButton" title="Atualizar cotações" class="text-f91-muted hover:text-f91-text transition-colors p-1.5 rounded-lg hover:bg-gray-100">
+                            <i class="ph ph-arrows-clockwise text-base"></i>
+                        </button>
+                    </div>
+                    <div class="space-y-1" id="currencyRatesList">
+                        <div class="flex items-center justify-between py-2">
+                            <span class="text-sm text-f91-muted">Carregando cotações...</span>
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-f91-muted mt-3" id="currencyUpdatedAt"></p>
+                </div>
+
+                <div class="bg-f91-card rounded-2xl p-6 shadow-sm border border-gray-100">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-semibold text-f91-text uppercase tracking-wider flex items-center gap-2">
                             <i class="ph ph-tag"></i> Categorias
@@ -368,7 +421,17 @@
                         <span class="bg-f91-navy text-white text-xs font-bold px-2 py-1 rounded-lg" id="item-count">0 itens</span>
                     </div>
 
-                    <form id="add-item-form" class="space-y-4">
+                    <form id="add-item-form" class="space-y-3" autocomplete="off">
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="ph ph-link text-gray-400"></i>
+                            </div>
+                            <input type="text" inputmode="url" id="item-url" class="block w-full pl-9 pr-24 sm:pr-32 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime focus:border-f91-lime sm:text-sm outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="Cole o link do produto (AliExpress, Amazon, Shopee, Mercado Livre…)">
+                            <button type="button" id="import-link-button" title="Buscar nome, foto e preço a partir do link" class="absolute right-1.5 top-1/2 -translate-y-1/2 px-3 py-1 bg-f91-navy hover:bg-f91-navyLight text-white text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5">
+                                <i class="ph-bold ph-magic-wand" id="import-link-icon"></i> <span class="hidden sm:inline" id="import-link-label">Preencher</span>
+                            </button>
+                        </div>
+
                         <div class="flex flex-col md:flex-row gap-3 items-end">
                             <div class="w-full md:w-auto flex-shrink-0">
                                 <label class="cursor-pointer flex flex-col items-center justify-center w-full md:w-14 h-[38px] border border-gray-200 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors text-f91-muted relative overflow-hidden group" title="Adicionar Foto">
@@ -387,25 +450,22 @@
                             </div>
                         </div>
 
-                        <div class="flex flex-col md:flex-row gap-3 items-end">
-                            <div class="flex-grow w-full relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="ph ph-link text-gray-400"></i>
-                                </div>
-                                <input type="url" id="item-url" class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime focus:border-f91-lime sm:text-sm outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="Link da loja (opcional)">
+                        <div class="flex flex-col md:flex-row gap-3 md:items-center">
+                            <div class="flex w-full md:w-56 flex-shrink-0">
+                                <select id="item-price-currency" aria-label="Moeda do preço" class="px-2 py-2 border border-r-0 border-gray-200 rounded-l-xl bg-gray-100 text-xs font-bold text-f91-text outline-none focus:ring-f91-lime cursor-pointer"></select>
+                                <input type="number" id="item-price" required step="0.01" min="0" class="block w-full min-w-0 px-3 py-2 border border-gray-200 rounded-r-xl focus:ring-f91-lime focus:border-f91-lime sm:text-sm outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="0.00">
                             </div>
 
-                            <div class="w-full md:w-32 relative">
-                                 <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                                    <span class="text-gray-400 text-sm">R$</span>
-                                </div>
-                                <input type="number" id="item-price" required step="0.01" min="0" class="block w-full pl-8 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime focus:border-f91-lime sm:text-sm outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="0.00">
-                            </div>
+                            <p id="item-form-hint" class="flex-grow text-xs text-f91-muted leading-snug min-h-[16px]" aria-live="polite"></p>
 
                             <button type="submit" class="w-full md:w-auto px-6 py-2 bg-f91-navy hover:bg-f91-navyLight text-white font-medium rounded-xl transition-colors flex items-center justify-center gap-2 shadow-sm whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-f91-navy h-[38px]">
                                 <i class="ph-bold ph-plus"></i> Salvar
                             </button>
                         </div>
+
+                        <button type="button" id="open-clip-modal" class="text-[11px] text-f91-muted hover:text-f91-text underline underline-offset-2 decoration-dotted transition-colors flex items-center gap-1">
+                            <i class="ph ph-cursor-click"></i> A loja bloqueou a leitura ou não trouxe o preço? Use o botão mágico do FPV91
+                        </button>
                     </form>
                 </div>
 
@@ -492,9 +552,13 @@
                 <div class="flex justify-between items-center font-bold text-slate-800 border-t-2 border-slate-200 mt-2 pt-4">
                     <span>Total</span><span id="export-total" class="text-lg">R$ 0,00</span>
                 </div>
+                <div id="export-summary" class="mt-2 space-y-1 text-xs text-slate-500"></div>
             </div>
             <div class="px-6 py-4 border-t border-gray-100 flex justify-end gap-2 no-print">
                 <button onclick="closeModal('export-modal')" class="px-4 py-2 text-sm text-f91-text hover:bg-gray-100 rounded-lg transition-colors">Fechar</button>
+                <button type="button" id="exportShareButton" class="px-4 py-2 text-sm bg-gray-100 hover:bg-gray-200 text-f91-text rounded-lg transition-colors font-medium flex items-center gap-2">
+                    <i class="ph ph-share-network"></i> Compartilhar link
+                </button>
                 <button onclick="printShoppingList()" id="printShoppingListButton" class="px-4 py-2 text-sm bg-f91-navy hover:bg-f91-navyLight text-white rounded-lg transition-colors font-medium flex items-center gap-2">
                     <i class="ph ph-printer"></i> Imprimir
                 </button>
@@ -534,16 +598,18 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <i class="ph ph-link text-gray-400"></i>
                         </div>
-                        <input type="url" id="edit-item-url" class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="https://...">
+                        <input type="text" inputmode="url" id="edit-item-url" class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="https://...">
                     </div>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-f91-text mb-1">Preço</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <span class="text-gray-400 text-sm">R$</span>
-                        </div>
-                        <input type="number" id="edit-item-price" required step="0.01" min="0" class="block w-full pl-9 pr-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all">
+                    <div class="flex">
+                        <select id="edit-item-price-currency" aria-label="Moeda do preço" class="px-2 py-2 border border-r-0 border-gray-200 rounded-l-xl bg-gray-100 text-xs font-bold text-f91-text outline-none focus:ring-f91-lime cursor-pointer"></select>
+                        <input type="number" id="edit-item-price" required step="0.01" min="0" class="block w-full min-w-0 px-3 py-2 border border-gray-200 rounded-r-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all">
+                    </div>
+                    <div class="flex items-start justify-between gap-3 mt-1.5">
+                        <p id="edit-item-hint" class="text-[11px] text-f91-muted leading-snug min-h-[14px]"></p>
+                        <button type="button" id="edit-refresh-price" class="text-[11px] font-semibold text-f91-text hover:text-f91-limeDark whitespace-nowrap flex items-center gap-1 transition-colors"><i class="ph ph-arrows-clockwise" id="edit-refresh-icon"></i> Atualizar pelo link</button>
                     </div>
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
@@ -554,6 +620,92 @@
         </div>
     </div>
 
+    <div id="wallet-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
+        <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer" onclick="closeModal('wallet-modal')"></div>
+        <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-md relative z-10 modal-scale-enter overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-semibold text-f91-text flex items-center gap-2"><i class="ph-fill ph-wallet text-f91-lime"></i> <span id="wallet-modal-title">Adicionar dinheiro</span></h3>
+                <button onclick="closeModal('wallet-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
+            </div>
+            <form id="wallet-form" class="p-6 space-y-4" autocomplete="off">
+                <input type="hidden" id="wallet-type" value="deposit">
+                <div>
+                    <label class="block text-sm font-medium text-f91-text mb-1">Valor</label>
+                    <div class="flex">
+                        <select id="wallet-currency" aria-label="Moeda" class="px-2 py-2 border border-r-0 border-gray-200 rounded-l-xl bg-gray-100 text-xs font-bold text-f91-text outline-none focus:ring-f91-lime cursor-pointer"></select>
+                        <input type="number" id="wallet-amount" required step="0.01" min="0.01" class="block w-full min-w-0 px-3 py-2 border border-gray-200 rounded-r-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="0.00">
+                    </div>
+                    <p id="wallet-convert-hint" class="text-[11px] text-f91-muted mt-1.5 min-h-[14px]"></p>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-f91-text mb-1">Descrição <span class="text-f91-muted font-normal">(opcional)</span></label>
+                    <input type="text" id="wallet-note" maxlength="100" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="Ex: salário, venda de uma peça usada…">
+                </div>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeModal('wallet-modal')" class="px-4 py-2 text-sm text-f91-text hover:bg-gray-100 rounded-lg transition-colors">Cancelar</button>
+                    <button type="submit" id="wallet-submit" class="px-4 py-2 text-sm bg-f91-navy hover:bg-f91-navyLight text-white rounded-lg transition-colors font-medium">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="clip-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
+        <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer" onclick="closeModal('clip-modal')"></div>
+        <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-lg relative z-10 modal-scale-enter overflow-hidden max-h-[88vh] flex flex-col">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-semibold text-f91-text flex items-center gap-2"><i class="ph-fill ph-magic-wand text-f91-lime"></i> Botão mágico do FPV91</h3>
+                <button onclick="closeModal('clip-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
+            </div>
+            <div class="p-6 space-y-5 overflow-y-auto text-sm text-f91-text">
+                <p class="leading-relaxed">Shopee, Mercado Livre e AliExpress escondem o <strong>preço</strong> de leitores automáticos. O botão mágico resolve: ele lê a página que <strong>você mesmo está vendo</strong> no navegador e traz nome, foto e preço para o seu planner.</p>
+
+                <ol class="space-y-4">
+                    <li class="flex gap-3">
+                        <span class="w-6 h-6 rounded-full bg-f91-navy text-white text-xs font-bold flex items-center justify-center flex-shrink-0">1</span>
+                        <div>
+                            <p class="font-medium mb-2">Arraste este botão para a sua barra de favoritos</p>
+                            <a id="clip-bookmarklet" href="#" draggable="true" class="inline-flex items-center gap-2 px-4 py-2 bg-f91-navy text-white text-sm font-semibold rounded-xl shadow-sm cursor-grab select-none" onclick="return false;">
+                                <i class="ph-bold ph-plus-circle"></i> Adicionar ao FPV91
+                            </a>
+                            <p class="text-[11px] text-f91-muted mt-2">Não vê a barra de favoritos? No Chrome/Edge use <kbd class="px-1 py-0.5 bg-gray-100 rounded text-[10px]">Ctrl</kbd>+<kbd class="px-1 py-0.5 bg-gray-100 rounded text-[10px]">Shift</kbd>+<kbd class="px-1 py-0.5 bg-gray-100 rounded text-[10px]">B</kbd>.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="w-6 h-6 rounded-full bg-f91-navy text-white text-xs font-bold flex items-center justify-center flex-shrink-0">2</span>
+                        <p class="font-medium">Abra a página do produto na loja que você quiser.</p>
+                    </li>
+                    <li class="flex gap-3">
+                        <span class="w-6 h-6 rounded-full bg-f91-navy text-white text-xs font-bold flex items-center justify-center flex-shrink-0">3</span>
+                        <p class="font-medium">Clique em <em>Adicionar ao FPV91</em> nos favoritos. O planner abre com tudo preenchido — é só conferir a categoria e salvar.</p>
+                    </li>
+                </ol>
+
+                <div class="bg-gray-50 rounded-xl p-4 text-xs text-f91-muted leading-relaxed">
+                    <p class="font-semibold text-f91-text mb-1 flex items-center gap-1.5"><i class="ph ph-device-mobile"></i> No celular?</p>
+                    <p>Crie um favorito qualquer no navegador, edite-o e cole este código no lugar do endereço:</p>
+                    <button type="button" id="clip-copy-button" class="mt-2 px-3 py-1.5 bg-white border border-gray-200 hover:bg-gray-100 rounded-lg text-f91-text font-semibold flex items-center gap-1.5 transition-colors">
+                        <i class="ph ph-copy"></i> <span>Copiar código do botão</span>
+                    </button>
+                </div>
+
+                <p class="text-[11px] text-f91-muted leading-relaxed">O botão só lê o que já está aberto na sua tela (título, foto e o preço em destaque) e envia para a sua conta FPV91. Ele não coleta senhas nem dados de pagamento.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="share-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
+        <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer" onclick="closeModal('share-modal')"></div>
+        <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-2xl relative z-10 modal-scale-enter overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-semibold text-f91-text flex items-center gap-2"><i class="ph-fill ph-share-network text-f91-lime"></i> Compartilhar minha lista</h3>
+                <button onclick="closeModal('share-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
+            </div>
+            <div class="overflow-y-auto flex-1 min-h-0" id="share-modal-body">
+                <p class="p-8 text-center text-sm text-f91-muted">Carregando…</p>
+            </div>
+        </div>
+    </div>
+
     <div id="appToast" class="fixed bottom-6 right-6 z-[70] max-w-sm bg-white dark:bg-f91-card rounded-2xl shadow-2xl border border-gray-100 p-4 flex items-center gap-3 translate-y-4 opacity-0 pointer-events-none transition-all duration-300 no-print" role="status" aria-live="polite">
         <div class="w-9 h-9 rounded-full bg-green-100 text-green-600 flex items-center justify-center flex-shrink-0">
             <i class="ph-bold ph-check"></i>
@@ -561,6 +713,9 @@
         <p id="appToastMessage" class="text-sm font-medium text-f91-text"></p>
     </div>
 
-    <script src="/js/fpv_planner.js?v=20260806-2"></script>
+    <script src="/<?= fpv_asset_v('js/fpv_money.js') ?>"></script>
+    <script src="/<?= fpv_asset_v('js/fpv_clip.js') ?>"></script>
+    <script src="/<?= fpv_asset_v('js/fpv_planner.js') ?>"></script>
+    <script src="/<?= fpv_asset_v('js/fpv_share.js') ?>"></script>
 </body>
 </html>

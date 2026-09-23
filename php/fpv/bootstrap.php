@@ -15,6 +15,8 @@ final class FpvAuthException extends RuntimeException
 {
 }
 
+require_once __DIR__ . '/schema_migrate.php';
+
 function fpv_config(): array
 {
     static $config = null;
@@ -45,6 +47,8 @@ function fpv_pdo(): PDO
         PDO::ATTR_EMULATE_PREPARES => false,
     ]);
     $pdo->exec("SET time_zone = '+00:00'");
+
+    fpv_ensure_schema($pdo);
 
     return $pdo;
 }

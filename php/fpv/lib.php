@@ -2,6 +2,9 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/bootstrap.php';
+require_once __DIR__ . '/wallet.php';
+require_once __DIR__ . '/product_import.php';
+require_once __DIR__ . '/share.php';
 
 const FPV_DEFAULT_CATEGORIES = [
     ['Frame', 'bg-gray-100 text-gray-800', 1],
@@ -499,9 +502,10 @@ function get_fpv_board(array $params): array
     $categories = $pdo->prepare('SELECT id, name, color_class, sort_order FROM fpv_categories WHERE user_id = :user_id ORDER BY sort_order, id');
     $categories->execute(['user_id' => $userId]);
 
+    $purchasedAtColumn = fpv_schema_ready() ? 'purchased_at' : 'NULL AS purchased_at';
     $items = $pdo->prepare(
-        'SELECT id, item_uuid, name, category_id, price, store_url, image_path, is_purchased, sort_order, created_at
-         FROM fpv_items WHERE user_id = :user_id ORDER BY sort_order, id'
+        "SELECT id, item_uuid, name, category_id, price, store_url, image_path, is_purchased, $purchasedAtColumn, sort_order, created_at
+         FROM fpv_items WHERE user_id = :user_id ORDER BY sort_order, id"
     );
     $items->execute(['user_id' => $userId]);
 
@@ -530,6 +534,7 @@ function get_fpv_board(array $params): array
             'store_url' => $row['store_url'],
             'image_path' => $row['image_path'],
             'is_purchased' => (bool) $row['is_purchased'],
+            'purchased_at' => fpv_iso_utc($row['purchased_at'] ?? null),
             'sort_order' => (int) $row['sort_order'],
             'created_at' => $row['created_at'],
         ], $items->fetchAll()),
@@ -537,6 +542,8 @@ function get_fpv_board(array $params): array
             'saved_amount' => (float) $planning['saved_amount'],
             'target_date' => $planning['target_date'],
         ],
+        'wallet' => fpv_wallet_payload($pdo, $userId),
+        'share' => fpv_share_summary($pdo, $userId),
         'videos' => array_map(static fn($row) => [
             'id' => (int) $row['id'],
             'url' => $row['url'],
@@ -646,6 +653,33 @@ function fpv_delete_image_file(string $imagePath): void
     }
 }
 
+/**
+ * Normaliza o link da loja: aceita "aliexpress.com/item/123" (sem esquema) e garante http/https.
+ * Qualquer outro esquema (javascript:, data:, etc.) e descartado — o link e exibido para visitantes
+ * na pagina publica da lista, entao nunca pode virar um vetor de XSS.
+ */
+function fpv_normalize_store_url(string $url): string
+{
+    $url = trim($url);
+    if ($url === '') {
+        return '';
+    }
+    if (!preg_match('#^[a-z][a-z0-9+.-]*:#i', $url)) {
+        $url = 'https://' . ltrim($url, '/');
+    }
+    $parts = parse_url($url);
+    if ($parts === false || !isset($parts['scheme'], $parts['host'])) {
+        return '';
+    }
+    if (!in_array(strtolower($parts['scheme']), ['http', 'https'], true)) {
+        return '';
+    }
+    if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        return '';
+    }
+    return mb_substr($url, 0, 500);
+}
+
 function add_fpv_item(array $input, ?array $file): array
 {
     $pdo = fpv_pdo();
@@ -661,7 +695,7 @@ function add_fpv_item(array $input, ?array $file): array
         $price = 0;
     }
 
-    $storeUrl = fpv_sanitize_string($input['store_url'] ?? '', 500);
+    $storeUrl = fpv_normalize_store_url(fpv_sanitize_string($input['store_url'] ?? '', 600));
     $categoryId = isset($input['category_id']) && $input['category_id'] !== '' ? (int) $input['category_id'] : null;
 
     if ($categoryId !== null) {
@@ -676,6 +710,9 @@ function add_fpv_item(array $input, ?array $file): array
         $imagePath = fpv_handle_image_upload($file, 'items');
     } catch (RuntimeException $e) {
         return ['success' => false, 'message' => $e->getMessage(), '_code' => 400];
+    }
+    if ($imagePath === '' && !empty($input['import_image'])) {
+        $imagePath = fpv_claim_imported_image($userId, (string) $input['import_image']);
     }
 
     $itemUuid = fpv_generate_uuid();
@@ -736,7 +773,7 @@ function update_fpv_item(array $input, ?array $file): array
     if ($price < 0) {
         $price = 0;
     }
-    $storeUrl = isset($input['store_url']) ? fpv_sanitize_string($input['store_url'], 500) : $existing['store_url'];
+    $storeUrl = isset($input['store_url']) ? fpv_normalize_store_url(fpv_sanitize_string($input['store_url'], 600)) : $existing['store_url'];
     $categoryId = $existing['category_id'] !== null ? (int) $existing['category_id'] : null;
     if (array_key_exists('category_id', $input)) {
         $categoryId = $input['category_id'] !== '' ? (int) $input['category_id'] : null;
@@ -756,14 +793,29 @@ function update_fpv_item(array $input, ?array $file): array
     } catch (RuntimeException $e) {
         return ['success' => false, 'message' => $e->getMessage(), '_code' => 400];
     }
+    if ($newImage === '' && !empty($input['import_image'])) {
+        $newImage = fpv_claim_imported_image($userId, (string) $input['import_image']);
+    }
     if ($newImage !== '') {
         fpv_delete_image_file($imagePath);
         $imagePath = $newImage;
     }
 
+    // "Comprado" debita o preco do item da carteira; o momento da compra alimenta o extrato.
+    // Ao desmarcar, o valor volta para a carteira (o saldo e derivado, ver wallet.php).
+    $purchasedAtSql = 'purchased_at';
+    if (fpv_schema_ready()) {
+        if ($isPurchased && !(int) $existing['is_purchased']) {
+            $purchasedAtSql = 'NOW()';
+        } elseif (!$isPurchased) {
+            $purchasedAtSql = 'NULL';
+        }
+    }
+    $purchasedAtAssignment = fpv_schema_ready() ? ", purchased_at = $purchasedAtSql" : '';
+
     $update = $pdo->prepare(
-        'UPDATE fpv_items SET name = :name, category_id = :category_id, price = :price, store_url = :store_url,
-         image_path = :image_path, is_purchased = :is_purchased WHERE item_uuid = :item_uuid AND user_id = :user_id'
+        "UPDATE fpv_items SET name = :name, category_id = :category_id, price = :price, store_url = :store_url,
+         image_path = :image_path, is_purchased = :is_purchased{$purchasedAtAssignment} WHERE item_uuid = :item_uuid AND user_id = :user_id"
     );
     $update->execute([
         'name' => $name,
@@ -787,6 +839,7 @@ function update_fpv_item(array $input, ?array $file): array
             'image_path' => $imagePath,
             'is_purchased' => (bool) $isPurchased,
         ],
+        'wallet' => fpv_wallet_payload($pdo, $userId),
     ];
 }
 
@@ -853,20 +906,17 @@ function save_fpv_planning(array $input): array
     $pdo = fpv_pdo();
     $userId = require_fpv_session($pdo);
 
-    $savedAmount = round((float) ($input['saved_amount'] ?? 0), 2);
-    if ($savedAmount < 0) {
-        $savedAmount = 0;
-    }
+    // Desde a v3 o dinheiro disponivel vive na carteira (fpv_wallet_entries); aqui so resta a data meta.
     $targetDate = fpv_sanitize_string($input['target_date'] ?? '', 10);
     $targetDate = preg_match('/^\d{4}-\d{2}-\d{2}$/', $targetDate) ? $targetDate : null;
 
     $stmt = $pdo->prepare(
-        'INSERT INTO fpv_planning (user_id, saved_amount, target_date) VALUES (:user_id, :saved_amount, :target_date)
-         ON DUPLICATE KEY UPDATE saved_amount = VALUES(saved_amount), target_date = VALUES(target_date)'
+        'INSERT INTO fpv_planning (user_id, saved_amount, target_date) VALUES (:user_id, 0, :target_date)
+         ON DUPLICATE KEY UPDATE target_date = VALUES(target_date)'
     );
-    $stmt->execute(['user_id' => $userId, 'saved_amount' => $savedAmount, 'target_date' => $targetDate]);
+    $stmt->execute(['user_id' => $userId, 'target_date' => $targetDate]);
 
-    return ['success' => true, 'planning' => ['saved_amount' => $savedAmount, 'target_date' => $targetDate]];
+    return ['success' => true, 'planning' => ['saved_amount' => 0.0, 'target_date' => $targetDate]];
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -939,6 +989,10 @@ function reset_fpv_data(array $input): array
     $pdo->prepare('DELETE FROM fpv_categories WHERE user_id = :user_id')->execute(['user_id' => $userId]);
     $pdo->prepare('DELETE FROM fpv_videos WHERE user_id = :user_id')->execute(['user_id' => $userId]);
     $pdo->prepare('DELETE FROM fpv_planning WHERE user_id = :user_id')->execute(['user_id' => $userId]);
+    if (fpv_schema_ready()) {
+        $pdo->prepare('DELETE FROM fpv_wallet_entries WHERE user_id = :user_id')->execute(['user_id' => $userId]);
+        $pdo->prepare('DELETE FROM fpv_share_feedback WHERE user_id = :user_id')->execute(['user_id' => $userId]);
+    }
 
     foreach ($rows as $row) {
         fpv_delete_image_file($row['image_path']);
