@@ -140,6 +140,23 @@
         .currency-switch-btn[aria-pressed="true"]{ background: var(--f91-card); color: var(--f91-navy); box-shadow: 0 1px 2px rgba(23,21,21,.12); }
         html.dark .currency-switch-btn[aria-pressed="true"]{ color: var(--f91-lime); }
 
+        .build-tab{ display:inline-flex; align-items:center; gap:8px; flex-shrink:0; max-width:17rem; padding:7px 12px; border-radius:12px; border:1px solid transparent; background:transparent; color:var(--f91-text); font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap; transition:background-color .15s ease, border-color .15s ease, box-shadow .15s ease; }
+        .build-tab:hover{ background:var(--f91-gray-100); }
+        .build-tab.is-active{ background:var(--f91-gray-100); border-color:var(--f91-gray-200); box-shadow:inset 0 -3px 0 var(--build-color, var(--f91-lime)); }
+        .build-tab.is-drop-target{ background:var(--f91-gray-200); outline:2px dashed var(--build-color, var(--f91-lime)); outline-offset:-2px; }
+        .build-dot{ width:10px; height:10px; border-radius:999px; flex-shrink:0; background:var(--build-color, var(--f91-lime)); }
+        .build-tab-name{ overflow:hidden; text-overflow:ellipsis; }
+        .build-tab-pct{ font-size:11px; font-weight:700; color:var(--f91-muted); }
+        .build-swatch{ width:30px; height:30px; border-radius:999px; background:var(--swatch); cursor:pointer; display:flex; align-items:center; justify-content:center; color:#fff; box-shadow:inset 0 0 0 2px rgba(255,255,255,.35); transition:transform .12s ease; }
+        .build-swatch:hover{ transform:scale(1.1); }
+        .build-swatch i{ opacity:0; font-size:14px; }
+        input:checked + .build-swatch{ box-shadow:0 0 0 2px var(--f91-card), 0 0 0 4px var(--swatch); }
+        input:checked + .build-swatch i{ opacity:1; }
+        input:focus-visible + .build-swatch{ outline:2px solid var(--f91-lime); outline-offset:3px; }
+        .build-card{ text-align:left; border:1px solid var(--f91-gray-200); border-radius:16px; background:var(--f91-card); overflow:hidden; cursor:pointer; transition:box-shadow .2s ease, transform .2s ease, border-color .2s ease; border-top:4px solid var(--build-color, var(--f91-lime)); }
+        .build-card:hover{ box-shadow:0 8px 24px rgba(0,0,0,.10); transform:translateY(-2px); }
+        .build-card.is-current{ border-color:var(--build-color, var(--f91-lime)); }
+
         @media print {
             @page { margin: 1.5cm; }
             body { background: #fff !important; }
@@ -221,6 +238,15 @@
             </div>
         </header>
 
+        <section id="builds-bar" class="hidden max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 no-print" aria-label="Montagens">
+            <div class="bg-f91-card rounded-2xl border border-gray-100 shadow-sm p-2 flex items-center gap-2">
+                <span class="hidden md:flex items-center gap-1.5 pl-3 pr-1 text-[11px] font-bold uppercase tracking-wider text-f91-muted flex-shrink-0"><i class="ph-bold ph-stack"></i> Montagens</span>
+                <div id="builds-tabs" role="tablist" aria-label="Minhas montagens" class="flex-1 min-w-0 flex items-center gap-1 overflow-x-auto py-0.5"></div>
+                <button type="button" id="build-new-button" title="Criar uma nova montagem" class="flex-shrink-0 px-3 py-2 bg-f91-navy hover:bg-f91-navyLight text-white text-xs font-semibold rounded-xl transition-colors flex items-center gap-1.5 whitespace-nowrap"><i class="ph-bold ph-plus"></i> <span class="hidden sm:inline">Nova montagem</span></button>
+                <button type="button" id="builds-overview-button" title="Visão geral de todas as montagens" class="flex-shrink-0 p-2 bg-gray-100 hover:bg-gray-200 text-f91-text rounded-xl transition-colors"><i class="ph ph-squares-four text-lg"></i></button>
+            </div>
+        </section>
+
         <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full grid grid-cols-1 xl:grid-cols-12 gap-8 no-print">
 
             <div class="xl:col-span-4 space-y-6">
@@ -230,6 +256,7 @@
                         <h2 class="text-lg font-semibold text-f91-text flex items-center gap-2">
                             <i class="ph-fill ph-chart-pie-slice text-f91-lime"></i> Resumo Financeiro
                         </h2>
+                        <span id="summary-build-label" class="hidden max-w-[45%] truncate text-[11px] font-semibold px-2 py-1 rounded-full bg-gray-100 text-f91-text"></span>
                     </div>
 
                     <div class="flex items-center justify-between mb-5">
@@ -239,7 +266,7 @@
 
                     <div class="space-y-4">
                         <div>
-                            <p class="text-sm text-f91-muted font-medium mb-1">Custo total do setup</p>
+                            <p class="text-sm text-f91-muted font-medium mb-1" id="summary-total-label">Custo total do setup</p>
                             <h3 class="text-3xl font-bold text-f91-text" id="display-total-cost">R$ 0,00</h3>
                         </div>
 
@@ -278,6 +305,7 @@
                         </div>
 
                         <p class="text-xs text-f91-muted leading-relaxed min-h-[16px]" id="summary-note"></p>
+                        <div id="summary-overall" class="hidden text-xs leading-relaxed bg-gray-50 rounded-xl px-3 py-2.5 text-f91-muted"></div>
                     </div>
                 </div>
 
@@ -288,6 +316,7 @@
                         </h2>
                     </div>
 
+                    <p id="wallet-caption" class="hidden text-[11px] text-f91-muted -mt-2 mb-3">Uma só carteira para todas as montagens.</p>
                     <p class="text-sm text-f91-muted font-medium mb-1">Saldo disponível</p>
                     <h3 class="text-3xl font-bold text-green-600" id="display-wallet-balance">R$ 0,00</h3>
                     <p class="text-xs text-f91-muted mt-1 min-h-[16px]" id="wallet-balance-hint"></p>
@@ -327,6 +356,7 @@
                         <h2 class="text-lg font-semibold text-f91-text flex items-center gap-2">
                             <i class="ph-fill ph-target text-f91-lime"></i> Planejamento
                         </h2>
+                        <span id="planning-build-label" class="hidden max-w-[45%] truncate text-[11px] font-semibold px-2 py-1 rounded-full bg-gray-100 text-f91-text"></span>
                     </div>
 
                     <form id="planning-form" class="space-y-4" onsubmit="return false;">
@@ -414,11 +444,18 @@
             <div class="xl:col-span-8 bg-f91-card rounded-2xl shadow-sm border border-gray-100 flex flex-col h-[calc(100vh-8rem)] xl:h-auto">
 
                 <div class="p-6 border-b border-gray-100 bg-white dark:bg-f91-card rounded-t-2xl z-10">
-                    <div class="flex items-center justify-between mb-4">
-                        <h2 class="text-lg font-semibold text-f91-text flex items-center gap-2">
-                            <i class="ph-fill ph-list-plus text-f91-lime"></i> Adicionar à Lista
-                        </h2>
-                        <span class="bg-f91-navy text-white text-xs font-bold px-2 py-1 rounded-lg" id="item-count">0 itens</span>
+                    <div class="flex items-start justify-between gap-3 mb-4">
+                        <div class="min-w-0">
+                            <h2 class="text-lg font-semibold text-f91-text flex items-center gap-2 min-w-0">
+                                <i class="ph-fill ph-list-plus text-f91-lime flex-shrink-0" id="current-build-icon"></i>
+                                <span id="current-build-title" class="truncate">Adicionar à Lista</span>
+                            </h2>
+                            <p id="current-build-desc" class="hidden text-xs text-f91-muted mt-0.5 truncate"></p>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0">
+                            <button type="button" id="build-edit-button" title="Editar esta montagem" class="hidden p-1.5 text-f91-muted hover:text-f91-text hover:bg-gray-100 rounded-lg transition-colors"><i class="ph ph-pencil-simple text-lg"></i></button>
+                            <span class="bg-f91-navy text-white text-xs font-bold px-2 py-1 rounded-lg" id="item-count">0 itens</span>
+                        </div>
                     </div>
 
                     <form id="add-item-form" class="space-y-3" autocomplete="off">
@@ -476,7 +513,7 @@
                         <div class="w-20 h-20 bg-white dark:bg-f91-card shadow-sm border border-gray-100 rounded-full flex items-center justify-center mb-4 text-f91-muted">
                             <i class="ph ph-drone text-4xl"></i>
                         </div>
-                        <h3 class="text-lg font-medium text-f91-text mb-1">Nenhum equipamento adicionado</h3>
+                        <h3 class="text-lg font-medium text-f91-text mb-1" id="empty-state-title">Nenhum equipamento adicionado</h3>
                         <p class="text-sm text-f91-muted max-w-sm">Comece a listar seu setup dos sonhos. Não esqueça de adicionar a foto e o link da loja!</p>
                     </div>
                 </div>
@@ -545,6 +582,7 @@
                     </div>
                     <span class="text-xs font-semibold text-slate-400" id="export-item-count"></span>
                 </div>
+                <p class="text-sm font-semibold text-slate-700 hidden" id="export-build-name"></p>
                 <p class="text-xs text-slate-400 mb-5" id="export-date"></p>
 
                 <div id="export-table-body" class="divide-y divide-slate-100"></div>
@@ -591,6 +629,17 @@
                 <div>
                     <label class="block text-sm font-medium text-f91-text mb-1">Categoria</label>
                     <select id="edit-item-category" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 cursor-pointer"></select>
+                </div>
+                <div id="edit-build-row" class="hidden grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-sm font-medium text-f91-text mb-1" for="edit-item-build">Montagem</label>
+                        <select id="edit-item-build" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 cursor-pointer text-sm"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-f91-text mb-1" for="edit-item-copy-to">Copiar para</label>
+                        <select id="edit-item-copy-to" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 cursor-pointer text-sm"></select>
+                    </div>
+                    <p class="col-span-2 text-[11px] text-f91-muted -mt-1.5">Para <strong>mover</strong>, troque a montagem e salve. <strong>Copiar</strong> cria uma cópia na outra montagem (sem marcar como comprado).</p>
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-f91-text mb-1">Link da loja</label>
@@ -693,11 +742,81 @@
         </div>
     </div>
 
+    <div id="build-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
+        <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer" onclick="closeModal('build-modal')"></div>
+        <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-md relative z-10 modal-scale-enter overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-semibold text-f91-text flex items-center gap-2"><i class="ph-fill ph-stack text-f91-lime"></i> <span id="build-modal-title">Nova montagem</span></h3>
+                <button onclick="closeModal('build-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
+            </div>
+            <form id="build-form" class="p-6 space-y-4 overflow-y-auto" autocomplete="off">
+                <input type="hidden" id="build-uuid">
+                <div>
+                    <label class="block text-sm font-medium text-f91-text mb-1" for="build-name">Nome da montagem</label>
+                    <input type="text" id="build-name" required maxlength="80" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="Ex: Mark5 Phisital 5&quot;">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-f91-text mb-1" for="build-description">Descrição <span class="text-f91-muted font-normal">(opcional)</span></label>
+                    <input type="text" id="build-description" maxlength="240" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 transition-all" placeholder="Ex: Freestyle 6S · frame Mark5 · analógico">
+                </div>
+                <div>
+                    <span class="block text-sm font-medium text-f91-text mb-2">Cor</span>
+                    <div id="build-colors" class="flex flex-wrap gap-2.5" role="radiogroup" aria-label="Cor da montagem"></div>
+                </div>
+                <div id="build-source-wrap">
+                    <label class="block text-sm font-medium text-f91-text mb-1" for="build-source">Começar com</label>
+                    <select id="build-source" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 cursor-pointer text-sm"></select>
+                    <p class="text-[11px] text-f91-muted mt-1.5">Copiar itens traz nome, foto, preço e link (tudo como “pendente”). Você ajusta o que for diferente.</p>
+                </div>
+
+                <div id="build-delete-panel" class="hidden border border-red-200 bg-red-50/60 dark:bg-transparent rounded-xl p-4 space-y-3">
+                    <p class="text-sm font-semibold text-red-600 flex items-center gap-1.5"><i class="ph-fill ph-warning"></i> Excluir esta montagem</p>
+                    <p class="text-xs text-f91-text" id="build-delete-summary"></p>
+                    <div id="build-delete-choices" class="space-y-2 text-sm text-f91-text">
+                        <label class="flex items-start gap-2 cursor-pointer"><input type="radio" name="build-delete-mode" value="move" checked class="mt-1"> <span>Mover os itens para: <select id="build-move-to" class="ml-1 px-2 py-1 border border-gray-200 rounded-lg bg-white dark:bg-f91-card text-sm"></select></span></label>
+                        <label class="flex items-start gap-2 cursor-pointer"><input type="radio" name="build-delete-mode" value="delete" class="mt-1"> <span>Apagar também os itens, fotos e opiniões</span></label>
+                    </div>
+                    <p class="text-[11px] text-f91-muted">As compras já feitas continuam contando na carteira, se os itens forem movidos. Apagar não dá para desfazer.</p>
+                    <div class="flex justify-end gap-2">
+                        <button type="button" id="build-delete-cancel" class="px-3 py-1.5 text-xs text-f91-text hover:bg-gray-100 rounded-lg">Cancelar</button>
+                        <button type="button" id="build-delete-confirm" class="px-3 py-1.5 text-xs font-semibold bg-red-500 hover:bg-red-600 text-white rounded-lg">Excluir montagem</button>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center justify-between gap-2 pt-2">
+                    <div class="flex items-center gap-1" id="build-edit-actions">
+                        <button type="button" id="build-duplicate-button" class="px-3 py-2 text-xs font-semibold text-f91-text hover:bg-gray-100 rounded-lg transition-colors flex items-center gap-1.5"><i class="ph ph-copy"></i> Duplicar</button>
+                        <button type="button" id="build-delete-button" class="px-3 py-2 text-xs font-semibold text-red-500 hover:bg-red-50 rounded-lg transition-colors flex items-center gap-1.5"><i class="ph ph-trash"></i> Excluir</button>
+                    </div>
+                    <div class="flex gap-2 ml-auto">
+                        <button type="button" onclick="closeModal('build-modal')" class="px-4 py-2 text-sm text-f91-text hover:bg-gray-100 rounded-lg transition-colors">Cancelar</button>
+                        <button type="submit" id="build-submit" class="px-4 py-2 text-sm bg-f91-navy hover:bg-f91-navyLight text-white rounded-lg transition-colors font-medium">Criar</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="builds-overview-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
+        <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer" onclick="closeModal('builds-overview-modal')"></div>
+        <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-4xl relative z-10 modal-scale-enter overflow-hidden max-h-[90vh] flex flex-col">
+            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+                <h3 class="text-lg font-semibold text-f91-text flex items-center gap-2"><i class="ph-fill ph-squares-four text-f91-lime"></i> Minhas montagens</h3>
+                <button onclick="closeModal('builds-overview-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
+            </div>
+            <div class="overflow-y-auto p-6 space-y-5">
+                <div id="overview-totals" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+                <p id="overview-note" class="text-xs text-f91-muted leading-relaxed"></p>
+                <div id="overview-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+    </div>
+
     <div id="share-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-enter p-4 no-print">
         <div class="absolute inset-0 bg-f91-navy/40 backdrop-blur-sm cursor-pointer" onclick="closeModal('share-modal')"></div>
         <div class="bg-white dark:bg-f91-card rounded-2xl shadow-xl w-full max-w-2xl relative z-10 modal-scale-enter overflow-hidden max-h-[90vh] flex flex-col">
             <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h3 class="text-lg font-semibold text-f91-text flex items-center gap-2"><i class="ph-fill ph-share-network text-f91-lime"></i> Compartilhar minha lista</h3>
+                <h3 class="text-lg font-semibold text-f91-text flex items-center gap-2 min-w-0"><i class="ph-fill ph-share-network text-f91-lime flex-shrink-0"></i> <span class="truncate" id="share-modal-title">Compartilhar minha lista</span></h3>
                 <button onclick="closeModal('share-modal')" class="text-gray-400 hover:text-gray-600"><i class="ph ph-x text-xl"></i></button>
             </div>
             <div class="overflow-y-auto flex-1 min-h-0" id="share-modal-body">

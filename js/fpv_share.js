@@ -23,6 +23,10 @@
     const body = () => document.getElementById("share-modal-body");
     const api = () => window.FpvPlanner.apiRequest;
 
+    // Cada montagem tem o seu proprio link: todas as chamadas levam a montagem aberta no planner.
+    const currentBuild = () => (window.FpvPlanner.currentBuild && window.FpvPlanner.currentBuild()) || null;
+    const buildParams = () => (currentBuild() ? { build_uuid: currentBuild().build_uuid } : {});
+
     function escapeHtml(value) {
         return String(value ?? "")
             .replace(/&/g, "&amp;")
@@ -88,7 +92,7 @@
     async function load() {
         state.loading = true;
         try {
-            applyPayload(await api()("getFpvShare"));
+            applyPayload(await api()("getFpvShare", { params: buildParams() }));
         } finally {
             state.loading = false;
         }
@@ -131,7 +135,8 @@
             `;
         }
 
-        const shareText = `Olha a minha lista de compras FPV e me diz o que acha 🚁 ${share.url}`;
+        const buildName = currentBuild() ? currentBuild().name : "";
+        const shareText = `Olha a minha lista de compras FPV${buildName ? ` (${buildName})` : ""} e me diz o que acha 🚁 ${share.url}`;
         const whatsapp = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
         const canNativeShare = typeof navigator.share === "function";
         const views = share.view_count || 0;
@@ -157,8 +162,8 @@
                     ${switchRow("share-opt-feedback", "Permitir reações e comentários", "Visitantes podem curtir, tirar dúvidas ou sugerir trocas.", share.allow_feedback)}
 
                     <div class="pt-3">
-                        <label class="block text-sm font-medium text-f91-text mb-1">Título da página <span class="text-f91-muted font-normal">(opcional)</span></label>
-                        <input type="text" id="share-opt-title" maxlength="120" value="${escapeHtml(share.title)}" placeholder="Ex: Meu primeiro 5 polegadas" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 text-sm">
+                        <label class="block text-sm font-medium text-f91-text mb-1">Título da página <span class="text-f91-muted font-normal">(opcional — se vazio, usa o nome da montagem)</span></label>
+                        <input type="text" id="share-opt-title" maxlength="120" value="${escapeHtml(share.title)}" placeholder="${escapeHtml(currentBuild() ? currentBuild().name : "Ex: Meu primeiro 5 polegadas")}" class="block w-full px-3 py-2 border border-gray-200 rounded-xl focus:ring-f91-lime outline-none bg-gray-50 focus:bg-white dark:focus:bg-f91-gray-200 text-sm">
                     </div>
                     <div class="pt-2">
                         <label class="block text-sm font-medium text-f91-text mb-1">Mensagem para quem abrir o link <span class="text-f91-muted font-normal">(opcional)</span></label>
@@ -271,6 +276,7 @@
     async function save(overrides) {
         const share = state.share || {};
         const params = {
+            ...buildParams(),
             enabled: "enabled" in overrides ? (overrides.enabled ? "1" : "0") : (share.is_active === false ? "0" : "1"),
             show_prices: "show_prices" in overrides ? (overrides.show_prices ? "1" : "0") : (share.show_prices === false ? "0" : "1"),
             allow_feedback: "allow_feedback" in overrides ? (overrides.allow_feedback ? "1" : "0") : (share.allow_feedback === false ? "0" : "1"),
@@ -286,7 +292,7 @@
         if (!state.feedback.some((f) => !f.is_read)) return;
         state.newIds = new Set(state.feedback.filter((f) => !f.is_read).map((f) => f.id));
         try {
-            applyPayload(await api()("markFpvFeedbackRead", { method: "POST", params: { all: "1" } }));
+            applyPayload(await api()("markFpvFeedbackRead", { method: "POST", params: { all: "1", ...buildParams() } }));
         } catch (error) {
             // segue: o aviso apenas continua aparecendo
         }
@@ -331,13 +337,13 @@
                 }
                 toast("Link copiado!");
             } else if (type === "native") {
-                await navigator.share({ title: "Minha lista de compras FPV", text: "Olha a minha lista e me diz o que acha 🚁", url: state.share.url }).catch(() => {});
+                await navigator.share({ title: currentBuild() ? `Lista FPV: ${currentBuild().name}` : "Minha lista de compras FPV", text: "Olha a minha lista e me diz o que acha 🚁", url: state.share.url }).catch(() => {});
             } else if (type === "clear-filter") {
                 state.filterItemUuid = null;
                 render();
             } else if (type === "delete-feedback") {
                 if (!confirm("Apagar esta opinião?")) return;
-                applyPayload(await api()("deleteFpvFeedback", { method: "POST", params: { feedback_id: action.dataset.id } }));
+                applyPayload(await api()("deleteFpvFeedback", { method: "POST", params: { feedback_id: action.dataset.id, ...buildParams() } }));
                 render();
             }
         } catch (error) {
@@ -376,6 +382,8 @@
 
         const container = body();
         if (container) container.innerHTML = `<p class="p-10 text-center text-sm text-f91-muted">Carregando…</p>`;
+        const title = document.getElementById("share-modal-title");
+        if (title) title.textContent = currentBuild() ? `Compartilhar: ${currentBuild().name}` : "Compartilhar minha lista";
         window.openModal("share-modal");
 
         try {

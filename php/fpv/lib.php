@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/wallet.php';
 require_once __DIR__ . '/product_import.php';
+require_once __DIR__ . '/builds.php';
 require_once __DIR__ . '/share.php';
 
 const FPV_DEFAULT_CATEGORIES = [
@@ -227,6 +228,9 @@ function register_fpv_user(array $input, ?array $avatarFile): array
         $userId = (int) $pdo->lastInsertId();
 
         fpv_seed_default_categories($pdo, $userId);
+        if (fpv_schema_ready()) {
+            fpv_ensure_default_build($pdo, $userId);
+        }
 
         $code = str_pad((string) random_int(0, 9999), 4, '0', STR_PAD_LEFT);
         $verify = $pdo->prepare(
@@ -498,20 +502,26 @@ function get_fpv_board(array $params): array
 {
     $pdo = fpv_pdo();
     $userId = require_fpv_session($pdo);
+    $ready = fpv_schema_ready();
+
+    // Montagem atual: a pedida (?build=<uuid>) ou a primeira. Sem a migracao v5, cai no modo legado (lista unica).
+    $build = $ready ? fpv_resolve_build($pdo, $userId, (string) ($params['build'] ?? '')) : null;
 
     $categories = $pdo->prepare('SELECT id, name, color_class, sort_order FROM fpv_categories WHERE user_id = :user_id ORDER BY sort_order, id');
     $categories->execute(['user_id' => $userId]);
 
-    $purchasedAtColumn = fpv_schema_ready() ? 'purchased_at' : 'NULL AS purchased_at';
-    $items = $pdo->prepare(
-        "SELECT id, item_uuid, name, category_id, price, store_url, image_path, is_purchased, $purchasedAtColumn, sort_order, created_at
-         FROM fpv_items WHERE user_id = :user_id ORDER BY sort_order, id"
-    );
-    $items->execute(['user_id' => $userId]);
+    $purchasedAtColumn = $ready ? 'purchased_at' : 'NULL AS purchased_at';
+    $itemsSql = "SELECT id, item_uuid, name, category_id, price, store_url, image_path, is_purchased, $purchasedAtColumn, sort_order, created_at
+                 FROM fpv_items WHERE user_id = :user_id" . ($build ? ' AND build_id = :build_id' : '') . ' ORDER BY sort_order, id';
+    $items = $pdo->prepare($itemsSql);
+    $items->execute($build ? ['user_id' => $userId, 'build_id' => $build['id']] : ['user_id' => $userId]);
 
     $planningStmt = $pdo->prepare('SELECT saved_amount, target_date FROM fpv_planning WHERE user_id = :user_id');
     $planningStmt->execute(['user_id' => $userId]);
     $planning = $planningStmt->fetch() ?: ['saved_amount' => '0.00', 'target_date' => null];
+    if ($build) {
+        $planning = ['saved_amount' => '0.00', 'target_date' => $build['target_date']];
+    }
 
     $videos = $pdo->prepare('SELECT id, url, title, video_id FROM fpv_videos WHERE user_id = :user_id ORDER BY sort_order, id DESC');
     $videos->execute(['user_id' => $userId]);
@@ -519,6 +529,8 @@ function get_fpv_board(array $params): array
     return [
         'success' => true,
         'user' => get_fpv_current_user($pdo, $userId),
+        'builds' => $build ? fpv_builds_summary($pdo, $userId) : [],
+        'current_build' => $build ? fpv_build_public($build) : null,
         'categories' => array_map(static fn($row) => [
             'id' => (int) $row['id'],
             'name' => $row['name'],
@@ -543,7 +555,7 @@ function get_fpv_board(array $params): array
             'target_date' => $planning['target_date'],
         ],
         'wallet' => fpv_wallet_payload($pdo, $userId),
-        'share' => fpv_share_summary($pdo, $userId),
+        'share' => fpv_share_summary($pdo, $userId, $build),
         'videos' => array_map(static fn($row) => [
             'id' => (int) $row['id'],
             'url' => $row['url'],
@@ -720,11 +732,14 @@ function add_fpv_item(array $input, ?array $file): array
     $sortStmt->execute(['user_id' => $userId]);
     $sortOrder = (int) $sortStmt->fetchColumn();
 
+    // Vai para a montagem pedida (build_uuid) ou para a primeira.
+    $build = fpv_schema_ready() ? fpv_resolve_build($pdo, $userId, (string) ($input['build_uuid'] ?? '')) : null;
+
     $stmt = $pdo->prepare(
-        'INSERT INTO fpv_items (user_id, item_uuid, name, category_id, price, store_url, image_path, sort_order)
-         VALUES (:user_id, :item_uuid, :name, :category_id, :price, :store_url, :image_path, :sort_order)'
+        'INSERT INTO fpv_items (user_id, ' . ($build ? 'build_id, ' : '') . 'item_uuid, name, category_id, price, store_url, image_path, sort_order)
+         VALUES (:user_id, ' . ($build ? ':build_id, ' : '') . ':item_uuid, :name, :category_id, :price, :store_url, :image_path, :sort_order)'
     );
-    $stmt->execute([
+    $stmt->execute(($build ? ['build_id' => $build['id']] : []) + [
         'user_id' => $userId,
         'item_uuid' => $itemUuid,
         'name' => $name,
@@ -787,6 +802,18 @@ function update_fpv_item(array $input, ?array $file): array
     }
     $isPurchased = isset($input['is_purchased']) ? (int) filter_var($input['is_purchased'], FILTER_VALIDATE_BOOLEAN) : (int) $existing['is_purchased'];
 
+    // Mover para outra montagem (build_uuid): o item leva junto foto, preco, status de compra e opinioes.
+    $moveBuildId = null;
+    if (fpv_schema_ready() && !empty($input['build_uuid'])) {
+        $targetBuild = fpv_build_row_by_uuid($pdo, $userId, fpv_sanitize_string($input['build_uuid'], 36));
+        if (!$targetBuild) {
+            return ['success' => false, 'message' => 'Montagem de destino nao encontrada.', '_code' => 404];
+        }
+        if ((int) $targetBuild['id'] !== (int) ($existing['build_id'] ?? 0)) {
+            $moveBuildId = (int) $targetBuild['id'];
+        }
+    }
+
     $imagePath = $existing['image_path'];
     try {
         $newImage = fpv_handle_image_upload($file, 'items');
@@ -812,12 +839,13 @@ function update_fpv_item(array $input, ?array $file): array
         }
     }
     $purchasedAtAssignment = fpv_schema_ready() ? ", purchased_at = $purchasedAtSql" : '';
+    $buildAssignment = $moveBuildId !== null ? ', build_id = :move_build_id' : '';
 
     $update = $pdo->prepare(
         "UPDATE fpv_items SET name = :name, category_id = :category_id, price = :price, store_url = :store_url,
-         image_path = :image_path, is_purchased = :is_purchased{$purchasedAtAssignment} WHERE item_uuid = :item_uuid AND user_id = :user_id"
+         image_path = :image_path, is_purchased = :is_purchased{$purchasedAtAssignment}{$buildAssignment} WHERE item_uuid = :item_uuid AND user_id = :user_id"
     );
-    $update->execute([
+    $update->execute(($moveBuildId !== null ? ['move_build_id' => $moveBuildId] : []) + [
         'name' => $name,
         'category_id' => $categoryId,
         'price' => $price,
@@ -853,18 +881,22 @@ function delete_fpv_item(array $input): array
         return ['success' => false, 'message' => 'item_uuid obrigatorio.', '_code' => 400];
     }
 
-    $stmt = $pdo->prepare('SELECT image_path FROM fpv_items WHERE item_uuid = :item_uuid AND user_id = :user_id');
+    $stmt = $pdo->prepare('SELECT item_uuid, image_path FROM fpv_items WHERE item_uuid = :item_uuid AND user_id = :user_id');
     $stmt->execute(['item_uuid' => $itemUuid, 'user_id' => $userId]);
     $row = $stmt->fetch();
 
-    $delete = $pdo->prepare('DELETE FROM fpv_items WHERE item_uuid = :item_uuid AND user_id = :user_id');
-    $delete->execute(['item_uuid' => $itemUuid, 'user_id' => $userId]);
-
-    if ($row && $row['image_path']) {
-        fpv_delete_image_file($row['image_path']);
+    if ($row && fpv_schema_ready()) {
+        // Opinioes e reacoes seguem o item: sem ele elas nao pertenceriam a nenhuma montagem.
+        fpv_delete_items_cascade($pdo, $userId, [$row]);
+    } else {
+        $delete = $pdo->prepare('DELETE FROM fpv_items WHERE item_uuid = :item_uuid AND user_id = :user_id');
+        $delete->execute(['item_uuid' => $itemUuid, 'user_id' => $userId]);
+        if ($row && $row['image_path']) {
+            fpv_delete_image_file($row['image_path']);
+        }
     }
 
-    return ['success' => true];
+    return ['success' => true, 'builds' => fpv_schema_ready() ? fpv_builds_summary($pdo, $userId) : []];
 }
 
 function reorder_fpv_items(array $input): array
@@ -906,15 +938,22 @@ function save_fpv_planning(array $input): array
     $pdo = fpv_pdo();
     $userId = require_fpv_session($pdo);
 
-    // Desde a v3 o dinheiro disponivel vive na carteira (fpv_wallet_entries); aqui so resta a data meta.
+    // Desde a v3 o dinheiro disponivel vive na carteira (fpv_wallet_entries); aqui so resta a data meta,
+    // que desde a v5 e de cada montagem.
     $targetDate = fpv_sanitize_string($input['target_date'] ?? '', 10);
     $targetDate = preg_match('/^\d{4}-\d{2}-\d{2}$/', $targetDate) ? $targetDate : null;
 
-    $stmt = $pdo->prepare(
-        'INSERT INTO fpv_planning (user_id, saved_amount, target_date) VALUES (:user_id, 0, :target_date)
-         ON DUPLICATE KEY UPDATE target_date = VALUES(target_date)'
-    );
-    $stmt->execute(['user_id' => $userId, 'target_date' => $targetDate]);
+    if (fpv_schema_ready()) {
+        $build = fpv_resolve_build($pdo, $userId, (string) ($input['build_uuid'] ?? ''));
+        $pdo->prepare('UPDATE fpv_builds SET target_date = :target_date WHERE id = :id')
+            ->execute(['target_date' => $targetDate, 'id' => $build['id']]);
+    } else {
+        $stmt = $pdo->prepare(
+            'INSERT INTO fpv_planning (user_id, saved_amount, target_date) VALUES (:user_id, 0, :target_date)
+             ON DUPLICATE KEY UPDATE target_date = VALUES(target_date)'
+        );
+        $stmt->execute(['user_id' => $userId, 'target_date' => $targetDate]);
+    }
 
     return ['success' => true, 'planning' => ['saved_amount' => 0.0, 'target_date' => $targetDate]];
 }
@@ -993,6 +1032,9 @@ function reset_fpv_data(array $input): array
         $pdo->prepare('DELETE FROM fpv_wallet_entries WHERE user_id = :user_id')->execute(['user_id' => $userId]);
         $pdo->prepare('DELETE FROM fpv_share_feedback WHERE user_id = :user_id')->execute(['user_id' => $userId]);
         $pdo->prepare('DELETE FROM fpv_share_reactions WHERE user_id = :user_id')->execute(['user_id' => $userId]);
+        // Apaga as montagens (e os links publicos, em cascata) e recomeca com uma vazia.
+        $pdo->prepare('DELETE FROM fpv_builds WHERE user_id = :user_id')->execute(['user_id' => $userId]);
+        fpv_ensure_default_build($pdo, $userId);
     }
 
     foreach ($rows as $row) {

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 /**
  * Lista publica compartilhavel + feedback de visitantes.
+ * Desde a v5 cada MONTAGEM (build) tem o seu proprio link (fpv_build_shares); itens, opinioes e reacoes
+ * pertencem a montagem do item. Opiniao geral ("sobre o setup todo") guarda o build_id dela.
  *
  * Privacidade: o token (128 bits aleatorios) e a unica "chave" da URL. A pagina publica nunca expoe a
  * carteira/saldo/meta do dono — so os itens (nome, foto, categoria, link da loja, status) e, se o dono
@@ -82,21 +84,28 @@ function fpv_visitor_key(bool $issue = false): string
     return hash('sha256', 'visitor|' . $id . '|' . fpv_config()['ip_hash_pepper']);
 }
 
-function fpv_share_row(PDO $pdo, int $userId): ?array
+function fpv_share_row(PDO $pdo, int $buildId): ?array
 {
-    $stmt = $pdo->prepare('SELECT * FROM fpv_shares WHERE user_id = :user_id');
-    $stmt->execute(['user_id' => $userId]);
+    $stmt = $pdo->prepare('SELECT * FROM fpv_build_shares WHERE build_id = :build_id');
+    $stmt->execute(['build_id' => $buildId]);
     return $stmt->fetch() ?: null;
 }
 
+/** Montagem alvo de uma acao do dono: build_uuid do pedido (validado) ou a primeira. */
+function fpv_share_build(PDO $pdo, int $userId, array $input): array
+{
+    return fpv_resolve_build($pdo, $userId, (string) ($input['build_uuid'] ?? ''));
+}
+
 /** Reacoes de uma batida por item: item_uuid => ['like' => n, 'dislike' => n] (tabela fpv_share_reactions). */
-function fpv_share_reaction_counts(PDO $pdo, int $userId): array
+function fpv_share_reaction_counts(PDO $pdo, int $userId, ?int $buildId = null): array
 {
     $stmt = $pdo->prepare(
-        "SELECT item_uuid, SUM(reaction = 'like') AS likes, SUM(reaction = 'dislike') AS dislikes
-         FROM fpv_share_reactions WHERE user_id = :user_id GROUP BY item_uuid"
+        "SELECT r.item_uuid, SUM(r.reaction = 'like') AS likes, SUM(r.reaction = 'dislike') AS dislikes
+         FROM fpv_share_reactions r" . ($buildId !== null ? ' JOIN fpv_items i ON i.item_uuid = r.item_uuid AND i.build_id = :build_id' : '') . "
+         WHERE r.user_id = :user_id GROUP BY r.item_uuid"
     );
-    $stmt->execute(['user_id' => $userId]);
+    $stmt->execute(['user_id' => $userId] + ($buildId !== null ? ['build_id' => $buildId] : []));
     $map = [];
     foreach ($stmt->fetchAll() as $row) {
         $map[$row['item_uuid']] = ['like' => (int) $row['likes'], 'dislike' => (int) $row['dislikes']];
@@ -104,15 +113,29 @@ function fpv_share_reaction_counts(PDO $pdo, int $userId): array
     return $map;
 }
 
-function fpv_share_feedback_counts(PDO $pdo, int $userId): array
+/**
+ * Trecho SQL que limita opinioes (alias f, itens em i) a uma montagem: a opiniao de item segue o item;
+ * a geral (sem item) guarda o build_id. Parametros nomeados distintos (prepares nativos nao reusam nomes).
+ */
+function fpv_feedback_build_filter(?int $buildId): array
 {
+    if ($buildId === null) {
+        return ['', []];
+    }
+    return [' AND (i.build_id = :fb1 OR (f.item_uuid IS NULL AND f.build_id = :fb2))', ['fb1' => $buildId, 'fb2' => $buildId]];
+}
+
+function fpv_share_feedback_counts(PDO $pdo, int $userId, ?int $buildId = null): array
+{
+    [$filterSql, $filterParams] = fpv_feedback_build_filter($buildId);
     $stmt = $pdo->prepare(
-        "SELECT item_uuid, COUNT(*) AS total,
-                SUM(reaction = 'like') AS likes, SUM(reaction = 'doubt') AS doubts, SUM(reaction = 'dislike') AS dislikes,
-                SUM(message <> '') AS comments, SUM(is_read = 0) AS unread
-         FROM fpv_share_feedback WHERE user_id = :user_id GROUP BY item_uuid"
+        "SELECT f.item_uuid, COUNT(*) AS total,
+                SUM(f.reaction = 'like') AS likes, SUM(f.reaction = 'doubt') AS doubts, SUM(f.reaction = 'dislike') AS dislikes,
+                SUM(f.message <> '') AS comments, SUM(f.is_read = 0) AS unread
+         FROM fpv_share_feedback f LEFT JOIN fpv_items i ON i.item_uuid = f.item_uuid
+         WHERE f.user_id = :user_id{$filterSql} GROUP BY f.item_uuid"
     );
-    $stmt->execute(['user_id' => $userId]);
+    $stmt->execute(['user_id' => $userId] + $filterParams);
 
     $byItem = [];
     $general = ['total' => 0, 'unread' => 0];
@@ -133,7 +156,7 @@ function fpv_share_feedback_counts(PDO $pdo, int $userId): array
     }
 
     // Soma as reacoes de uma batida (nao geram "nao lido": o dono ve so o placar).
-    foreach (fpv_share_reaction_counts($pdo, $userId) as $uuid => $r) {
+    foreach (fpv_share_reaction_counts($pdo, $userId, $buildId) as $uuid => $r) {
         $entry = $byItem[$uuid] ?? ['total' => 0, 'like' => 0, 'doubt' => 0, 'dislike' => 0, 'comments' => 0, 'unread' => 0];
         $entry['like'] += $r['like'];
         $entry['dislike'] += $r['dislike'];
@@ -149,14 +172,15 @@ function fpv_share_feedback_counts(PDO $pdo, int $userId): array
 }
 
 /** Resumo leve para o board: badge do header + contadores por item. */
-function fpv_share_summary(PDO $pdo, int $userId): ?array
+function fpv_share_summary(PDO $pdo, int $userId, ?array $build): ?array
 {
-    if (!fpv_schema_ready()) {
+    if (!fpv_schema_ready() || !$build) {
         return null;
     }
-    $row = fpv_share_row($pdo, $userId);
-    $counts = fpv_share_feedback_counts($pdo, $userId);
+    $row = fpv_share_row($pdo, (int) $build['id']);
+    $counts = fpv_share_feedback_counts($pdo, $userId, (int) $build['id']);
     return [
+        'build_uuid' => $build['build_uuid'],
         'is_active' => $row ? (bool) $row['is_active'] : false,
         'has_share' => $row !== null,
         'unread' => $counts['unread'],
@@ -164,9 +188,10 @@ function fpv_share_summary(PDO $pdo, int $userId): ?array
     ];
 }
 
-function fpv_share_owner_payload(PDO $pdo, int $userId): array
+function fpv_share_owner_payload(PDO $pdo, int $userId, array $build): array
 {
-    $row = fpv_share_row($pdo, $userId);
+    $buildId = (int) $build['id'];
+    $row = fpv_share_row($pdo, $buildId);
     $share = null;
     if ($row) {
         $share = [
@@ -182,11 +207,13 @@ function fpv_share_owner_payload(PDO $pdo, int $userId): array
         ];
     }
 
+    [$filterSql, $filterParams] = fpv_feedback_build_filter($buildId);
     $stmt = $pdo->prepare(
-        'SELECT id, item_uuid, item_name, author_name, reaction, message, is_read, created_at
-         FROM fpv_share_feedback WHERE user_id = :user_id ORDER BY created_at DESC, id DESC LIMIT ' . FPV_SHARE_FEEDBACK_LIST_LIMIT
+        'SELECT f.id, f.item_uuid, f.item_name, f.author_name, f.reaction, f.message, f.is_read, f.created_at
+         FROM fpv_share_feedback f LEFT JOIN fpv_items i ON i.item_uuid = f.item_uuid
+         WHERE f.user_id = :user_id' . $filterSql . ' ORDER BY f.created_at DESC, f.id DESC LIMIT ' . FPV_SHARE_FEEDBACK_LIST_LIMIT
     );
-    $stmt->execute(['user_id' => $userId]);
+    $stmt->execute(['user_id' => $userId] + $filterParams);
     $feedback = array_map(static fn(array $f): array => [
         'id' => (int) $f['id'],
         'item_uuid' => $f['item_uuid'],
@@ -198,13 +225,14 @@ function fpv_share_owner_payload(PDO $pdo, int $userId): array
         'created_at' => fpv_iso_utc($f['created_at']),
     ], $stmt->fetchAll());
 
-    $counts = fpv_share_feedback_counts($pdo, $userId);
+    $counts = fpv_share_feedback_counts($pdo, $userId, $buildId);
 
     return [
         'success' => true,
+        'build' => ['build_uuid' => $build['build_uuid'], 'name' => $build['name']],
         'share' => $share,
         'feedback' => $feedback,
-        'reactions' => (object) fpv_share_reaction_counts($pdo, $userId),
+        'reactions' => (object) fpv_share_reaction_counts($pdo, $userId, $buildId),
         'unread' => $counts['unread'],
     ];
 }
@@ -216,7 +244,7 @@ function get_fpv_share(array $input): array
     if (!fpv_schema_ready()) {
         return fpv_share_unavailable();
     }
-    return fpv_share_owner_payload($pdo, $userId);
+    return fpv_share_owner_payload($pdo, $userId, fpv_share_build($pdo, $userId, $input));
 }
 
 function save_fpv_share(array $input): array
@@ -227,7 +255,8 @@ function save_fpv_share(array $input): array
         return fpv_share_unavailable();
     }
 
-    $row = fpv_share_row($pdo, $userId);
+    $build = fpv_share_build($pdo, $userId, $input);
+    $row = fpv_share_row($pdo, (int) $build['id']);
     $flag = static fn(string $key, bool $default): int => array_key_exists($key, $input)
         ? (int) filter_var($input[$key], FILTER_VALIDATE_BOOLEAN)
         : (int) $default;
@@ -241,11 +270,12 @@ function save_fpv_share(array $input): array
 
     if (!$row) {
         $stmt = $pdo->prepare(
-            'INSERT INTO fpv_shares (user_id, token, is_active, show_prices, allow_feedback, title, message)
-             VALUES (:user_id, :token, :is_active, :show_prices, :allow_feedback, :title, :message)'
+            'INSERT INTO fpv_build_shares (user_id, build_id, token, is_active, show_prices, allow_feedback, title, message)
+             VALUES (:user_id, :build_id, :token, :is_active, :show_prices, :allow_feedback, :title, :message)'
         );
         $stmt->execute([
             'user_id' => $userId,
+            'build_id' => $build['id'],
             'token' => bin2hex(random_bytes(16)),
             'is_active' => $enabled,
             'show_prices' => $showPrices,
@@ -256,8 +286,8 @@ function save_fpv_share(array $input): array
     } else {
         $token = $regenerate ? bin2hex(random_bytes(16)) : $row['token'];
         $stmt = $pdo->prepare(
-            'UPDATE fpv_shares SET token = :token, is_active = :is_active, show_prices = :show_prices,
-             allow_feedback = :allow_feedback, title = :title, message = :message WHERE user_id = :user_id'
+            'UPDATE fpv_build_shares SET token = :token, is_active = :is_active, show_prices = :show_prices,
+             allow_feedback = :allow_feedback, title = :title, message = :message WHERE build_id = :build_id'
         );
         $stmt->execute([
             'token' => $token,
@@ -266,11 +296,11 @@ function save_fpv_share(array $input): array
             'allow_feedback' => $allowFeedback,
             'title' => $title,
             'message' => $message,
-            'user_id' => $userId,
+            'build_id' => $build['id'],
         ]);
     }
 
-    return fpv_share_owner_payload($pdo, $userId);
+    return fpv_share_owner_payload($pdo, $userId, $build);
 }
 
 function mark_fpv_feedback_read(array $input): array
@@ -281,13 +311,19 @@ function mark_fpv_feedback_read(array $input): array
         return fpv_share_unavailable();
     }
 
+    $build = fpv_share_build($pdo, $userId, $input);
     if (!empty($input['all'])) {
-        $pdo->prepare('UPDATE fpv_share_feedback SET is_read = 1 WHERE user_id = :user_id AND is_read = 0')->execute(['user_id' => $userId]);
+        // So as opinioes desta montagem (as das outras continuam "nao lidas").
+        $pdo->prepare(
+            'UPDATE fpv_share_feedback f LEFT JOIN fpv_items i ON i.item_uuid = f.item_uuid
+             SET f.is_read = 1
+             WHERE f.user_id = :user_id AND f.is_read = 0 AND (i.build_id = :fb1 OR (f.item_uuid IS NULL AND f.build_id = :fb2))'
+        )->execute(['user_id' => $userId, 'fb1' => $build['id'], 'fb2' => $build['id']]);
     } elseif (!empty($input['item_uuid'])) {
         $pdo->prepare('UPDATE fpv_share_feedback SET is_read = 1 WHERE user_id = :user_id AND item_uuid = :item_uuid')
             ->execute(['user_id' => $userId, 'item_uuid' => fpv_sanitize_string($input['item_uuid'], 36)]);
     }
-    return fpv_share_owner_payload($pdo, $userId);
+    return fpv_share_owner_payload($pdo, $userId, $build);
 }
 
 function delete_fpv_feedback(array $input): array
@@ -303,7 +339,7 @@ function delete_fpv_feedback(array $input): array
         return ['success' => false, 'message' => 'feedback_id invalido.', '_code' => 400];
     }
     $pdo->prepare('DELETE FROM fpv_share_feedback WHERE id = :id AND user_id = :user_id')->execute(['id' => $id, 'user_id' => $userId]);
-    return fpv_share_owner_payload($pdo, $userId);
+    return fpv_share_owner_payload($pdo, $userId, fpv_share_build($pdo, $userId, $input));
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -337,13 +373,18 @@ function fpv_public_share_load(string $token, ?int $viewerUserId = null): ?array
     }
     $pdo = fpv_pdo();
 
-    $stmt = $pdo->prepare('SELECT * FROM fpv_shares WHERE token = :token AND is_active = 1');
+    $stmt = $pdo->prepare(
+        'SELECT s.*, b.name AS build_name, b.description AS build_description
+         FROM fpv_build_shares s JOIN fpv_builds b ON b.id = s.build_id
+         WHERE s.token = :token AND s.is_active = 1'
+    );
     $stmt->execute(['token' => $token]);
     $share = $stmt->fetch();
     if (!$share) {
         return null;
     }
     $ownerId = (int) $share['user_id'];
+    $buildId = (int) $share['build_id'];
 
     $owner = $pdo->prepare('SELECT name, avatar_path FROM fpv_users WHERE id = :id');
     $owner->execute(['id' => $ownerId]);
@@ -357,15 +398,15 @@ function fpv_public_share_load(string $token, ?int $viewerUserId = null): ?array
 
     $items = $pdo->prepare(
         'SELECT item_uuid, name, category_id, price, store_url, image_path, is_purchased
-         FROM fpv_items WHERE user_id = :user_id ORDER BY sort_order, id'
+         FROM fpv_items WHERE user_id = :user_id AND build_id = :build_id ORDER BY sort_order, id'
     );
-    $items->execute(['user_id' => $ownerId]);
+    $items->execute(['user_id' => $ownerId, 'build_id' => $buildId]);
 
     $showPrices = (bool) $share['show_prices'];
 
     // Placar (curtidas/descurtidas/comentarios) e a reacao do proprio visitante. O cookie do visitante
     // e entregue aqui, na 1a visita, antes de qualquer saida.
-    $counts = fpv_share_feedback_counts($pdo, $ownerId)['by_item'];
+    $counts = fpv_share_feedback_counts($pdo, $ownerId, $buildId)['by_item'];
     $mine = fpv_share_my_reactions($pdo, $ownerId, fpv_visitor_key());
     fpv_visitor_key(true);
 
@@ -394,14 +435,16 @@ function fpv_public_share_load(string $token, ?int $viewerUserId = null): ?array
 
     // Conta a visualizacao (menos a do proprio dono olhando o preview).
     if ($viewerUserId !== $ownerId) {
-        $pdo->prepare('UPDATE fpv_shares SET view_count = view_count + 1, last_viewed_at = NOW() WHERE user_id = :user_id')
-            ->execute(['user_id' => $ownerId]);
+        $pdo->prepare('UPDATE fpv_build_shares SET view_count = view_count + 1, last_viewed_at = NOW() WHERE build_id = :build_id')
+            ->execute(['build_id' => $buildId]);
     }
 
     return [
         'token' => $token,
         'owner_name' => explode(' ', trim((string) $ownerRow['name']))[0],
         'owner_avatar' => $ownerRow['avatar_path'],
+        'build_name' => $share['build_name'],
+        'build_description' => $share['build_description'],
         'title' => $share['title'],
         'message' => $share['message'],
         'show_prices' => $showPrices,
@@ -438,7 +481,7 @@ function add_fpv_feedback(array $input): array
     if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
         return ['success' => false, 'message' => 'Link invalido.', '_code' => 404];
     }
-    $stmt = $pdo->prepare('SELECT user_id, allow_feedback FROM fpv_shares WHERE token = :token AND is_active = 1');
+    $stmt = $pdo->prepare('SELECT user_id, build_id, allow_feedback FROM fpv_build_shares WHERE token = :token AND is_active = 1');
     $stmt->execute(['token' => $token]);
     $share = $stmt->fetch();
     if (!$share) {
@@ -448,6 +491,7 @@ function add_fpv_feedback(array $input): array
         return ['success' => false, 'message' => 'O dono desta lista desativou os comentarios.', '_code' => 403];
     }
     $ownerId = (int) $share['user_id'];
+    $buildId = (int) $share['build_id'];
 
     $author = fpv_share_clean_text((string) ($input['author_name'] ?? ''), 60);
     if ($author === '') {
@@ -466,8 +510,8 @@ function add_fpv_feedback(array $input): array
     $itemName = '';
     $rawUuid = fpv_sanitize_string($input['item_uuid'] ?? '', 36);
     if ($rawUuid !== '') {
-        $itemStmt = $pdo->prepare('SELECT item_uuid, name FROM fpv_items WHERE item_uuid = :uuid AND user_id = :user_id');
-        $itemStmt->execute(['uuid' => $rawUuid, 'user_id' => $ownerId]);
+        $itemStmt = $pdo->prepare('SELECT item_uuid, name FROM fpv_items WHERE item_uuid = :uuid AND user_id = :user_id AND build_id = :build_id');
+        $itemStmt->execute(['uuid' => $rawUuid, 'user_id' => $ownerId, 'build_id' => $buildId]);
         $item = $itemStmt->fetch();
         if (!$item) {
             return ['success' => false, 'message' => 'Item nao encontrado nesta lista.', '_code' => 404];
@@ -502,10 +546,11 @@ function add_fpv_feedback(array $input): array
     }
 
     $insert = $pdo->prepare(
-        'INSERT INTO fpv_share_feedback (user_id, item_uuid, item_name, author_name, reaction, message, ip_hash)
-         VALUES (:user_id, :item_uuid, :item_name, :author, :reaction, :message, :ip_hash)'
+        'INSERT INTO fpv_share_feedback (user_id, build_id, item_uuid, item_name, author_name, reaction, message, ip_hash)
+         VALUES (:user_id, :build_id, :item_uuid, :item_name, :author, :reaction, :message, :ip_hash)'
     );
     $insert->execute([
+        'build_id' => $buildId,
         'user_id' => $ownerId,
         'item_uuid' => $itemUuid,
         'item_name' => $itemName,
@@ -533,7 +578,7 @@ function toggle_fpv_reaction(array $input): array
     if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
         return ['success' => false, 'message' => 'Link invalido.', '_code' => 404];
     }
-    $stmt = $pdo->prepare('SELECT user_id, allow_feedback FROM fpv_shares WHERE token = :token AND is_active = 1');
+    $stmt = $pdo->prepare('SELECT user_id, build_id, allow_feedback FROM fpv_build_shares WHERE token = :token AND is_active = 1');
     $stmt->execute(['token' => $token]);
     $share = $stmt->fetch();
     if (!$share) {
@@ -543,6 +588,7 @@ function toggle_fpv_reaction(array $input): array
         return ['success' => false, 'message' => 'O dono desta lista desativou as reacoes.', '_code' => 403];
     }
     $ownerId = (int) $share['user_id'];
+    $buildId = (int) $share['build_id'];
 
     $reaction = (string) ($input['reaction'] ?? '');
     if (!in_array($reaction, FPV_TOGGLE_REACTIONS, true)) {
@@ -550,8 +596,8 @@ function toggle_fpv_reaction(array $input): array
     }
 
     $itemUuid = fpv_sanitize_string($input['item_uuid'] ?? '', 36);
-    $itemStmt = $pdo->prepare('SELECT 1 FROM fpv_items WHERE item_uuid = :uuid AND user_id = :user_id');
-    $itemStmt->execute(['uuid' => $itemUuid, 'user_id' => $ownerId]);
+    $itemStmt = $pdo->prepare('SELECT 1 FROM fpv_items WHERE item_uuid = :uuid AND user_id = :user_id AND build_id = :build_id');
+    $itemStmt->execute(['uuid' => $itemUuid, 'user_id' => $ownerId, 'build_id' => $buildId]);
     if ($itemUuid === '' || !$itemStmt->fetchColumn()) {
         return ['success' => false, 'message' => 'Item nao encontrado nesta lista.', '_code' => 404];
     }

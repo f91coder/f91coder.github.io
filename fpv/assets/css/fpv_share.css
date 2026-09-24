@@ -97,6 +97,7 @@ button{ font:inherit; color:inherit; }
 .sh-avatar{ width:52px; height:52px; border-radius:50%; object-fit:cover; flex-shrink:0; background:linear-gradient(135deg,var(--ink),var(--brand)); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:20px; }
 .sh-eyebrow{ margin:0; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--brand); }
 .sh-hero h1{ margin:2px 0 0; font-size:clamp(20px,4.6vw,28px); line-height:1.2; letter-spacing:-.02em; }
+.sh-sub{ margin:4px 0 0; font-size:13.5px; color:var(--muted); }
 .sh-message{ margin:16px 0 0; padding:14px 16px; background:var(--surface-2); border-radius:12px; font-size:14px; color:var(--ink); white-space:pre-line; }
 .sh-stats{ display:flex; flex-wrap:wrap; gap:8px; margin-top:16px; }
 .sh-chip{ display:inline-flex; align-items:center; gap:6px; padding:6px 12px; background:var(--surface-2); border-radius:999px; font-size:12px; font-weight:600; color:var(--muted); }

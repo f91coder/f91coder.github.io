@@ -6,8 +6,17 @@
     const THEME_STORAGE_KEY = "f91_fpv_theme";
     const DISPLAY_CURRENCY_KEY = "f91_fpv_display_currency";
     const INPUT_CURRENCY_KEY = "f91_fpv_input_currency";
+    const BUILD_KEY = "f91_fpv_build";
+    const BUILD_COLORS = {
+        orange: "#ff6829", blue: "#3b82f6", green: "#22c55e", purple: "#a855f7", pink: "#ec4899",
+        teal: "#14b8a6", yellow: "#eab308", red: "#ef4444", slate: "#64748b",
+    };
 
     const state = {
+        builds: [],
+        currentBuild: null,
+        otherPurchased: 0,
+        scrollTabs: false,
         categories: [],
         items: [],
         planning: { saved_amount: 0, target_date: null },
@@ -129,6 +138,49 @@
         currencyRatesList: $("currencyRatesList"),
         currencyUpdatedAt: $("currencyUpdatedAt"),
         refreshRatesButton: $("refreshRatesButton"),
+
+        buildsBar: $("builds-bar"),
+        buildsTabs: $("builds-tabs"),
+        buildNewButton: $("build-new-button"),
+        buildsOverviewButton: $("builds-overview-button"),
+        buildEditButton: $("build-edit-button"),
+        currentBuildTitle: $("current-build-title"),
+        currentBuildDesc: $("current-build-desc"),
+        currentBuildIcon: $("current-build-icon"),
+        emptyStateTitle: $("empty-state-title"),
+        summaryBuildLabel: $("summary-build-label"),
+        summaryTotalLabel: $("summary-total-label"),
+        summaryOverall: $("summary-overall"),
+        planningBuildLabel: $("planning-build-label"),
+        walletCaption: $("wallet-caption"),
+        exportBuildName: $("export-build-name"),
+
+        editBuildRow: $("edit-build-row"),
+        editItemBuildSelect: $("edit-item-build"),
+        editItemCopyTo: $("edit-item-copy-to"),
+
+        buildForm: $("build-form"),
+        buildUuid: $("build-uuid"),
+        buildName: $("build-name"),
+        buildDescription: $("build-description"),
+        buildColors: $("build-colors"),
+        buildModalTitle: $("build-modal-title"),
+        buildSubmit: $("build-submit"),
+        buildSourceWrap: $("build-source-wrap"),
+        buildSource: $("build-source"),
+        buildEditActions: $("build-edit-actions"),
+        buildDuplicateButton: $("build-duplicate-button"),
+        buildDeleteButton: $("build-delete-button"),
+        buildDeletePanel: $("build-delete-panel"),
+        buildDeleteSummary: $("build-delete-summary"),
+        buildDeleteChoices: $("build-delete-choices"),
+        buildMoveTo: $("build-move-to"),
+        buildDeleteCancel: $("build-delete-cancel"),
+        buildDeleteConfirm: $("build-delete-confirm"),
+
+        overviewTotals: $("overview-totals"),
+        overviewNote: $("overview-note"),
+        overviewGrid: $("overview-grid"),
     };
 
     // ── Helpers ──────────────────────────────────────────────────────────
@@ -169,7 +221,50 @@
     // ── Financeiro (calculo unico em FpvMoney.summarizeFinance) ──────────
 
     function finance() {
-        return FM.summarizeFinance(state.items, state.wallet);
+        return FM.summarizeFinance(state.items, state.wallet, state.otherPurchased);
+    }
+
+    // ── Montagens: helpers ───────────────────────────────────────────────
+
+    const buildColor = (key) => BUILD_COLORS[key] || BUILD_COLORS.orange;
+    const currentBuildUuid = () => (state.currentBuild ? state.currentBuild.build_uuid : "");
+    const buildByUuid = (uuid) => state.builds.find((b) => b.build_uuid === uuid) || null;
+    const hasBuilds = () => state.builds.length > 0 && !!state.currentBuild;
+    const buildPct = (b) => (b.total > 0 ? Math.min(100, Math.round((b.purchased_total / b.total) * 100)) : 0);
+
+    /** Numeros de TODAS as montagens juntas (a montagem aberta entra com os valores vivos). */
+    function overallFinance() {
+        const cur = finance();
+        let total = cur.total;
+        let purchased = cur.purchased;
+        state.builds.forEach((b) => {
+            if (b.build_uuid !== currentBuildUuid()) {
+                total += b.total;
+                purchased += b.purchased_total;
+            }
+        });
+        total = FM.round2(total);
+        purchased = FM.round2(purchased);
+        const toBuy = FM.round2(total - purchased);
+        return {
+            total, purchased, toBuy,
+            balance: cur.balance,
+            shortfall: FM.round2(Math.max(0, toBuy - cur.balance)),
+            surplus: FM.round2(Math.max(0, cur.balance - toBuy)),
+        };
+    }
+
+    /** Mantem o resumo da montagem aberta (abas, visao geral) igual aos itens vivos, inclusive apos marcar/desmarcar. */
+    function syncCurrentBuildSummary() {
+        const build = buildByUuid(currentBuildUuid());
+        if (!build) return;
+        const fin = finance();
+        build.items_count = state.items.length;
+        build.purchased_count = state.items.filter((item) => item.is_purchased).length;
+        build.total = fin.total;
+        build.purchased_total = fin.purchased;
+        build.to_buy = fin.toBuy;
+        build.target_date = state.planning.target_date;
     }
 
     function categoryById(id) {
@@ -237,6 +332,8 @@
     }
 
     function renderMoneyViews() {
+        syncCurrentBuildSummary();
+        renderBuildsBar();
         renderItems();
         renderSummary();
         renderWallet();
@@ -391,6 +488,7 @@
         showToast: (message) => showAppToast(message),
         getItems: () => state.items,
         reloadBoard: () => loadBoard(),
+        currentBuild: () => state.currentBuild,
     };
 
     // ── Auth (a sessao ja e garantida pelo router antes desta pagina carregar) ──
@@ -406,15 +504,24 @@
 
     // ── Board loading ────────────────────────────────────────────────────
 
-    async function loadBoard() {
+    async function loadBoard(buildUuid) {
         try {
-            const payload = await apiRequest("getFpvBoard");
+            const wanted = buildUuid || currentBuildUuid() || storageGet(BUILD_KEY) || "";
+            const payload = await apiRequest("getFpvBoard", { params: wanted ? { build: wanted } : {} });
             state.categories = payload.categories;
             state.items = payload.items;
             state.planning = payload.planning;
             state.videos = payload.videos;
             state.wallet = payload.wallet || null;
             state.share = payload.share || null;
+            state.builds = payload.builds || [];
+            state.currentBuild = payload.current_build || null;
+            if (state.currentBuild) storageSet(BUILD_KEY, state.currentBuild.build_uuid);
+
+            // A carteira e unica: o que ja foi gasto em OUTRAS montagens tambem sai do saldo desta.
+            const purchasedHere = state.items.filter((item) => item.is_purchased).reduce((sum, item) => sum + (Number(item.price) || 0), 0);
+            state.otherPurchased = state.wallet ? Math.max(0, FM.round2(state.wallet.purchased_total - purchasedHere)) : 0;
+
             renderAll();
         } catch (error) {
             if (error.status === 401) {
@@ -426,6 +533,8 @@
     }
 
     function renderAll() {
+        syncCurrentBuildSummary();
+        renderBuildsBar();
         renderCategories();
         renderItems();
         renderSummary();
@@ -496,6 +605,9 @@
         el.itemCount.textContent = `${state.items.length} ${state.items.length === 1 ? "item" : "itens"}`;
 
         if (!state.items.length) {
+            if (el.emptyStateTitle) {
+                el.emptyStateTitle.textContent = hasBuilds() ? `Nada em “${state.currentBuild.name}” ainda` : "Nenhum equipamento adicionado";
+            }
             el.itemsContainer.innerHTML = "";
             el.itemsContainer.classList.add("hidden");
             el.emptyState.classList.remove("hidden");
@@ -609,6 +721,7 @@
         formData.append("price", String(priceBrl));
         formData.append("category_id", el.itemCategorySelect.value);
         formData.append("store_url", el.itemUrl.value.trim());
+        if (currentBuildUuid()) formData.append("build_uuid", currentBuildUuid());
         if (el.itemImage.files[0]) {
             formData.append("image", el.itemImage.files[0]);
         } else if (state.pendingImport) {
@@ -824,6 +937,16 @@
         el.editItemHint.textContent = "";
         el.editItemUrl.value = item.store_url || "";
         el.editItemCategorySelect.value = item.category_id || "";
+        const many = state.builds.length > 1;
+        el.editBuildRow.classList.toggle("hidden", !many);
+        if (many) {
+            const current = currentBuildUuid();
+            el.editItemBuildSelect.innerHTML = state.builds
+                .map((b) => `<option value="${escapeHtml(b.build_uuid)}" ${b.build_uuid === current ? "selected" : ""}>${escapeHtml(b.name)}</option>`).join("");
+            el.editItemCopyTo.innerHTML = `<option value="">Escolha…</option>` + state.builds
+                .filter((b) => b.build_uuid !== current)
+                .map((b) => `<option value="${escapeHtml(b.build_uuid)}">${escapeHtml(b.name)}</option>`).join("");
+        }
         el.editItemImage.value = "";
         setImagePreview(el.editImagePreview, el.editImagePlaceholderIcon, item.image_path ? `/${item.image_path}` : "");
         window.openModal("edit-item-modal");
@@ -859,6 +982,9 @@
         if (el.editItemImage.files[0]) {
             formData.append("image", el.editItemImage.files[0]);
         }
+        const targetBuild = el.editBuildRow.classList.contains("hidden") ? "" : el.editItemBuildSelect.value;
+        const moving = targetBuild && targetBuild !== currentBuildUuid();
+        if (moving) formData.append("build_uuid", targetBuild);
 
         const submitButton = el.editItemForm.querySelector("button[type=submit]");
         submitButton.disabled = true;
@@ -866,6 +992,10 @@
         try {
             await apiRequest("updateFpvItem", { formData });
             window.closeModal("edit-item-modal");
+            if (moving) {
+                const target = buildByUuid(targetBuild);
+                showAppToast(`Item movido${target ? ` para “${target.name}”` : ""}.`);
+            }
             await loadBoard();
         } catch (error) {
             alert("Erro ao salvar item: " + error.message);
@@ -874,9 +1004,50 @@
         }
     }
 
+    /** Copia o item aberto no modal para outra montagem (mesma peca em dois projetos). */
+    async function handleCopyItem() {
+        const targetUuid = el.editItemCopyTo.value;
+        const itemUuid = el.editItemUuid.value;
+        if (!targetUuid || !itemUuid) return;
+        try {
+            const payload = await apiRequest("copyFpvItem", { method: "POST", params: { item_uuid: itemUuid, build_uuid: targetUuid } });
+            state.builds = payload.builds || state.builds;
+            renderMoneyViews();
+            showAppToast(`Copiado para “${payload.build.name}” (como pendente).`);
+        } catch (error) {
+            alert("Erro ao copiar item: " + error.message);
+        } finally {
+            el.editItemCopyTo.value = "";
+        }
+    }
+
+    /** Move um item para outra montagem (arrastar para a aba). */
+    async function moveItemToBuild(itemUuid, buildUuid) {
+        const item = state.items.find((it) => it.item_uuid === itemUuid);
+        const target = buildByUuid(buildUuid);
+        if (!item || !target || buildUuid === currentBuildUuid()) return;
+        try {
+            await apiRequest("updateFpvItem", { method: "POST", params: { item_uuid: itemUuid, build_uuid: buildUuid } });
+            showAppToast(`“${item.name}” foi para “${target.name}”.`);
+            await loadBoard();
+        } catch (error) {
+            alert("Erro ao mover item: " + error.message);
+        }
+    }
+
     async function handleTogglePurchased(itemUuid, isPurchased) {
         const item = state.items.find((it) => it.item_uuid === itemUuid);
-        if (!item) return;
+        if (!item) {
+            // Compra feita em outra montagem (vem do extrato da carteira): so da para desfazer.
+            try {
+                await apiRequest("updateFpvItem", { method: "POST", params: { item_uuid: itemUuid, is_purchased: isPurchased ? "1" : "0" } });
+                await loadBoard();
+                showAppToast("Compra desfeita: o valor voltou para a carteira.");
+            } catch (error) {
+                alert("Erro ao atualizar item: " + error.message);
+            }
+            return;
+        }
 
         // Atualizacao otimista: a carteira e derivada dos itens, entao o saldo muda na hora.
         item.is_purchased = isPurchased;
@@ -1010,6 +1181,26 @@
     function renderSummary() {
         const fin = finance();
         const round = (value) => Math.round(value);
+        const many = state.builds.length > 1;
+
+        if (el.summaryBuildLabel) {
+            el.summaryBuildLabel.classList.toggle("hidden", !hasBuilds());
+            if (hasBuilds()) {
+                el.summaryBuildLabel.innerHTML = `<span class="inline-flex items-center gap-1.5"><span class="build-dot" style="--build-color:${buildColor(state.currentBuild.color)}"></span><span class="truncate">${escapeHtml(state.currentBuild.name)}</span></span>`;
+            }
+        }
+        if (el.summaryTotalLabel) el.summaryTotalLabel.textContent = hasBuilds() ? "Custo total desta montagem" : "Custo total do setup";
+        if (el.summaryOverall) {
+            el.summaryOverall.classList.toggle("hidden", !many);
+            if (many) {
+                const all = overallFinance();
+                el.summaryOverall.innerHTML = `<strong class="text-f91-text">Todas as ${state.builds.length} montagens:</strong> ${escapeHtml(formatDisplayCurrency(all.total))} no total, `
+                    + `falta comprar <strong class="text-f91-text">${escapeHtml(formatDisplayCurrency(all.toBuy))}</strong> — `
+                    + (all.shortfall > 0
+                        ? `faltam juntar <strong class="text-red-500">${escapeHtml(formatDisplayCurrency(all.shortfall))}</strong> (a carteira é uma só).`
+                        : `a carteira cobre tudo${all.surplus > 0 ? ` e ainda sobram ${escapeHtml(formatDisplayCurrency(all.surplus))}` : ""}.`);
+            }
+        }
 
         el.displayTotalCost.textContent = formatDisplayCurrency(fin.total);
         el.displayPurchased.textContent = formatDisplayCurrency(fin.purchased);
@@ -1030,7 +1221,7 @@
         if (!state.items.length) {
             note = "Adicione itens à lista para acompanhar o progresso da compra.";
         } else if (fin.toBuy <= 0) {
-            note = "Setup completo: todos os itens já foram comprados. 🎉";
+            note = hasBuilds() ? "Montagem completa: todos os itens já foram comprados. 🎉" : "Setup completo: todos os itens já foram comprados. 🎉";
         } else if (fin.balance < 0) {
             note = `Você gastou ${formatDisplayCurrency(-fin.balance)} além do que tinha na carteira — adicione dinheiro para equilibrar.`;
         } else if (fin.shortfall <= 0) {
@@ -1053,12 +1244,25 @@
             label: entry.note || (entry.type === "deposit" ? "Depósito" : "Retirada"),
             at: entry.created_at,
         }));
+        const many = state.builds.length > 1;
+        const current = state.currentBuild;
+        // Compras da montagem aberta (vivas: marcar/desmarcar e otimista) + as das outras montagens (do servidor).
         state.items.filter((item) => item.is_purchased).forEach((item) => rows.push({
             kind: "purchase",
             uuid: item.item_uuid,
             amount: item.price,
             label: item.name,
             at: item.purchased_at || item.created_at,
+            build: many && current ? { name: current.name, color: current.color } : null,
+        }));
+        const others = state.wallet && Array.isArray(state.wallet.purchases) ? state.wallet.purchases : [];
+        others.filter((p) => p.build_uuid !== currentBuildUuid()).forEach((p) => rows.push({
+            kind: "purchase",
+            uuid: p.item_uuid,
+            amount: p.price,
+            label: p.name,
+            at: p.purchased_at,
+            build: many ? { name: p.build_name, color: p.build_color } : null,
         }));
         rows.sort((a, b) => new Date(b.at || 0) - new Date(a.at || 0));
         return rows;
@@ -1071,7 +1275,8 @@
         el.displayWalletBalance.textContent = formatDisplayCurrency(fin.balance);
         el.displayWalletBalance.className = `text-3xl font-bold ${fin.balance < 0 ? "text-red-500" : "text-green-600"}`;
         el.walletStatIn.textContent = formatDisplayCurrency(fin.deposits);
-        el.walletStatPurchases.textContent = formatDisplayCurrency(fin.purchased);
+        el.walletStatPurchases.textContent = formatDisplayCurrency(fin.purchased + state.otherPurchased);
+        if (el.walletCaption) el.walletCaption.classList.toggle("hidden", state.builds.length < 2);
         el.walletStatOut.textContent = formatDisplayCurrency(fin.withdrawals);
         el.walletAddButton.disabled = !walletReady;
         el.walletWithdrawButton.disabled = !walletReady;
@@ -1081,8 +1286,10 @@
             hint = "Carteira indisponível no momento (atualização do banco em andamento).";
         } else if (fin.balance < 0) {
             hint = "Saldo negativo: você já comprou mais do que colocou na carteira.";
-        } else if (fin.deposits === 0 && fin.withdrawals === 0 && fin.purchased === 0) {
+        } else if (fin.deposits === 0 && fin.withdrawals === 0 && fin.purchased + state.otherPurchased === 0) {
             hint = "Informe quanto você tem disponível para começar.";
+        } else if (state.builds.length > 1 && overallFinance().toBuy > 0) {
+            hint = `Disponível para o que falta comprar nas ${state.builds.length} montagens (${formatDisplayCurrency(overallFinance().toBuy)}).`;
         } else if (fin.toBuy > 0) {
             hint = `Disponível para comprar o que falta (${formatDisplayCurrency(fin.toBuy)}).`;
         } else {
@@ -1113,7 +1320,7 @@
                     <span class="w-7 h-7 rounded-full ${v.box} flex items-center justify-center flex-shrink-0"><i class="ph-bold ${v.icon} text-sm"></i></span>
                     <div class="min-w-0 flex-grow">
                         <p class="text-xs font-medium text-f91-text truncate">${escapeHtml(row.label)}</p>
-                        <p class="text-[10px] text-f91-muted">${kindLabel}${row.at ? " · " + escapeHtml(formatShortDate(row.at)) : ""}</p>
+                        <p class="text-[10px] text-f91-muted flex flex-wrap items-center gap-x-1.5"><span class="whitespace-nowrap">${kindLabel}${row.at ? " · " + escapeHtml(formatShortDate(row.at)) : ""}</span>${row.build ? `<span class="inline-flex items-center gap-1 max-w-full min-w-0"><span class="build-dot" style="--build-color:${buildColor(row.build.color)};width:7px;height:7px"></span><span class="truncate">${escapeHtml(row.build.name)}</span></span>` : ""}</p>
                     </div>
                     <span class="text-xs font-bold whitespace-nowrap ${v.amountClass}">${v.sign} ${escapeHtml(formatDisplayCurrency(row.amount))}</span>
                     ${action}
@@ -1191,6 +1398,13 @@
 
     function renderPlanningInputs() {
         el.inputDate.value = state.planning.target_date || "";
+        if (el.planningBuildLabel) {
+            const show = hasBuilds() && state.builds.length > 1;
+            el.planningBuildLabel.classList.toggle("hidden", !show);
+            if (show) {
+                el.planningBuildLabel.innerHTML = `<span class="inline-flex items-center gap-1.5"><span class="build-dot" style="--build-color:${buildColor(state.currentBuild.color)}"></span><span class="truncate">${escapeHtml(state.currentBuild.name)}</span></span>`;
+            }
+        }
     }
 
     function renderPlanningCalc() {
@@ -1260,11 +1474,13 @@
     let planningSaveTimer = null;
     function schedulePlanningSave() {
         window.clearTimeout(planningSaveTimer);
+        const buildUuid = currentBuildUuid();
+        const targetDate = state.planning.target_date || "";
         planningSaveTimer = window.setTimeout(async () => {
             try {
                 await apiRequest("saveFpvPlanning", {
                     method: "POST",
-                    params: { target_date: state.planning.target_date || "" },
+                    params: { target_date: targetDate, build_uuid: buildUuid },
                 });
             } catch (error) {
                 alert("Erro ao salvar planejamento: " + error.message);
@@ -1355,6 +1571,9 @@
             is_active: !!(detail.share && detail.share.is_active),
             has_share: !!detail.share,
         });
+        const build = buildByUuid(currentBuildUuid());
+        if (build) build.unread = detail.unread ?? 0;
+        renderBuildsBar();
         renderShareBadge();
         renderItems();
     }
@@ -1364,6 +1583,10 @@
     function openExportModal() {
         el.exportDate.textContent = new Intl.DateTimeFormat("pt-BR", { dateStyle: "long" }).format(new Date());
         el.exportItemCount.textContent = `${state.items.length} ${state.items.length === 1 ? "item" : "itens"}`;
+        if (el.exportBuildName) {
+            el.exportBuildName.textContent = hasBuilds() ? `${state.currentBuild.name}${state.currentBuild.description ? " — " + state.currentBuild.description : ""}` : "";
+            el.exportBuildName.classList.toggle("hidden", !hasBuilds());
+        }
 
         el.exportTableBody.innerHTML = state.items.map((item) => {
             const category = categoryById(item.category_id);
@@ -1424,10 +1647,259 @@
         }
     };
 
+    // ── Montagens (abas, modal, visao geral) ─────────────────────────────
+
+    function renderBuildHeader() {
+        const build = state.currentBuild;
+        el.currentBuildTitle.textContent = build ? build.name : "Adicionar à Lista";
+        if (el.currentBuildDesc) {
+            el.currentBuildDesc.textContent = build ? build.description : "";
+            el.currentBuildDesc.classList.toggle("hidden", !build || !build.description);
+        }
+        el.buildEditButton.classList.toggle("hidden", !build);
+        if (el.currentBuildIcon) el.currentBuildIcon.style.color = build ? buildColor(build.color) : "";
+        if (el.shareButton) el.shareButton.title = build ? `Compartilhar a lista “${build.name}”` : "Compartilhar minha lista";
+    }
+
+    function renderBuildsBar() {
+        if (!el.buildsBar) return;
+        renderBuildHeader();
+        if (!hasBuilds()) {
+            el.buildsBar.classList.add("hidden");
+            return;
+        }
+        el.buildsBar.classList.remove("hidden");
+        const current = currentBuildUuid();
+        el.buildsTabs.innerHTML = state.builds.map((b) => {
+            const active = b.build_uuid === current;
+            const tip = `${b.name} — ${b.items_count} ${b.items_count === 1 ? "item" : "itens"} · ${buildPct(b)}% comprado`;
+            return `<button type="button" role="tab" aria-selected="${active ? "true" : "false"}" data-build-tab="${escapeHtml(b.build_uuid)}" title="${escapeHtml(tip)}" class="build-tab ${active ? "is-active" : ""}" style="--build-color:${buildColor(b.color)}">
+                <span class="build-dot"></span>
+                <span class="build-tab-name">${escapeHtml(b.name)}</span>
+                <span class="build-tab-pct">${buildPct(b)}%</span>
+                ${b.unread ? `<span class="w-1.5 h-1.5 rounded-full bg-f91-lime" title="Opiniões novas"></span>` : ""}
+            </button>`;
+        }).join("");
+
+        if (state.scrollTabs) {
+            state.scrollTabs = false;
+            const active = el.buildsTabs.querySelector('[aria-selected="true"]');
+            if (active) el.buildsTabs.scrollLeft = Math.max(0, active.offsetLeft - 24);
+        }
+    }
+
+    async function switchBuild(uuid) {
+        if (!uuid || uuid === currentBuildUuid()) return;
+        state.scrollTabs = true;
+        await loadBoard(uuid);
+    }
+
+    function handleBuildsTabsClick(event) {
+        const tab = event.target.closest("[data-build-tab]");
+        if (tab) switchBuild(tab.dataset.buildTab);
+    }
+
+    // Arrastar um item para outra aba move o item de montagem.
+    function tabFromEvent(event) {
+        const tab = event.target.closest("[data-build-tab]");
+        return tab && state.dragUuid && tab.dataset.buildTab !== currentBuildUuid() ? tab : null;
+    }
+
+    function handleBuildsTabsDragOver(event) {
+        const tab = tabFromEvent(event);
+        el.buildsTabs.querySelectorAll(".is-drop-target").forEach((node) => { if (node !== tab) node.classList.remove("is-drop-target"); });
+        if (!tab) return;
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        tab.classList.add("is-drop-target");
+    }
+
+    function handleBuildsTabsDrop(event) {
+        const tab = tabFromEvent(event);
+        el.buildsTabs.querySelectorAll(".is-drop-target").forEach((node) => node.classList.remove("is-drop-target"));
+        if (!tab) return;
+        event.preventDefault();
+        const uuid = state.dragUuid;
+        state.dragUuid = null;
+        moveItemToBuild(uuid, tab.dataset.buildTab);
+    }
+
+    function renderBuildColorSwatches(selected) {
+        el.buildColors.innerHTML = Object.keys(BUILD_COLORS).map((key) => `
+            <label class="relative" title="${key}">
+                <input type="radio" name="build-color" value="${key}" class="sr-only" ${key === selected ? "checked" : ""}>
+                <span class="build-swatch" style="--swatch:${BUILD_COLORS[key]}"><i class="ph-bold ph-check"></i></span>
+            </label>`).join("");
+    }
+
+    function openBuildModal(build) {
+        const editing = !!build;
+        el.buildUuid.value = editing ? build.build_uuid : "";
+        el.buildName.value = editing ? build.name : "";
+        el.buildDescription.value = editing ? (build.description || "") : "";
+        const used = new Set(state.builds.map((b) => b.color));
+        renderBuildColorSwatches(editing ? build.color : (Object.keys(BUILD_COLORS).find((key) => !used.has(key)) || "orange"));
+
+        el.buildModalTitle.textContent = editing ? "Editar montagem" : "Nova montagem";
+        el.buildSubmit.textContent = editing ? "Salvar" : "Criar";
+        el.buildSourceWrap.classList.toggle("hidden", editing);
+        el.buildEditActions.classList.toggle("hidden", !editing);
+        el.buildDeleteButton.disabled = state.builds.length <= 1;
+        el.buildDeleteButton.title = state.builds.length <= 1 ? "Você precisa ter pelo menos uma montagem" : "";
+        el.buildDeleteButton.classList.toggle("opacity-40", state.builds.length <= 1);
+        el.buildDeletePanel.classList.add("hidden");
+
+        el.buildSource.innerHTML = `<option value="">Uma lista vazia</option>` + state.builds
+            .map((b) => `<option value="${escapeHtml(b.build_uuid)}">Copiar os ${b.items_count} ${b.items_count === 1 ? "item" : "itens"} de “${escapeHtml(b.name)}”</option>`).join("");
+
+        window.openModal("build-modal");
+        window.setTimeout(() => el.buildName.focus(), 60);
+    }
+
+    async function handleBuildSubmit(event) {
+        event.preventDefault();
+        const name = el.buildName.value.trim();
+        if (!name) return;
+        const color = (el.buildForm.querySelector('input[name="build-color"]:checked') || {}).value || "orange";
+        const description = el.buildDescription.value.trim();
+        const uuid = el.buildUuid.value;
+
+        el.buildSubmit.disabled = true;
+        try {
+            if (uuid) {
+                await apiRequest("updateFpvBuild", { method: "POST", params: { build_uuid: uuid, name, description, color } });
+                window.closeModal("build-modal");
+                await loadBoard(uuid);
+                showAppToast("Montagem atualizada.");
+            } else {
+                const payload = await apiRequest("addFpvBuild", { method: "POST", params: { name, description, color, copy_from: el.buildSource.value } });
+                window.closeModal("build-modal");
+                state.scrollTabs = true;
+                await loadBoard(payload.build.build_uuid);
+                showAppToast(`Montagem “${name}” criada.`);
+            }
+        } catch (error) {
+            alert("Erro ao salvar montagem: " + error.message);
+        } finally {
+            el.buildSubmit.disabled = false;
+        }
+    }
+
+    async function handleBuildDuplicate() {
+        const source = buildByUuid(el.buildUuid.value);
+        if (!source) return;
+        el.buildDuplicateButton.disabled = true;
+        try {
+            const payload = await apiRequest("addFpvBuild", {
+                method: "POST",
+                params: { name: `${source.name} (cópia)`.slice(0, 80), description: source.description || "", color: source.color, copy_from: source.build_uuid },
+            });
+            window.closeModal("build-modal");
+            state.scrollTabs = true;
+            await loadBoard(payload.build.build_uuid);
+            showAppToast(`Duplicada: ${source.items_count} ${source.items_count === 1 ? "item copiado" : "itens copiados"} como pendentes.`);
+        } catch (error) {
+            alert("Erro ao duplicar montagem: " + error.message);
+        } finally {
+            el.buildDuplicateButton.disabled = false;
+        }
+    }
+
+    function openBuildDeletePanel() {
+        const build = buildByUuid(el.buildUuid.value);
+        if (!build || state.builds.length <= 1) return;
+        const others = state.builds.filter((b) => b.build_uuid !== build.build_uuid);
+        const hasItems = build.items_count > 0;
+        el.buildDeleteSummary.textContent = hasItems
+            ? `“${build.name}” tem ${build.items_count} ${build.items_count === 1 ? "item" : "itens"} (${formatCurrency(build.total)}). O que fazer com eles?`
+            : `“${build.name}” está vazia. Excluir mesmo?`;
+        el.buildDeleteChoices.classList.toggle("hidden", !hasItems);
+        el.buildMoveTo.innerHTML = others.map((b) => `<option value="${escapeHtml(b.build_uuid)}">${escapeHtml(b.name)}</option>`).join("");
+        el.buildDeleteChoices.querySelector('input[value="move"]').checked = true;
+        el.buildDeletePanel.classList.remove("hidden");
+        el.buildDeletePanel.scrollIntoView({ block: "nearest" });
+    }
+
+    async function handleBuildDeleteConfirm() {
+        const build = buildByUuid(el.buildUuid.value);
+        if (!build) return;
+        const params = { build_uuid: build.build_uuid };
+        if (build.items_count > 0) {
+            params.mode = (el.buildDeleteChoices.querySelector('input[name="build-delete-mode"]:checked') || {}).value || "move";
+            if (params.mode === "move") params.move_to = el.buildMoveTo.value;
+        }
+        el.buildDeleteConfirm.disabled = true;
+        try {
+            const payload = await apiRequest("deleteFpvBuild", { method: "POST", params });
+            window.closeModal("build-modal");
+            state.currentBuild = null; // a atual foi excluida: abre a indicada pelo servidor
+            state.scrollTabs = true;
+            await loadBoard(payload.next_build_uuid || "");
+            showAppToast(`Montagem “${build.name}” excluída.`);
+        } catch (error) {
+            alert("Erro ao excluir montagem: " + error.message);
+        } finally {
+            el.buildDeleteConfirm.disabled = false;
+        }
+    }
+
+    function renderOverview() {
+        const all = overallFinance();
+        const stat = (label, value, tone) => `<div class="bg-gray-50 rounded-xl px-4 py-3"><p class="text-[11px] uppercase tracking-wider text-f91-muted">${label}</p><p class="text-lg font-bold ${tone || "text-f91-text"} mt-0.5">${escapeHtml(formatDisplayCurrency(value))}</p></div>`;
+        el.overviewTotals.innerHTML = stat("Total geral", all.total)
+            + stat("Já comprado", all.purchased, "text-green-600")
+            + stat("Falta comprar", all.toBuy)
+            + stat("Falta juntar", all.shortfall, all.shortfall > 0 ? "text-red-500" : "text-green-600");
+        el.overviewNote.textContent = `Saldo da carteira (única para todas as montagens): ${formatDisplayCurrency(all.balance)}. “Falta juntar” considera tudo o que ainda falta comprar em todas elas.`;
+
+        const cards = state.builds.map((b) => {
+            const pct = buildPct(b);
+            const cover = b.cover_image
+                ? `<img src="/${escapeHtml(b.cover_image)}" alt="" class="w-full h-full object-cover">`
+                : `<i class="ph ph-drone text-4xl" style="color:${buildColor(b.color)}"></i>`;
+            const chips = [
+                `<span class="px-2 py-0.5 rounded-full bg-gray-100 text-[11px] font-medium">${b.items_count} ${b.items_count === 1 ? "item" : "itens"}</span>`,
+                b.target_date ? `<span class="px-2 py-0.5 rounded-full bg-gray-100 text-[11px] font-medium flex items-center gap-1"><i class="ph ph-target"></i> ${escapeHtml(new Date(`${b.target_date}T00:00:00`).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "2-digit" }))}</span>` : "",
+                b.share_active ? `<span class="px-2 py-0.5 rounded-full bg-green-100 text-green-700 text-[11px] font-medium flex items-center gap-1"><i class="ph ph-link"></i> Link ativo</span>` : "",
+                b.unread ? `<span class="px-2 py-0.5 rounded-full bg-orange-100 text-orange-700 text-[11px] font-medium">${b.unread} ${b.unread === 1 ? "opinião nova" : "opiniões novas"}</span>` : "",
+            ].join("");
+            return `<button type="button" data-overview-build="${escapeHtml(b.build_uuid)}" class="build-card ${b.build_uuid === currentBuildUuid() ? "is-current" : ""} flex flex-col" style="--build-color:${buildColor(b.color)}">
+                <span class="block w-full h-28 bg-gray-100 flex items-center justify-center overflow-hidden">${cover}</span>
+                <span class="block p-4 flex-1 w-full">
+                    <span class="flex items-center gap-2 mb-1"><span class="build-dot"></span><span class="font-semibold text-f91-text truncate">${escapeHtml(b.name)}</span>${b.build_uuid === currentBuildUuid() ? `<span class="ml-auto text-[10px] font-bold uppercase tracking-wider text-f91-muted">aberta</span>` : ""}</span>
+                    ${b.description ? `<span class="block text-xs text-f91-muted mb-3 line-clamp-2">${escapeHtml(b.description)}</span>` : `<span class="block mb-3"></span>`}
+                    <span class="block w-full bg-gray-100 rounded-full h-2 overflow-hidden"><span class="block h-2 rounded-full" style="width:${pct}%;background:${buildColor(b.color)}"></span></span>
+                    <span class="flex justify-between text-xs mt-1.5 text-f91-muted"><span>${escapeHtml(formatDisplayCurrency(b.purchased_total))} de ${escapeHtml(formatDisplayCurrency(b.total))}</span><strong class="text-f91-text">${pct}%</strong></span>
+                    <span class="flex flex-wrap gap-1.5 mt-3 text-f91-text">${chips}</span>
+                </span>
+            </button>`;
+        }).join("");
+
+        el.overviewGrid.innerHTML = cards + `<button type="button" data-overview-new class="build-card flex flex-col items-center justify-center gap-2 min-h-[180px] text-f91-muted hover:text-f91-text" style="border-style:dashed;border-top-width:1px"><i class="ph ph-plus-circle text-3xl"></i><span class="text-sm font-semibold">Nova montagem</span></button>`;
+    }
+
+    function openOverview() {
+        renderOverview();
+        window.openModal("builds-overview-modal");
+    }
+
+    function handleOverviewClick(event) {
+        if (event.target.closest("[data-overview-new]")) {
+            window.closeModal("builds-overview-modal");
+            openBuildModal(null);
+            return;
+        }
+        const card = event.target.closest("[data-overview-build]");
+        if (card) {
+            window.closeModal("builds-overview-modal");
+            switchBuild(card.dataset.overviewBuild);
+        }
+    }
+
     // ── Reset ────────────────────────────────────────────────────────────
 
     window.resetData = async function resetData() {
-        if (!confirm("Apagar TODOS os dados do planner (itens, categorias, videos, carteira, opinioes e planejamento)? Essa acao nao pode ser desfeita.")) return;
+        if (!confirm("Apagar TODOS os dados do planner (montagens, itens, categorias, videos, carteira, opinioes e planejamento)? Essa acao nao pode ser desfeita.")) return;
         try {
             await apiRequest("resetFpvData", { method: "POST" });
             await loadBoard();
@@ -1480,6 +1952,24 @@
 
         el.inputDate.addEventListener("change", handlePlanningDateInput);
 
+        el.buildsTabs.addEventListener("click", handleBuildsTabsClick);
+        el.buildsTabs.addEventListener("dragover", handleBuildsTabsDragOver);
+        el.buildsTabs.addEventListener("dragleave", (event) => {
+            const tab = event.target.closest("[data-build-tab]");
+            if (tab) tab.classList.remove("is-drop-target");
+        });
+        el.buildsTabs.addEventListener("drop", handleBuildsTabsDrop);
+        el.buildNewButton.addEventListener("click", () => openBuildModal(null));
+        el.buildEditButton.addEventListener("click", () => state.currentBuild && openBuildModal(state.currentBuild));
+        el.buildsOverviewButton.addEventListener("click", openOverview);
+        el.overviewGrid.addEventListener("click", handleOverviewClick);
+        el.buildForm.addEventListener("submit", handleBuildSubmit);
+        el.buildDuplicateButton.addEventListener("click", handleBuildDuplicate);
+        el.buildDeleteButton.addEventListener("click", openBuildDeletePanel);
+        el.buildDeleteCancel.addEventListener("click", () => el.buildDeletePanel.classList.add("hidden"));
+        el.buildDeleteConfirm.addEventListener("click", handleBuildDeleteConfirm);
+        el.editItemCopyTo.addEventListener("change", handleCopyItem);
+
         el.walletAddButton.addEventListener("click", () => openWalletModal("deposit"));
         el.walletWithdrawButton.addEventListener("click", () => openWalletModal("withdrawal"));
         el.walletForm.addEventListener("submit", handleWalletSubmit);
@@ -1528,7 +2018,7 @@
 
         document.addEventListener("keydown", (event) => {
             if (event.key === "Escape") {
-                ["lightbox-modal", "category-modal", "export-modal", "edit-item-modal", "wallet-modal", "clip-modal", "share-modal"].forEach((id) => window.closeModal(id));
+                ["lightbox-modal", "category-modal", "export-modal", "edit-item-modal", "wallet-modal", "clip-modal", "share-modal", "build-modal", "builds-overview-modal"].forEach((id) => window.closeModal(id));
             }
         });
     }

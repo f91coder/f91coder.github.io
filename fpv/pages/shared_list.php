@@ -9,7 +9,12 @@ $e = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES, 
 $formatBrl = static fn(float $value): string => 'R$ ' . number_format($value, 2, ',', '.');
 
 $ownerName = $sharedList['owner_name'];
-$pageTitle = $sharedList['title'] !== '' ? $sharedList['title'] : 'Lista de compras FPV de ' . $ownerName;
+// Sem titulo proprio: usa o nome da montagem (ex.: "Mark5 Phisital"); a montagem padrao segue com o texto antigo.
+$buildName = (string) ($sharedList['build_name'] ?? '');
+$pageTitle = $sharedList['title'] !== ''
+    ? $sharedList['title']
+    : (($buildName !== '' && $buildName !== FPV_BUILD_DEFAULT_NAME) ? $buildName : 'Lista de compras FPV de ' . $ownerName);
+$buildDescription = (string) ($sharedList['build_description'] ?? '');
 $items = $sharedList['items'];
 $itemCount = count($items);
 $purchased = (int) $sharedList['purchased_count'];
@@ -115,8 +120,11 @@ $config = [
                 <span class="sh-avatar"><?= $e(mb_strtoupper(mb_substr($ownerName, 0, 1))) ?></span>
             <?php endif; ?>
             <div>
-                <p class="sh-eyebrow">Lista de compras FPV</p>
+                <p class="sh-eyebrow">Lista de compras FPV · <?= $e($ownerName) ?></p>
                 <h1><?= $e($pageTitle) ?></h1>
+                <?php if ($buildDescription !== ''): ?>
+                    <p class="sh-sub"><?= $e($buildDescription) ?></p>
+                <?php endif; ?>
             </div>
         </div>
 

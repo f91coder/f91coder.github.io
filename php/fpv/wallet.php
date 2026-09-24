@@ -74,12 +74,40 @@ function fpv_wallet_entries(PDO $pdo, int $userId, int $limit = FPV_WALLET_ENTRI
     ], $stmt->fetchAll());
 }
 
+/**
+ * Itens comprados de TODAS as montagens (a carteira e unica): alimentam o extrato com o nome da montagem.
+ * O cliente troca os da montagem aberta pelos itens vivos (marcar/desmarcar e otimista).
+ */
+function fpv_wallet_purchases(PDO $pdo, int $userId, int $limit = FPV_WALLET_ENTRIES_LIMIT): array
+{
+    $stmt = $pdo->prepare(
+        'SELECT i.item_uuid, i.name, i.price, i.purchased_at, i.created_at, b.build_uuid, b.name AS build_name, b.color AS build_color
+         FROM fpv_items i LEFT JOIN fpv_builds b ON b.id = i.build_id
+         WHERE i.user_id = :user_id AND i.is_purchased = 1
+         ORDER BY COALESCE(i.purchased_at, i.created_at) DESC, i.id DESC LIMIT ' . (int) $limit
+    );
+    $stmt->execute(['user_id' => $userId]);
+
+    return array_map(static fn(array $row): array => [
+        'item_uuid' => $row['item_uuid'],
+        'name' => $row['name'],
+        'price' => (float) $row['price'],
+        'purchased_at' => fpv_iso_utc($row['purchased_at'] ?? $row['created_at']),
+        'build_uuid' => $row['build_uuid'],
+        'build_name' => $row['build_name'],
+        'build_color' => $row['build_color'],
+    ], $stmt->fetchAll());
+}
+
 function fpv_wallet_payload(PDO $pdo, int $userId): ?array
 {
     if (!fpv_schema_ready()) {
         return null;
     }
-    return fpv_wallet_totals($pdo, $userId) + ['entries' => fpv_wallet_entries($pdo, $userId)];
+    return fpv_wallet_totals($pdo, $userId) + [
+        'entries' => fpv_wallet_entries($pdo, $userId),
+        'purchases' => fpv_wallet_purchases($pdo, $userId),
+    ];
 }
 
 function add_fpv_wallet_entry(array $input): array

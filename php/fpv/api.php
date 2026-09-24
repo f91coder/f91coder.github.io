@@ -71,6 +71,26 @@ try {
             $result = delete_fpv_category($_POST);
             break;
 
+        case 'addFpvBuild':
+            fpv_require_post($method);
+            $result = add_fpv_build($_POST);
+            break;
+
+        case 'updateFpvBuild':
+            fpv_require_post($method);
+            $result = update_fpv_build($_POST);
+            break;
+
+        case 'deleteFpvBuild':
+            fpv_require_post($method);
+            $result = delete_fpv_build($_POST);
+            break;
+
+        case 'copyFpvItem':
+            fpv_require_post($method);
+            $result = copy_fpv_item($_POST);
+            break;
+
         case 'addFpvItem':
             fpv_require_post($method);
             $result = add_fpv_item($_POST, $_FILES['image'] ?? null);

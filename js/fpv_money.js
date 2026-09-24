@@ -171,15 +171,17 @@
      *   saldo   = depositos - retiradas - itens comprados
      *   falta juntar = max(0, falta comprar - saldo)   (saldo negativo aumenta o que falta juntar)
      *   progresso = comprado / total; "coberto" = parte do que falta comprar que a carteira ja paga
+     * `items` sao os da montagem aberta; `otherPurchased` = compras ja feitas em OUTRAS montagens (a carteira e
+     * unica, entao o saldo desconta as compras de todas). Total/comprado/falta comprar sao da montagem aberta.
      */
-    function summarizeFinance(items, wallet) {
+    function summarizeFinance(items, wallet, otherPurchased) {
         const list = Array.isArray(items) ? items : [];
         const total = round2(list.reduce((sum, item) => sum + (Number(item.price) || 0), 0));
         const purchased = round2(list.filter((item) => item.is_purchased).reduce((sum, item) => sum + (Number(item.price) || 0), 0));
         const toBuy = round2(total - purchased);
         const deposits = round2(wallet && wallet.deposits_total);
         const withdrawals = round2(wallet && wallet.withdrawals_total);
-        const balance = round2(deposits - withdrawals - purchased);
+        const balance = round2(deposits - withdrawals - purchased - round2(otherPurchased));
         const covered = round2(Math.min(toBuy, Math.max(0, balance)));
         const shortfall = round2(Math.max(0, toBuy - balance));
         const surplus = round2(Math.max(0, balance - toBuy));
