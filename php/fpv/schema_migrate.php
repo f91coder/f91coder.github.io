@@ -2,7 +2,8 @@
 declare(strict_types=1);
 
 /**
- * Migracao automatica do schema (v3: carteira, compartilhamento, feedback, importador).
+ * Migracao automatica do schema (v3: carteira, compartilhamento, feedback, importador;
+ * v4: reacoes like/dislike de uma unica batida na lista publica).
  *
  * O deploy do FPV e "git push -> rsync": nao ha passo manual de banco. Em vez de depender
  * de alguem colar SQL no phpMyAdmin (e deixar o site quebrado ate la), a primeira requisicao
@@ -12,7 +13,9 @@ declare(strict_types=1);
  * e php/fpv/schema_v3.sql pode ser rodado manualmente.
  */
 
-const FPV_SCHEMA_MIGRATION_NAME = 'v3_wallet_share_import';
+// Todo o corpo da migracao e idempotente: subir este nome apenas reexecuta os CREATE ... IF NOT EXISTS
+// (e o saldo inicial da carteira so e importado na primeira criacao da tabela). Mantenha assim.
+const FPV_SCHEMA_MIGRATION_NAME = 'v4_share_reactions';
 
 function fpv_schema_attempted(?bool $set = null): bool
 {
@@ -172,6 +175,28 @@ function fpv_schema_run_migration(PDO $pdo): void
             KEY idx_fpv_feedback_item (item_uuid),
             KEY idx_fpv_feedback_ip (ip_hash, created_at),
             CONSTRAINT fk_fpv_feedback_user FOREIGN KEY (user_id)
+                REFERENCES fpv_users (id) ON DELETE CASCADE
+        ) $engine"
+    );
+
+    // Reacoes de uma batida (like/dislike) da lista publica: no maximo uma por visitante e item.
+    // visitor_key = hash do cookie do visitante (ou do IP+UA quando cookies estao bloqueados);
+    // ip_hash serve so ao limite de criacoes por hora.
+    $pdo->exec(
+        "CREATE TABLE IF NOT EXISTS fpv_share_reactions (
+            id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+            user_id BIGINT UNSIGNED NOT NULL,
+            item_uuid CHAR(36) NOT NULL,
+            visitor_key CHAR(64) NOT NULL,
+            ip_hash CHAR(64) NOT NULL,
+            reaction ENUM('like','dislike') NOT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            PRIMARY KEY (id),
+            UNIQUE KEY uq_fpv_reaction_visitor_item (item_uuid, visitor_key),
+            KEY idx_fpv_reaction_user (user_id, item_uuid),
+            KEY idx_fpv_reaction_ip (ip_hash, created_at),
+            CONSTRAINT fk_fpv_reaction_user FOREIGN KEY (user_id)
                 REFERENCES fpv_users (id) ON DELETE CASCADE
         ) $engine"
     );

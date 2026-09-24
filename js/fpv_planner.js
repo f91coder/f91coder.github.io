@@ -489,7 +489,7 @@
 
     function feedbackInfo(uuid) {
         const by = state.share && state.share.by_item ? state.share.by_item[uuid] : null;
-        return by && by.total > 0 ? by : null;
+        return by && (by.like > 0 || by.dislike > 0 || by.doubt > 0 || by.comments > 0 || by.unread > 0) ? by : null;
     }
 
     function renderItems() {
@@ -534,7 +534,7 @@
                             ${category ? `<span class="text-[11px] px-2 py-0.5 rounded-full font-medium ${escapeHtml(category.color_class)}">${escapeHtml(category.name)}</span>` : ""}
                             ${item.store_url ? `<a href="${escapeHtml(item.store_url)}" target="_blank" rel="noopener" class="text-[11px] text-f91-muted hover:text-f91-text flex items-center gap-1"><i class="ph ph-link"></i> Loja</a>` : ""}
                             ${purchasedInfo}
-                            ${fb ? `<button type="button" data-action="open-feedback" class="text-[11px] font-semibold text-f91-text bg-gray-100 hover:bg-gray-200 px-2 py-0.5 rounded-full flex items-center gap-1 transition-colors" title="Ver opiniões sobre este item"><i class="ph ph-chat-circle-text"></i> ${fb.total}${fb.unread ? ` <span class="w-1.5 h-1.5 rounded-full bg-f91-lime"></span>` : ""}${fb.like ? ` <span>👍${fb.like}</span>` : ""}${fb.doubt ? ` <span>🤔${fb.doubt}</span>` : ""}${fb.dislike ? ` <span>👎${fb.dislike}</span>` : ""}</button>` : ""}
+                            ${fb ? `<button type="button" data-action="open-feedback" class="text-[11px] font-semibold text-f91-text bg-gray-100 hover:bg-gray-200 px-2 py-0.5 rounded-full flex items-center gap-1.5 transition-colors" title="Ver opiniões sobre este item">${fb.unread ? `<span class="w-1.5 h-1.5 rounded-full bg-f91-lime"></span>` : ""}<span>👍${fb.like || 0}</span><span>👎${fb.dislike || 0}</span>${fb.doubt ? `<span>🤔${fb.doubt}</span>` : ""}<span class="flex items-center gap-0.5"><i class="ph ph-chat-circle-text"></i>${fb.comments || 0}</span></button>` : ""}
                         </div>
                     </div>
                     <p class="hidden sm:block font-bold text-f91-text text-base flex-shrink-0 whitespace-nowrap item-price" data-price="${item.price}">${formatDisplayCurrency(item.price)}</p>

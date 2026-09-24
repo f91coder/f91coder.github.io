@@ -15,6 +15,11 @@ const FPV_SHARE_FEEDBACK_PER_SHARE_HOUR = 80;
 const FPV_SHARE_FEEDBACK_PER_SHARE_DAY = 300;
 const FPV_SHARE_FEEDBACK_LIST_LIMIT = 300;
 const FPV_SHARE_REACTIONS = ['like', 'doubt', 'dislike'];
+// Reacoes de uma batida (fpv_share_reactions): so like/dislike, uma por visitante e item.
+const FPV_TOGGLE_REACTIONS = ['like', 'dislike'];
+const FPV_REACTIONS_NEW_PER_VISITOR_HOUR = 200;
+const FPV_REACTIONS_NEW_PER_SHARE_HOUR = 600;
+const FPV_VISITOR_COOKIE = 'fpv_visitor';
 
 function fpv_share_unavailable(): array
 {
@@ -50,6 +55,33 @@ function fpv_visitor_hash(): string
     return hash('sha256', $ip . '|' . substr((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 120) . '|' . $config['ip_hash_pepper']);
 }
 
+/**
+ * Identidade do visitante para reacoes: cookie aleatorio (distingue pessoas atras do mesmo IP/Wi-Fi);
+ * sem cookie na requisicao (bloqueado ou 1a visita) cai no hash IP+UA, que e estavel. $issue = true
+ * entrega o cookie a quem ainda nao tem (so chame antes de qualquer saida).
+ */
+function fpv_visitor_key(bool $issue = false): string
+{
+    $id = (string) ($_COOKIE[FPV_VISITOR_COOKIE] ?? '');
+    if (!preg_match('/^[a-f0-9]{32}$/', $id)) {
+        $id = '';
+        if ($issue && !headers_sent()) {
+            $fresh = bin2hex(random_bytes(16));
+            setcookie(FPV_VISITOR_COOKIE, $fresh, [
+                'expires' => time() + 31536000,
+                'path' => '/',
+                'secure' => fpv_is_https_request(),
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ]);
+        }
+    }
+    if ($id === '') {
+        return fpv_visitor_hash();
+    }
+    return hash('sha256', 'visitor|' . $id . '|' . fpv_config()['ip_hash_pepper']);
+}
+
 function fpv_share_row(PDO $pdo, int $userId): ?array
 {
     $stmt = $pdo->prepare('SELECT * FROM fpv_shares WHERE user_id = :user_id');
@@ -57,12 +89,27 @@ function fpv_share_row(PDO $pdo, int $userId): ?array
     return $stmt->fetch() ?: null;
 }
 
+/** Reacoes de uma batida por item: item_uuid => ['like' => n, 'dislike' => n] (tabela fpv_share_reactions). */
+function fpv_share_reaction_counts(PDO $pdo, int $userId): array
+{
+    $stmt = $pdo->prepare(
+        "SELECT item_uuid, SUM(reaction = 'like') AS likes, SUM(reaction = 'dislike') AS dislikes
+         FROM fpv_share_reactions WHERE user_id = :user_id GROUP BY item_uuid"
+    );
+    $stmt->execute(['user_id' => $userId]);
+    $map = [];
+    foreach ($stmt->fetchAll() as $row) {
+        $map[$row['item_uuid']] = ['like' => (int) $row['likes'], 'dislike' => (int) $row['dislikes']];
+    }
+    return $map;
+}
+
 function fpv_share_feedback_counts(PDO $pdo, int $userId): array
 {
     $stmt = $pdo->prepare(
         "SELECT item_uuid, COUNT(*) AS total,
                 SUM(reaction = 'like') AS likes, SUM(reaction = 'doubt') AS doubts, SUM(reaction = 'dislike') AS dislikes,
-                SUM(is_read = 0) AS unread
+                SUM(message <> '') AS comments, SUM(is_read = 0) AS unread
          FROM fpv_share_feedback WHERE user_id = :user_id GROUP BY item_uuid"
     );
     $stmt->execute(['user_id' => $userId]);
@@ -75,6 +122,7 @@ function fpv_share_feedback_counts(PDO $pdo, int $userId): array
             'like' => (int) $row['likes'],
             'doubt' => (int) $row['doubts'],
             'dislike' => (int) $row['dislikes'],
+            'comments' => (int) $row['comments'],
             'unread' => (int) $row['unread'],
         ];
         if ($row['item_uuid'] === null) {
@@ -82,6 +130,15 @@ function fpv_share_feedback_counts(PDO $pdo, int $userId): array
         } else {
             $byItem[$row['item_uuid']] = $entry;
         }
+    }
+
+    // Soma as reacoes de uma batida (nao geram "nao lido": o dono ve so o placar).
+    foreach (fpv_share_reaction_counts($pdo, $userId) as $uuid => $r) {
+        $entry = $byItem[$uuid] ?? ['total' => 0, 'like' => 0, 'doubt' => 0, 'dislike' => 0, 'comments' => 0, 'unread' => 0];
+        $entry['like'] += $r['like'];
+        $entry['dislike'] += $r['dislike'];
+        $entry['total'] += $r['like'] + $r['dislike'];
+        $byItem[$uuid] = $entry;
     }
 
     $unread = $general['unread'];
@@ -143,7 +200,13 @@ function fpv_share_owner_payload(PDO $pdo, int $userId): array
 
     $counts = fpv_share_feedback_counts($pdo, $userId);
 
-    return ['success' => true, 'share' => $share, 'feedback' => $feedback, 'unread' => $counts['unread']];
+    return [
+        'success' => true,
+        'share' => $share,
+        'feedback' => $feedback,
+        'reactions' => (object) fpv_share_reaction_counts($pdo, $userId),
+        'unread' => $counts['unread'],
+    ];
 }
 
 function get_fpv_share(array $input): array
@@ -247,6 +310,25 @@ function delete_fpv_feedback(array $input): array
 // Lado publico (visitantes, sem login)
 // ─────────────────────────────────────────────────────────────────────────
 
+/** Reacao atual do visitante em cada item da lista: item_uuid => 'like'|'dislike'. */
+function fpv_share_my_reactions(PDO $pdo, int $ownerId, string $visitorKey): array
+{
+    $stmt = $pdo->prepare('SELECT item_uuid, reaction FROM fpv_share_reactions WHERE user_id = :user_id AND visitor_key = :key');
+    $stmt->execute(['user_id' => $ownerId, 'key' => $visitorKey]);
+    return $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+}
+
+/** Placar publico de um item (o texto dos comentarios continua so para o dono). */
+function fpv_share_item_score(PDO $pdo, int $ownerId, string $itemUuid): array
+{
+    $by = fpv_share_feedback_counts($pdo, $ownerId)['by_item'][$itemUuid] ?? null;
+    return [
+        'likes' => (int) ($by['like'] ?? 0),
+        'dislikes' => (int) ($by['dislike'] ?? 0),
+        'comments' => (int) ($by['comments'] ?? 0),
+    ];
+}
+
 /** Carrega a lista publica pelo token; null se o token nao existir ou o dono tiver desativado o link. */
 function fpv_public_share_load(string $token, ?int $viewerUserId = null): ?array
 {
@@ -280,6 +362,13 @@ function fpv_public_share_load(string $token, ?int $viewerUserId = null): ?array
     $items->execute(['user_id' => $ownerId]);
 
     $showPrices = (bool) $share['show_prices'];
+
+    // Placar (curtidas/descurtidas/comentarios) e a reacao do proprio visitante. O cookie do visitante
+    // e entregue aqui, na 1a visita, antes de qualquer saida.
+    $counts = fpv_share_feedback_counts($pdo, $ownerId)['by_item'];
+    $mine = fpv_share_my_reactions($pdo, $ownerId, fpv_visitor_key());
+    fpv_visitor_key(true);
+
     $itemRows = [];
     $total = 0.0;
     $purchased = 0;
@@ -296,6 +385,10 @@ function fpv_public_share_load(string $token, ?int $viewerUserId = null): ?array
             'store_url' => $url,
             'image_path' => $row['image_path'],
             'is_purchased' => (bool) $row['is_purchased'],
+            'likes' => (int) ($counts[$row['item_uuid']]['like'] ?? 0),
+            'dislikes' => (int) ($counts[$row['item_uuid']]['dislike'] ?? 0),
+            'comments' => (int) ($counts[$row['item_uuid']]['comments'] ?? 0),
+            'my_reaction' => $mine[$row['item_uuid']] ?? null,
         ];
     }
 
@@ -405,7 +498,7 @@ function add_fpv_feedback(array $input): array
     );
     $dup->execute(['u' => $ownerId, 'h' => $visitor, 'm' => $message, 'i1' => $itemUuid, 'i2' => $itemUuid, 'r' => $reaction]);
     if ($dup->fetchColumn()) {
-        return ['success' => true];
+        return ['success' => true] + ($itemUuid !== null ? fpv_share_item_score($pdo, $ownerId, $itemUuid) : []);
     }
 
     $insert = $pdo->prepare(
@@ -422,5 +515,76 @@ function add_fpv_feedback(array $input): array
         'ip_hash' => $visitor,
     ]);
 
-    return ['success' => true];
+    return ['success' => true] + ($itemUuid !== null ? fpv_share_item_score($pdo, $ownerId, $itemUuid) : []);
+}
+
+/**
+ * Acao PUBLICA: curtir/descurtir com uma batida. Bater de novo na mesma reacao a desfaz; bater na outra troca.
+ * Uma reacao por visitante e item (UNIQUE), sem nome nem texto.
+ */
+function toggle_fpv_reaction(array $input): array
+{
+    if (!fpv_schema_ready()) {
+        return fpv_share_unavailable();
+    }
+    $pdo = fpv_pdo();
+
+    $token = fpv_sanitize_string($input['token'] ?? '', 32);
+    if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
+        return ['success' => false, 'message' => 'Link invalido.', '_code' => 404];
+    }
+    $stmt = $pdo->prepare('SELECT user_id, allow_feedback FROM fpv_shares WHERE token = :token AND is_active = 1');
+    $stmt->execute(['token' => $token]);
+    $share = $stmt->fetch();
+    if (!$share) {
+        return ['success' => false, 'message' => 'Esta lista nao esta mais disponivel.', '_code' => 404];
+    }
+    if (!(int) $share['allow_feedback']) {
+        return ['success' => false, 'message' => 'O dono desta lista desativou as reacoes.', '_code' => 403];
+    }
+    $ownerId = (int) $share['user_id'];
+
+    $reaction = (string) ($input['reaction'] ?? '');
+    if (!in_array($reaction, FPV_TOGGLE_REACTIONS, true)) {
+        return ['success' => false, 'message' => 'Reacao invalida.', '_code' => 400];
+    }
+
+    $itemUuid = fpv_sanitize_string($input['item_uuid'] ?? '', 36);
+    $itemStmt = $pdo->prepare('SELECT 1 FROM fpv_items WHERE item_uuid = :uuid AND user_id = :user_id');
+    $itemStmt->execute(['uuid' => $itemUuid, 'user_id' => $ownerId]);
+    if ($itemUuid === '' || !$itemStmt->fetchColumn()) {
+        return ['success' => false, 'message' => 'Item nao encontrado nesta lista.', '_code' => 404];
+    }
+
+    $key = fpv_visitor_key(true);
+    $existing = $pdo->prepare('SELECT reaction FROM fpv_share_reactions WHERE item_uuid = :uuid AND visitor_key = :key');
+    $existing->execute(['uuid' => $itemUuid, 'key' => $key]);
+    $current = $existing->fetchColumn();
+
+    if ($current === $reaction) {
+        $pdo->prepare('DELETE FROM fpv_share_reactions WHERE item_uuid = :uuid AND visitor_key = :key')
+            ->execute(['uuid' => $itemUuid, 'key' => $key]);
+        $mine = null;
+    } else {
+        $ipHash = fpv_visitor_hash();
+        if ($current === false) {
+            // Reacao nova: limita criacoes por visitante (IP+UA) e por lista para conter inflacao de placar.
+            $perVisitor = $pdo->prepare('SELECT COUNT(*) FROM fpv_share_reactions WHERE ip_hash = :h AND created_at > (NOW() - INTERVAL 1 HOUR)');
+            $perVisitor->execute(['h' => $ipHash]);
+            $perShare = $pdo->prepare('SELECT COUNT(*) FROM fpv_share_reactions WHERE user_id = :u AND created_at > (NOW() - INTERVAL 1 HOUR)');
+            $perShare->execute(['u' => $ownerId]);
+            if ((int) $perVisitor->fetchColumn() >= FPV_REACTIONS_NEW_PER_VISITOR_HOUR
+                || (int) $perShare->fetchColumn() >= FPV_REACTIONS_NEW_PER_SHARE_HOUR) {
+                return ['success' => false, 'message' => 'Muitas reacoes em pouco tempo. Tente novamente mais tarde.', '_code' => 429];
+            }
+        }
+        $pdo->prepare(
+            'INSERT INTO fpv_share_reactions (user_id, item_uuid, visitor_key, ip_hash, reaction)
+             VALUES (:user_id, :item_uuid, :key, :ip_hash, :reaction)
+             ON DUPLICATE KEY UPDATE reaction = VALUES(reaction)'
+        )->execute(['user_id' => $ownerId, 'item_uuid' => $itemUuid, 'key' => $key, 'ip_hash' => $ipHash, 'reaction' => $reaction]);
+        $mine = $reaction;
+    }
+
+    return ['success' => true, 'my_reaction' => $mine] + fpv_share_item_score($pdo, $ownerId, $itemUuid);
 }

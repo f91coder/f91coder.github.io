@@ -232,11 +232,17 @@ $config = [
                     </div>
 
                     <?php if ($allowFeedback): ?>
-                        <div class="sh-react" role="group" aria-label="Sua opinião sobre <?= $e($item['name']) ?>">
-                            <button type="button" class="is-icon is-like" data-reaction="like" aria-label="Curti" title="Curti"><i class="fa-regular fa-thumbs-up" aria-hidden="true"></i></button>
-                            <button type="button" class="is-icon is-dislike" data-reaction="dislike" aria-label="Não curti" title="Não curti"><i class="fa-regular fa-thumbs-down" aria-hidden="true"></i></button>
-                            <button type="button" class="is-doubt" data-reaction="doubt"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Sei não!</button>
-                            <button type="button" class="is-comment" data-reaction="comment"><i class="fa-regular fa-comment" aria-hidden="true"></i> Comentar</button>
+                        <?php $mine = $item['my_reaction'] ?? null; ?>
+                        <div class="sh-react" role="group" aria-label="Reações e comentários sobre <?= $e($item['name']) ?>">
+                            <button type="button" class="<?= $mine === 'like' ? 'is-active' : '' ?>" data-reaction="like" aria-pressed="<?= $mine === 'like' ? 'true' : 'false' ?>" title="Curti">
+                                <i class="fa-regular fa-thumbs-up" aria-hidden="true"></i><span class="sh-sr">Curti</span><span class="sh-count" data-count="likes"><?= (int) $item['likes'] ?></span>
+                            </button>
+                            <button type="button" class="<?= $mine === 'dislike' ? 'is-active' : '' ?>" data-reaction="dislike" aria-pressed="<?= $mine === 'dislike' ? 'true' : 'false' ?>" title="Não curti">
+                                <i class="fa-regular fa-thumbs-down" aria-hidden="true"></i><span class="sh-sr">Não curti</span><span class="sh-count" data-count="dislikes"><?= (int) $item['dislikes'] ?></span>
+                            </button>
+                            <button type="button" data-reaction="comment" aria-expanded="false" title="Comentar">
+                                <i class="fa-regular fa-comment" aria-hidden="true"></i><span class="sh-sr">Comentários</span><span class="sh-count" data-count="comments"><?= (int) $item['comments'] ?></span>
+                            </button>
                         </div>
                         <p class="sh-fb-done" hidden></p>
                     <?php endif; ?>

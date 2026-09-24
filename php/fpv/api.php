@@ -126,6 +126,12 @@ try {
             $result = add_fpv_feedback($_POST);
             break;
 
+        case 'toggleFpvReaction':
+            // PUBLICA: curtir/descurtir com uma batida (cookie do visitante).
+            fpv_require_post($method);
+            $result = toggle_fpv_reaction($_POST);
+            break;
+
         case 'addFpvWalletEntry':
             fpv_require_post($method);
             $result = add_fpv_wallet_entry($_POST);

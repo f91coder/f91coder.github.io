@@ -992,6 +992,7 @@ function reset_fpv_data(array $input): array
     if (fpv_schema_ready()) {
         $pdo->prepare('DELETE FROM fpv_wallet_entries WHERE user_id = :user_id')->execute(['user_id' => $userId]);
         $pdo->prepare('DELETE FROM fpv_share_feedback WHERE user_id = :user_id')->execute(['user_id' => $userId]);
+        $pdo->prepare('DELETE FROM fpv_share_reactions WHERE user_id = :user_id')->execute(['user_id' => $userId]);
     }
 
     foreach ($rows as $row) {

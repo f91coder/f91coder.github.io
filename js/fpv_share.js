@@ -14,6 +14,7 @@
         loading: false,
         share: null,
         feedback: [],
+        reactions: {},
         tab: "link",
         filterItemUuid: null,
         newIds: new Set(),
@@ -51,12 +52,21 @@
 
     function countsByItem() {
         const map = {};
+        const entryFor = (uuid) => map[uuid] || (map[uuid] = { total: 0, like: 0, doubt: 0, dislike: 0, comments: 0, unread: 0 });
         state.feedback.forEach((f) => {
             if (!f.item_uuid) return;
-            const entry = map[f.item_uuid] || (map[f.item_uuid] = { total: 0, like: 0, doubt: 0, dislike: 0, unread: 0 });
+            const entry = entryFor(f.item_uuid);
             entry.total += 1;
             if (f.reaction && entry[f.reaction] !== undefined) entry[f.reaction] += 1;
+            if (f.message) entry.comments += 1;
             if (!f.is_read) entry.unread += 1;
+        });
+        // Curtidas/descurtidas de uma batida vivem em outra tabela (nao geram "nao lido").
+        Object.entries(state.reactions).forEach(([uuid, r]) => {
+            const entry = entryFor(uuid);
+            entry.like += r.like || 0;
+            entry.dislike += r.dislike || 0;
+            entry.total += (r.like || 0) + (r.dislike || 0);
         });
         return map;
     }
@@ -70,6 +80,7 @@
     function applyPayload(payload) {
         state.share = payload.share;
         state.feedback = payload.feedback || [];
+        state.reactions = payload.reactions || {};
         state.loaded = true;
         notifyPlanner();
     }
@@ -198,20 +209,25 @@
 
     function renderFeedbackTab() {
         const filtered = state.filterItemUuid ? state.feedback.filter((f) => f.item_uuid === state.filterItemUuid) : state.feedback;
+        // Placar: reacoes de uma batida (por item ou soma geral) + reacoes antigas que vieram junto de comentario.
         const totals = { like: 0, doubt: 0, dislike: 0 };
+        const tapped = state.filterItemUuid ? [state.reactions[state.filterItemUuid] || {}] : Object.values(state.reactions);
+        tapped.forEach((r) => { totals.like += r.like || 0; totals.dislike += r.dislike || 0; });
         filtered.forEach((f) => { if (f.reaction && totals[f.reaction] !== undefined) totals[f.reaction] += 1; });
+        const comments = filtered.filter((f) => f.message).length;
+        const hasReactions = totals.like + totals.dislike + totals.doubt > 0;
 
         const filterItem = state.filterItemUuid
             ? (state.feedback.find((f) => f.item_uuid === state.filterItemUuid) || {}).item_name
                 || (window.FpvPlanner.getItems().find((it) => it.item_uuid === state.filterItemUuid) || {}).name
             : "";
 
-        if (!state.feedback.length) {
+        if (!state.feedback.length && !hasReactions) {
             return `
                 <div class="p-10 text-center">
                     <div class="w-16 h-16 rounded-full bg-gray-100 text-f91-muted flex items-center justify-center mx-auto mb-4"><i class="ph ph-chat-circle-dots text-3xl"></i></div>
                     <h4 class="text-base font-semibold text-f91-text mb-1">Ainda sem opiniões</h4>
-                    <p class="text-sm text-f91-muted max-w-sm mx-auto">Quando alguém reagir ou comentar pelo seu link, aparece aqui — e você recebe o aviso no botão Compartilhar.</p>
+                    <p class="text-sm text-f91-muted max-w-sm mx-auto">Quando alguém curtir, descurtir ou comentar pelo seu link, aparece aqui — e você recebe o aviso no botão Compartilhar.</p>
                 </div>
             `;
         }
@@ -221,13 +237,13 @@
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
                         <span class="px-2.5 py-1 rounded-full bg-gray-100 text-f91-text">👍 ${totals.like}</span>
-                        <span class="px-2.5 py-1 rounded-full bg-gray-100 text-f91-text">🤔 ${totals.doubt}</span>
                         <span class="px-2.5 py-1 rounded-full bg-gray-100 text-f91-text">👎 ${totals.dislike}</span>
-                        <span class="text-f91-muted font-medium">${filtered.length} ${filtered.length === 1 ? "opinião" : "opiniões"}</span>
+                        ${totals.doubt ? `<span class="px-2.5 py-1 rounded-full bg-gray-100 text-f91-text">🤔 ${totals.doubt}</span>` : ""}
+                        <span class="text-f91-muted font-medium">${comments} ${comments === 1 ? "comentário" : "comentários"}</span>
                     </div>
                     ${state.filterItemUuid ? `<button type="button" data-share-action="clear-filter" class="text-xs font-semibold text-f91-text bg-gray-100 hover:bg-gray-200 px-3 py-1.5 rounded-full flex items-center gap-1.5 transition-colors max-w-full"><span class="truncate max-w-[14rem]">${escapeHtml(filterItem || "Item")}</span> <i class="ph ph-x"></i></button>` : ""}
                 </div>
-                ${filtered.length ? `<ul class="space-y-3">${filtered.map(feedbackCard).join("")}</ul>` : `<p class="text-sm text-f91-muted text-center py-6">Nenhuma opinião sobre este item.</p>`}
+                ${filtered.length ? `<ul class="space-y-3">${filtered.map(feedbackCard).join("")}</ul>` : `<p class="text-sm text-f91-muted text-center py-6">${state.filterItemUuid ? "Nenhum comentário sobre este item." : "Nenhum comentário ainda."}</p>`}
             </div>
         `;
     }
