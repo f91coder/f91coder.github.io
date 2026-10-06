@@ -428,7 +428,36 @@ html.fpv-js .fpv-typing:not(.is-ready){ visibility:hidden; }
   letter-spacing:-.005em;
   box-shadow:0 14px 34px rgba(255,104,41,.32);
 }
-.fpv-hero-actions .fpv-btn:hover{ box-shadow:0 18px 40px rgba(255,104,41,.42); transform:translateY(-1px); }
+
+/* Botoes laranja da landing: texto branco; no hover invertem (fundo branco, texto e borda laranja). */
+.fpv-hero-actions .fpv-btn-lime,
+body.fpv-hero-only .fpv-nav-actions .fpv-btn-lime{
+  background-color:var(--lime);
+  color:#fff;
+  border:1px solid var(--lime);
+  transition:
+    background-color .5s cubic-bezier(.22,.61,.36,1),
+    color .5s cubic-bezier(.22,.61,.36,1),
+    border-color .5s cubic-bezier(.22,.61,.36,1),
+    box-shadow .5s ease,
+    transform .5s cubic-bezier(.22,.61,.36,1);
+}
+.fpv-hero-actions .fpv-btn-lime:hover,
+body.fpv-hero-only .fpv-nav-actions .fpv-btn-lime:hover{
+  background-color:#fff;
+  color:var(--lime);
+  border-color:var(--lime);
+  box-shadow:0 0 0 4px rgba(255,104,41,.16), 0 16px 40px rgba(255,104,41,.28);
+  transform:translateY(-2px);
+}
+.fpv-hero-actions .fpv-btn-lime:active,
+body.fpv-hero-only .fpv-nav-actions .fpv-btn-lime:active{ transform:translateY(0) scale(.98); }
+.fpv-hero-actions .fpv-btn-lime:focus-visible{ outline:2px solid #fff; outline-offset:3px; }
+
+@media (prefers-reduced-motion: reduce){
+  .fpv-hero-actions .fpv-btn-lime:hover,
+  body.fpv-hero-only .fpv-nav-actions .fpv-btn-lime:hover{ transform:none; }
+}
 
 /* Telas baixas (paisagem de celular, notebook pequeno): o conteudo tem que caber sem rolagem. */
 @media (max-width:1000px){
