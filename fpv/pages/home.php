@@ -1,9 +1,20 @@
 <?php
-$recentPosts = list_fpv_posts('blog', 3);
-$recentTutorials = list_fpv_posts('tutorial', 3);
+/**
+ * Landing do FPV91.
+ *
+ * FPV_HOME_HERO_ONLY = true: so o hero (video de fundo com revelacao no cursor). Rolagem, links do menu
+ * e rodape ficam desligados ate o conteudo (blog, tutoriais, comunidade, cursos) estar pronto.
+ * Para reativar a pagina completa, troque para false: o conteudo abaixo volta sem mais nenhuma alteracao.
+ */
+const FPV_HOME_HERO_ONLY = true;
+
+$recentPosts = FPV_HOME_HERO_ONLY ? [] : list_fpv_posts('blog', 3);
+$recentTutorials = FPV_HOME_HERO_ONLY ? [] : list_fpv_posts('tutorial', 3);
+$heroVideo = '/' . fpv_asset_v('img/fpv_drone_hero_background.mp4');
+$pageClass = FPV_HOME_HERO_ONLY ? ' fpv-hero-only' : '';
 ?>
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="<?= trim($pageClass) ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -14,28 +25,10 @@ $recentTutorials = list_fpv_posts('tutorial', 3);
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/fpv/assets/css/fpv_site.css?v=1">
+<link rel="stylesheet" href="/<?= fpv_asset_v('fpv/assets/css/fpv_hero.css') ?>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <style>
-    .fpv-hero{
-        min-height:100vh;
-        display:flex;
-        align-items:center;
-        background:
-            radial-gradient(900px 500px at 85% 10%, rgba(255,104,41,.12), transparent),
-            linear-gradient(180deg, var(--navy) 0%, #050404 100%);
-        color:#fff;
-        position:relative;
-        overflow:hidden;
-    }
-    .fpv-hero-inner{ max-width:var(--content-max); margin:0 auto; padding:120px 24px 80px; position:relative; z-index:2; }
-    .fpv-hero h1{ font-size:clamp(38px, 6.5vw, 78px); font-weight:800; letter-spacing:-.03em; line-height:1.02; margin:18px 0 22px; max-width:820px; }
-    .fpv-hero h1 .fpv-hero-highlight{ color:var(--lime); }
-    .fpv-hero p{ font-size:17px; color:rgba(255,255,255,.68); max-width:520px; margin:0 0 34px; line-height:1.7; }
-    .fpv-hero-actions{ display:flex; gap:14px; flex-wrap:wrap; }
-    .fpv-hero-drone{ position:absolute; right:-6%; top:18%; width:46%; max-width:640px; opacity:.92; filter:drop-shadow(0 30px 60px rgba(0,0,0,.4)); }
-    @media (max-width:900px){ .fpv-hero-drone{ display:none; } }
-
     .fpv-value-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:24px; margin-top:8px; }
     .fpv-value-card{ background:var(--surface); border-radius:var(--radius-md); padding:28px; border:1px solid var(--border); }
     .fpv-value-card .fpv-value-icon{ width:44px; height:44px; border-radius:12px; background:var(--surface-2); display:flex; align-items:center; justify-content:center; font-size:20px; margin-bottom:16px; }
@@ -52,22 +45,47 @@ $recentTutorials = list_fpv_posts('tutorial', 3);
     .fpv-cta-band p{ margin:0; color:rgba(255,255,255,.68); font-size:14.5px; }
 </style>
 </head>
-<body class="fpv-site">
+<body class="fpv-site<?= $pageClass ?>">
 <?php require __DIR__ . '/../partials/header.php'; ?>
 
-<section class="fpv-hero">
-    <img src="/<?= fpv_asset_v('img/fpv_logo.png') ?>" alt="" class="fpv-hero-drone">
+<section class="fpv-hero" id="fpvHero" aria-labelledby="fpvHeroTitle">
+    <div class="fpv-cinema" id="fpvCinema" aria-hidden="true">
+        <video class="fpv-cinema-video" autoplay muted loop playsinline preload="auto" disablepictureinpicture>
+            <source src="<?= htmlspecialchars($heroVideo) ?>" type="video/mp4">
+        </video>
+        <div class="fpv-cinema-scrim"></div>
+        <div class="fpv-cinema-veil"></div>
+
+        <div class="fpv-lens" id="fpvLens">
+            <div class="fpv-lens-ring"></div>
+            <div class="fpv-horizon" id="fpvHorizon"></div>
+            <div class="fpv-reticle">
+                <div class="fpv-reticle-brackets">
+                    <span class="tl"></span><span class="tr"></span><span class="bl"></span><span class="br"></span>
+                </div>
+                <span class="fpv-reticle-dot"></span>
+            </div>
+            <div class="fpv-lens-readout"><span id="fpvSpeed">0</span> km/h</div>
+        </div>
+
+        <div class="fpv-osd fpv-osd-tl"><span class="fpv-rec"></span>REC <span id="fpvTimer">00:00</span></div>
+        <div class="fpv-osd fpv-osd-tr"><span class="fpv-batt"><i></i></span>16.8 V</div>
+        <div class="fpv-osd fpv-osd-bl">Acro · CH R2 · 5.8 GHz</div>
+        <div class="fpv-osd fpv-osd-br">FPV91</div>
+        <div class="fpv-scanlines"></div>
+    </div>
+
     <div class="fpv-hero-inner">
-        <span class="fpv-eyebrow" style="display:inline-block;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.1);color:var(--lime);font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">FPV91 by F91</span>
-        <h1>Monte seu <span class="fpv-hero-highlight">drone FPV</span> do zero, com quem entende do assunto.</h1>
-        <p>Tutoriais de montagem DIY, comunidade de pilotos, cursos e um planner de verdade para organizar as pecas e o orcamento do seu proximo setup.</p>
+        <span class="fpv-eyebrow">FPV91 by F91</span>
+        <h1 id="fpvHeroTitle">Como iniciar no <span class="fpv-hero-highlight">Drone FPV</span> da melhor forma.</h1>
+        <p>Em breve, tutoriais de montagem DIY, comunidade de pilotos, cursos e e-books gratuitos e um planner de verdade para organizar o orçamento do seu próximo setup.</p>
         <div class="fpv-hero-actions">
-            <a href="/fpv/cadastro" class="fpv-btn fpv-btn-lime">Criar minha conta</a>
-            <a href="/fpv/tutoriais" class="fpv-btn fpv-btn-ghost-light">Ver tutoriais</a>
+            <a href="/fpv/cadastro" class="fpv-btn fpv-btn-lime">Criar minha conta grátis</a>
         </div>
     </div>
 </section>
 
+<?php if (!FPV_HOME_HERO_ONLY): ?>
 <section class="fpv-section">
     <div class="fpv-container">
         <div class="fpv-value-grid" data-reveal data-reveal-group>
@@ -135,5 +153,10 @@ $recentTutorials = list_fpv_posts('tutorial', 3);
 </section>
 
 <?php require __DIR__ . '/../partials/footer.php'; ?>
+<?php else: ?>
+<script src="/fpv/assets/js/fpv_site.js"></script>
+<?php endif; ?>
+
+<script src="/<?= fpv_asset_v('fpv/assets/js/fpv_hero.js') ?>"></script>
 </body>
 </html>
