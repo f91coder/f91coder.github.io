@@ -143,7 +143,7 @@ $pageClass = FPV_HOME_HERO_ONLY ? ' fpv-hero-only' : '';
 
     <div class="fpv-hero-inner">
         <span class="fpv-eyebrow">FPV91 by F91</span>
-        <h1 id="fpvHeroTitle" class="fpv-typing" data-split="1">Tudo o que você precisa saber para começar no hobby <span class="fpv-hero-highlight">do jeito certo!</span></h1>
+        <h1 id="fpvHeroTitle" class="fpv-typing" data-split="1">Tudo o que você precisa saber para começar no hobby <br>do <span class="fpv-hero-highlight">jeito certo!</span></h1>
         <p>Organize, planeje e interaja com outros pilotos experientes para coletar opiniões e sugestões na montagem do seu próximo setup.</p>
         <div class="fpv-hero-actions">
             <a href="/fpv/cadastro" class="fpv-btn fpv-btn-lime">Criar minha conta grátis</a>
