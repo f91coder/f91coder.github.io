@@ -17,6 +17,7 @@ $pageClass = FPV_HOME_HERO_ONLY ? ' fpv-hero-only' : '';
 <html lang="pt-BR" class="<?= trim($pageClass) ?>">
 <head>
 <meta charset="utf-8">
+<script>document.documentElement.classList.add("fpv-js");</script>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FPV91 — Monte seu drone FPV do zero</title>
 <meta name="description" content="Conteudo, tutoriais e ferramentas para quem quer montar o proprio drone FPV do zero.">
@@ -142,8 +143,8 @@ $pageClass = FPV_HOME_HERO_ONLY ? ' fpv-hero-only' : '';
 
     <div class="fpv-hero-inner">
         <span class="fpv-eyebrow">FPV91 by F91</span>
-        <h1 id="fpvHeroTitle">Como iniciar no <span class="fpv-hero-highlight">Drone FPV</span> da melhor forma.</h1>
-        <p>Em breve, tutoriais de montagem DIY, comunidade de pilotos, cursos e e-books gratuitos e um planner de verdade para organizar o orçamento do seu próximo setup.</p>
+        <h1 id="fpvHeroTitle" class="fpv-typing" data-split="1">Tudo o que você precisa saber para começar no hobby <span class="fpv-hero-highlight">do jeito certo!</span></h1>
+        <p>Organize, planeje e interaja com outros pilotos experientes para coletar opiniões e sugestões na montagem do seu próximo setup.</p>
         <div class="fpv-hero-actions">
             <a href="/fpv/cadastro" class="fpv-btn fpv-btn-lime">Criar minha conta grátis</a>
         </div>

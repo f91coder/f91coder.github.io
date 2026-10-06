@@ -20,6 +20,58 @@
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const touchOnly = window.matchMedia("(hover: none)").matches;
 
+    // ── Titulo digitado (como um prompt de chat), com cursor "|" piscando ──
+    function typeTitle() {
+        const title = document.getElementById("fpvHeroTitle");
+        if (!title) return;
+        // Guarda os trechos de texto (com o destaque em laranja no meio) e zera para digitar.
+        const walker = document.createTreeWalker(title, NodeFilter.SHOW_TEXT);
+        const parts = [];
+        for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            parts.push({ node, text: node.textContent });
+        }
+        // Reserva a altura final para o bloco nao "pular" enquanto as linhas crescem.
+        title.style.minHeight = `${title.offsetHeight}px`;
+        title.classList.add("is-ready");
+        if (reduceMotion || !parts.length) return;
+
+        const caret = document.createElement("span");
+        caret.className = "fpv-caret";
+        caret.setAttribute("aria-hidden", "true");
+        caret.textContent = "|";
+
+        parts.forEach((part) => { part.node.textContent = ""; });
+        let part = 0;
+        let index = 0;
+        const place = () => {
+            const node = parts[part].node;
+            node.parentNode.insertBefore(caret, node.nextSibling);
+        };
+        place();
+
+        const typeNext = () => {
+            // Pula trechos vazios e acaba quando nao ha mais texto.
+            while (part < parts.length && index >= parts[part].text.length) {
+                part += 1;
+                index = 0;
+            }
+            if (part >= parts.length) return;
+
+            const current = parts[part];
+            index += 1;
+            current.node.textContent = current.text.slice(0, index);
+            place();
+
+            const ch = current.text[index - 1];
+            let delay = 42 + Math.random() * 55;
+            if (ch === " ") delay = 28 + Math.random() * 30;
+            if (/[.!?,;:]/.test(ch)) delay = 260 + Math.random() * 120;
+            window.setTimeout(typeNext, delay);
+        };
+        window.setTimeout(typeNext, 450);
+    }
+    typeTitle();
+
     // ── Video: muted + playsinline; iOS so libera o autoplay com a chamada explicita ──
     if (video) {
         video.muted = true;

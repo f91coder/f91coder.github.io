@@ -396,6 +396,17 @@ body.fpv-hero-only .fpv-mobile-panel{ display:none !important; }
 }
 .fpv-hero h1 .fpv-hero-highlight{ color:var(--lime); }
 
+/* Titulo digitado: antes do JS marcar is-ready, fica oculto (sem flash do texto completo). */
+html.fpv-js .fpv-typing:not(.is-ready){ visibility:hidden; }
+.fpv-caret{
+  display:inline-block;
+  margin-left:2px;
+  color:var(--lime);
+  font-weight:300;
+  animation:fpv-caret-blink 1s steps(1, end) infinite;
+}
+@keyframes fpv-caret-blink{ 50%{ opacity:0; } }
+
 .fpv-hero p{
   font-size:17px;
   color:rgba(255,255,255,.76);
@@ -414,6 +425,7 @@ body.fpv-hero-only .fpv-mobile-panel{ display:none !important; }
 @media (max-height:720px){
   /* Pouca altura: so o essencial no painel, para nao cobrir o texto nem o botao. */
   .fpv-osd-throttle, .fpv-osd-bl, .fpv-osd-latlon, .fpv-osd-tl{ display:none; }
+  .osd-compass{ display:none; }
   .fpv-osd-alt{ height:200px; margin-top:-100px; }
   .fpv-hero-inner{ padding-top:96px; padding-bottom:40px; }
   .fpv-hero h1{ margin:12px 0 14px; }
@@ -438,6 +450,6 @@ body.fpv-hero-only .fpv-mobile-panel{ display:none !important; }
 @media (prefers-reduced-motion: reduce){
   .fpv-lens-ring::after,
   .fpv-reticle-brackets,
-  .fpv-rec{ animation:none; }
+  .fpv-caret{ animation:none; }
   .fpv-cinema-video{ transition:none; }
 }
