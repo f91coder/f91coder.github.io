@@ -28,16 +28,69 @@
         video.addEventListener("error", () => hero.classList.add("is-no-video"));
     }
 
-    // ── Relogio do REC ──
     const startedAt = performance.now();
-    if (timerEl) {
-        const pad = (n) => String(n).padStart(2, "0");
-        const tick = () => {
-            const total = Math.floor((performance.now() - startedAt) / 1000);
-            timerEl.textContent = `${pad(Math.floor(total / 60) % 100)}:${pad(total % 60)}`;
-        };
-        tick();
-        window.setInterval(tick, 1000);
+
+    // ── Telemetria do painel (demonstrativa: segue o movimento e o tempo da pagina) ──
+    const OSD_START_SECONDS = 258; // 04:18, como no exemplo do painel
+    const $ = (id) => document.getElementById(id);
+    const osd = {
+        batt: $("osdBatt"), battFill: $("osdBattFill"), cell: $("osdCell"),
+        rssi: $("osdRssi"), ant1: $("osdAnt1"), ant2: $("osdAnt2"),
+        throttle: $("osdThrottle"), throttleFill: $("osdThrottleFill"),
+        altNow: $("osdAltNow"), curr: $("osdCurr"), used: $("osdUsed"), wh: $("osdWh"),
+        time: timerEl, speed: $("osdSpeed"), alt: $("osdAlt"), dist: $("osdDist"),
+        arrow: $("osdArrow"), homeArrow: $("osdHomeArrow"),
+    };
+    const shown = new Map();
+    function setText(el, value) {
+        if (!el || shown.get(el) === value) return;
+        shown.set(el, value);
+        el.textContent = value;
+    }
+    const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+    const pad = (n) => String(n).padStart(2, "0");
+
+    let usedMah = 2800;
+    let lastOsdAt = performance.now();
+    function updateOsd() {
+        const now = performance.now();
+        const dt = (now - lastOsdAt) / 1000;
+        lastOsdAt = now;
+        const t = (now - startedAt) / 1000;
+
+        // Bateria: descarga bem devagar; corrente oscila como em voo de acro.
+        const volts = 16.8 - Math.min(1.4, t / 600);
+        const curr = 35.4 + 6 * Math.sin(t * 0.9);
+        usedMah += (curr * dt) / 3.6;
+        const throttle = clamp(Math.round(62 + 12 * Math.sin(t * 0.45) + (state.speed > 80 ? 6 : 0)), 0, 100);
+
+        const totalSeconds = OSD_START_SECONDS + Math.floor(t);
+        setText(osd.time, `${pad(Math.floor(totalSeconds / 60) % 100)}:${pad(totalSeconds % 60)}`);
+        setText(osd.batt, `${volts.toFixed(1)}V`);
+        setText(osd.cell, `${(volts / 4).toFixed(1)}V`);
+        if (osd.battFill) osd.battFill.style.width = `${(clamp((volts - 13.2) / 3.6, 0, 1) * 100).toFixed(0)}%`;
+        setText(osd.rssi, `${clamp(Math.round(98 + 2 * Math.sin(t * 1.7)), 0, 100)}%`);
+        setText(osd.ant1, "100%");
+        setText(osd.ant2, `${clamp(Math.round(97 + Math.sin(t * 2.3)), 0, 100)}%`);
+        setText(osd.throttle, `${throttle}%`);
+        if (osd.throttleFill) osd.throttleFill.style.height = `${throttle}%`;
+        setText(osd.curr, `${curr.toFixed(1)}A`);
+        setText(osd.used, `${Math.round(usedMah)}mAh`);
+        setText(osd.wh, `${Math.round((usedMah * volts) / 1000)}Wh`);
+
+        const speed = clamp(Math.round(60 + state.speed * 0.06), 0, 199);
+        const alt = 110 + Math.round(4 * Math.sin(t * 0.3));
+        setText(osd.speed, `${speed}km/h`);
+        setText(osd.alt, `${alt}m`);
+        setText(osd.altNow, String(alt));
+        setText(osd.dist, `${450 + Math.round(t * 0.6)}m`);
+    }
+
+    // Bussola e minimapa acompanham o cursor (yaw).
+    function updateHeading() {
+        const heading = Math.round((state.x / window.innerWidth) * 360) % 360;
+        if (osd.arrow) osd.arrow.style.transform = `rotate(${heading}deg)`;
+        if (osd.homeArrow) osd.homeArrow.style.transform = `rotate(${Math.round(heading * 0.5)}deg)`;
     }
 
     // ── Estado da lente (posicao e raio em px, suavizados por frame) ──
@@ -196,6 +249,11 @@
         state.ty = Math.min(Math.max(state.ty, 0), window.innerHeight);
         applyFrame();
     });
+
+    // Telemetria: atualiza a cada 250 ms (nao precisa do frame da lente).
+    updateOsd();
+    updateHeading();
+    window.setInterval(() => { updateOsd(); updateHeading(); }, 250);
 
     // Estado inicial: lente fechada; no celular ja comeca a passear.
     applyFrame();

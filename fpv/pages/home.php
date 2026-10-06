@@ -23,7 +23,7 @@ $pageClass = FPV_HOME_HERO_ONLY ? ' fpv-hero-only' : '';
 <link rel="icon" type="image/png" href="/<?= fpv_asset_v('img/fpv_fav.png') ?>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/fpv/assets/css/fpv_site.css?v=1">
 <link rel="stylesheet" href="/<?= fpv_asset_v('fpv/assets/css/fpv_hero.css') ?>">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
@@ -68,10 +68,75 @@ $pageClass = FPV_HOME_HERO_ONLY ? ' fpv-hero-only' : '';
             <div class="fpv-lens-readout"><span id="fpvSpeed">0</span> km/h</div>
         </div>
 
-        <div class="fpv-osd fpv-osd-tl"><span class="fpv-rec"></span>REC <span id="fpvTimer">00:00</span></div>
-        <div class="fpv-osd fpv-osd-tr"><span class="fpv-batt"><i></i></span>16.8 V</div>
-        <div class="fpv-osd fpv-osd-bl">Acro · CH R2 · 5.8 GHz</div>
-        <div class="fpv-osd fpv-osd-br">FPV91</div>
+        <div class="fpv-osd" aria-hidden="true">
+            <div class="fpv-osd-block fpv-osd-tl">
+                <div class="osd-row">NAME: <b>RAPTOR_01</b></div>
+                <div class="osd-row">BATT: <b id="osdBatt">16.8V</b> <span class="osd-batt"><i id="osdBattFill"></i></span></div>
+                <div class="osd-row">CELL: <b id="osdCell">4.2V</b></div>
+            </div>
+
+            <div class="fpv-osd-block fpv-osd-tr">
+                <div class="osd-row">RSSI: <b id="osdRssi">98%</b></div>
+                <div class="osd-row">ANT1:<b id="osdAnt1">100%</b> ANT2:<b id="osdAnt2">97%</b></div>
+                <div class="osd-row">BAND: <b>R</b> | CH: <b>4</b></div>
+            </div>
+
+            <div class="fpv-osd-block fpv-osd-latlon">
+                <div class="osd-row">LAT: <b>38.8977° N</b></div>
+                <div class="osd-row">LON: <b>77.0365° W</b></div>
+            </div>
+
+            <div class="fpv-osd-throttle">
+                <span class="osd-vlabel">THROTTLE: <b id="osdThrottle">65%</b></span>
+                <div class="osd-vbar">
+                    <div class="osd-vbar-fill" id="osdThrottleFill"></div>
+                    <span style="--y:0%">0%</span><span style="--y:35%">35%</span><span style="--y:50%">50%</span><span style="--y:75%">75%</span><span style="--y:90%">90%</span>
+                </div>
+            </div>
+
+            <div class="fpv-osd-alt">
+                <div class="osd-alt-ladder">
+                </div>
+                <b class="osd-alt-now" id="osdAltNow">110</b>
+            </div>
+
+            <div class="fpv-osd-block fpv-osd-bl">
+                <div class="osd-row">CURR: <b id="osdCurr">35.4A</b></div>
+                <div class="osd-row">USED: <b id="osdUsed">2800mAh</b> <small id="osdWh">47Wh</small></div>
+                <div class="osd-row">TIME: <b id="fpvTimer">04:18</b> <small>TOT_ENERGY</small></div>
+            </div>
+
+            <div class="fpv-osd-center">
+                <div class="osd-compass">
+                    <span class="osd-compass-h">H</span>
+                    <svg viewBox="0 0 100 100" aria-hidden="true">
+                        <circle cx="50" cy="50" r="46" fill="rgba(5,4,4,.35)" stroke="#ff6829" stroke-width="2"/>
+                        <circle cx="50" cy="50" r="36" fill="none" stroke="rgba(255,255,255,.25)" stroke-width="1" stroke-dasharray="2 4"/>
+                        <g id="osdArrow"><path d="M50 14 L63 70 L50 60 L37 70 Z" fill="#ff6829"/></g>
+                    </svg>
+                </div>
+                <div class="osd-modes">
+                    <span class="osd-armed">ARMED</span>
+                    <span class="osd-acro">ACRO</span>
+                </div>
+            </div>
+
+            <div class="fpv-osd-block fpv-osd-br">
+                <div class="osd-row">SATS: <b>19</b></div>
+                <div class="osd-row">SPD: <b id="osdSpeed">72km/h</b></div>
+                <div class="osd-row">ALT: <b id="osdAlt">110m</b></div>
+                <div class="osd-row">DIST: <b id="osdDist">450m</b></div>
+            </div>
+
+            <div class="fpv-osd-home">
+                <span class="osd-home-label">HOME SET</span>
+                <svg viewBox="0 0 80 56" aria-hidden="true">
+                    <rect x="1" y="1" width="78" height="54" fill="rgba(5,4,4,.35)" stroke="rgba(255,255,255,.7)" stroke-width="1.5"/>
+                    <path d="M4 50 L22 30 L34 40 L48 22 L76 50 Z" fill="rgba(255,255,255,.22)"/>
+                    <g transform="translate(40 28)"><path id="osdHomeArrow" d="M0 -9 L6 7 L0 3 L-6 7 Z" fill="#ff6829"/></g>
+                </svg>
+            </div>
+        </div>
         <div class="fpv-scanlines"></div>
     </div>
 

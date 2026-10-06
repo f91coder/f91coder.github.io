@@ -173,61 +173,186 @@ body.fpv-hero-only .fpv-mobile-panel{ display:none !important; }
 }
 .fpv-hero.is-live .fpv-lens-readout{ opacity:1; }
 
-/* ── OSD (tela de oculos FPV) ──────────────────────────────────────────── */
+/* ── OSD: painel de telemetria tipo goggles (layout de referencia, cores FPV91) ── */
 
 .fpv-osd{
   position:absolute;
+  inset:0;
   z-index:1;
-  font:600 11px/1 ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  letter-spacing:.16em;
-  text-transform:uppercase;
-  color:rgba(255,255,255,.78);
-  text-shadow:0 1px 8px rgba(0,0,0,.7);
   pointer-events:none;
+  font-family:"Share Tech Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size:14px;
+  line-height:1.32;
+  letter-spacing:.04em;
+  color:rgba(255,255,255,.72);
+  text-shadow:0 0 6px rgba(0,0,0,.85), 0 1px 2px rgba(0,0,0,.9);
   white-space:nowrap;
 }
-.fpv-osd-tl{ top:96px; left:28px; }
-.fpv-osd-tr{ top:96px; right:28px; }
-.fpv-osd-bl{ bottom:26px; left:28px; }
-.fpv-osd-br{ bottom:26px; right:28px; color:#ff6829; }
+.fpv-osd b{ font-weight:400; color:#fff; }
+.fpv-osd small{ font-size:.82em; color:rgba(255,255,255,.6); }
+.fpv-osd-block{ position:absolute; }
+.osd-row{ display:block; }
 
-.fpv-rec{
-  display:inline-block;
-  width:8px;
-  height:8px;
-  margin-right:8px;
-  border-radius:50%;
-  background:#ff3b30;
-  vertical-align:0;
-  animation:fpv-blink 1.2s steps(2, start) infinite;
-}
-.fpv-batt{
+/* Cantos superiores */
+.fpv-osd-tl{ top:96px; left:clamp(20px, 3.4vw, 48px); }
+.fpv-osd-tr{ top:96px; right:clamp(20px, 3.4vw, 48px); text-align:right; }
+.fpv-osd-latlon{ top:186px; right:clamp(20px, 3.4vw, 48px); text-align:right; }
+
+/* Bateria (barra) */
+.osd-batt{
   position:relative;
   display:inline-block;
-  width:22px;
-  height:11px;
-  margin-right:9px;
-  border:1.5px solid currentColor;
-  border-radius:2px;
-  vertical-align:-1px;
+  width:44px;
+  height:14px;
+  margin-left:4px;
+  border:1.5px solid #fff;
+  vertical-align:-2px;
+  padding:1.5px;
+  box-sizing:border-box;
 }
-.fpv-batt::after{
-  content:"";
+.osd-batt::after{ content:""; position:absolute; right:-4px; top:3px; width:2.5px; height:4px; background:#fff; }
+.osd-batt i{ display:block; height:100%; width:100%; background:repeating-linear-gradient(90deg, #ff6829 0 8px, transparent 8px 10px); transition:width .6s ease; }
+
+/* Throttle (barra vertical na esquerda) */
+.fpv-osd-throttle{
   position:absolute;
-  right:-4px;
-  top:2px;
-  width:2px;
-  height:3px;
-  background:currentColor;
+  left:clamp(14px, 2.2vw, 30px);
+  top:50%;
+  height:260px;
+  margin-top:-150px;
+  display:flex;
+  align-items:stretch;
+  gap:10px;
 }
-.fpv-batt i{
+.osd-vlabel{
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+  align-self:center;
+}
+.osd-vbar{
+  position:relative;
+  width:14px;
+  height:100%;
+  margin-left:38px;
+  border:1.5px solid rgba(255,255,255,.75);
+  border-radius:2px;
+  background:rgba(5,4,4,.25);
+}
+.osd-vbar-fill{
   position:absolute;
   left:2px;
-  top:2px;
+  right:2px;
   bottom:2px;
-  width:72%;
-  background:#7cfc9a;
+  height:65%;
+  background:linear-gradient(0deg, #ff6829, #ffa27a);
+  transition:height .5s ease;
 }
+.osd-vbar > span{
+  position:absolute;
+  left:20px;
+  bottom:calc(var(--y) - 6px);
+  font-size:.78em;
+  color:rgba(255,255,255,.65);
+}
+
+/* Altitude (escala na direita) */
+.fpv-osd-alt{
+  position:absolute;
+  right:clamp(14px, 2.2vw, 30px);
+  top:50%;
+  height:260px;
+  margin-top:-150px;
+  width:70px;
+}
+.osd-alt-ladder{
+  position:absolute;
+  right:24px;
+  top:0;
+  bottom:0;
+  width:14px;
+  border-left:2px solid rgba(255,255,255,.75);
+}
+.osd-alt-ladder::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:9px;
+  border-left:1px dashed rgba(255,255,255,.35);
+  background:repeating-linear-gradient(180deg, rgba(255,255,255,.7) 0 2px, transparent 2px 26px);
+  transform:translateX(-7px);
+  opacity:.5;
+}
+.osd-alt-now{
+  position:absolute;
+  right:-6px;
+  top:50%;
+  transform:translateY(-50%);
+  padding:2px 6px;
+  border:1px solid #ff6829;
+  color:#fff;
+  background:rgba(255,104,41,.18);
+  font-size:1em;
+}
+
+/* Centro inferior: compass + modos */
+.fpv-osd-center{
+  position:absolute;
+  left:50%;
+  bottom:24px;
+  transform:translateX(-50%);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
+}
+.osd-compass{ position:relative; width:88px; height:88px; }
+.osd-compass svg{ width:100%; height:100%; display:block; filter:drop-shadow(0 0 6px rgba(0,0,0,.6)); }
+.osd-compass-h{
+  position:absolute;
+  left:50%;
+  top:-16px;
+  transform:translateX(-50%);
+  font-size:12px;
+  color:#fff;
+}
+#osdArrow{ transform-origin:50px 50px; transition:transform .25s linear; }
+.osd-modes{ display:flex; align-items:center; gap:12px; }
+.osd-armed{
+  padding:4px 16px;
+  background:#ff6829;
+  color:#171515;
+  font-weight:400;
+  font-size:17px;
+  letter-spacing:.14em;
+  box-shadow:0 0 18px rgba(255,104,41,.5);
+}
+.osd-acro{
+  padding:2px 8px;
+  border:1px solid rgba(255,255,255,.7);
+  color:#fff;
+  font-size:14px;
+  letter-spacing:.14em;
+}
+
+/* Baixo direito: telemetria + minimapa */
+.fpv-osd-br{ right:clamp(20px, 3.4vw, 48px); bottom:24px; text-align:left; }
+.fpv-osd-br .osd-row{ text-align:right; }
+.fpv-osd-home{
+  position:absolute;
+  right:calc(clamp(20px, 3.4vw, 48px) + 150px);
+  bottom:24px;
+  width:110px;
+  text-align:center;
+}
+.osd-home-label{ display:block; font-size:11px; margin-bottom:4px; color:rgba(255,255,255,.8); }
+.fpv-osd-home svg{ width:110px; height:77px; display:block; }
+#osdHomeArrow{ transform-origin:0 0; transition:transform .25s linear; }
+
+/* Baixo esquerda */
+.fpv-osd-bl{ left:clamp(20px, 3.4vw, 48px); bottom:24px; }
+.fpv-osd-bl small{ margin-left:8px; }
 
 /* Linhas de varredura sutis por cima de tudo (textura de visor). */
 .fpv-scanlines{
@@ -283,14 +408,23 @@ body.fpv-hero-only .fpv-mobile-panel{ display:none !important; }
 .fpv-hero-actions{ display:flex; gap:14px; flex-wrap:wrap; }
 
 /* Telas baixas (paisagem de celular, notebook pequeno): o conteudo tem que caber sem rolagem. */
+@media (max-width:1000px){
+  .fpv-osd-latlon{ display:none; }
+}
 @media (max-height:720px){
+  /* Pouca altura: so o essencial no painel, para nao cobrir o texto nem o botao. */
+  .fpv-osd-throttle, .fpv-osd-bl, .fpv-osd-latlon, .fpv-osd-tl{ display:none; }
+  .fpv-osd-alt{ height:200px; margin-top:-100px; }
   .fpv-hero-inner{ padding-top:96px; padding-bottom:40px; }
   .fpv-hero h1{ margin:12px 0 14px; }
   .fpv-hero p{ margin-bottom:24px; font-size:16px; }
 }
 @media (max-width:560px){
-  .fpv-osd-br{ display:none; }
-  .fpv-osd-tl, .fpv-osd-tr{ top:90px; }
+  .fpv-osd{ font-size:10.5px; }
+  .fpv-osd-latlon, .fpv-osd-bl, .fpv-osd-throttle, .fpv-osd-alt, .fpv-osd-home, .fpv-osd-center{ display:none; }
+  .fpv-osd-tl{ top:88px; }
+  .fpv-osd-tr{ top:88px; }
+  .fpv-osd-br{ bottom:20px; right:18px; font-size:11.5px; }
   .fpv-hero-inner{ padding-left:22px; padding-right:22px; }
   .fpv-hero p{ font-size:16px; }
   .fpv-cinema-scrim{ background:linear-gradient(180deg, rgba(5,4,4,.35) 0%, rgba(5,4,4,.7) 55%, rgba(5,4,4,.88) 100%); }
