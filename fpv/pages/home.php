@@ -70,7 +70,7 @@ $pageClass = FPV_HOME_HERO_ONLY ? ' fpv-hero-only' : '';
 
         <div class="fpv-osd" aria-hidden="true">
             <div class="fpv-osd-block fpv-osd-tl">
-                <div class="osd-row">NAME: <b>RAPTOR_01</b></div>
+                <div class="osd-row">NAME: <b>FPV91_F91</b></div>
                 <div class="osd-row">BATT: <b id="osdBatt">16.8V</b> <span class="osd-batt"><i id="osdBattFill"></i></span></div>
                 <div class="osd-row">CELL: <b id="osdCell">4.2V</b></div>
             </div>
