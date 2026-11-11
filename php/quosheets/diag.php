@@ -2,42 +2,48 @@
 declare(strict_types=1);
 
 /**
- * TEMPORARIO: mostra as linhas recentes do log de erros do PHP ligadas ao Quosheets. Remover depois do uso.
- * Acesso: GET api.php?action=mailDiag&t=<token> (so o hash do token fica no codigo).
+ * TEMPORARIO: confere no banco de producao as consultas corrigidas (erro 1267 de collation). Nao altera dados:
+ * o UPDATE roda com WHERE id = 0. Remover depois do uso. Acesso: GET api.php?action=mailDiag&t=<token>.
  */
-const QS_DIAG_HASH = 'af332fe37fe41925a8a05526ab5a6182e9469f3bc589f0b8329533b4a171acb3';
+const QS_DIAG_HASH = 'b43028ab7ab4de668ffa27b54da362e12845e7c5277b2ad2fb26db1592871b3a';
 
 function qs_action_mail_diag(PDO $pdo): array
 {
     if (!hash_equals(QS_DIAG_HASH, hash('sha256', (string) ($_GET['t'] ?? '')))) {
         throw new QsHttpException('not_found', 404);
     }
-    $out = ['now' => gmdate('d-M-Y H:i:s') . ' UTC', 'lines' => []];
-    $logPath = (string) ini_get('error_log');
-    if ($logPath === '' || !is_readable($logPath)) {
-        $out['error'] = 'log ilegivel';
-        return $out;
-    }
-    $size = (int) filesize($logPath);
-    $fh = fopen($logPath, 'rb');
-    if (!$fh) {
-        return $out;
-    }
-    fseek($fh, max(0, $size - 600000));
-    $chunk = (string) stream_get_contents($fh);
-    fclose($fh);
-    $today = gmdate('d-M-Y');
-    $keep = [];
-    $inBlock = false;
-    foreach (explode("\n", $chunk) as $line) {
-        $isEntry = str_starts_with($line, '[');
-        if ($isEntry) {
-            $inBlock = str_contains($line, $today) && (stripos($line, 'quosheets') !== false || str_contains($line, 'PHP '));
+    $out = [
+        'server' => (string) $pdo->query('SELECT VERSION()')->fetchColumn(),
+        'collation_connection' => (string) $pdo->query('SELECT @@collation_connection')->fetchColumn(),
+        'character_set_client' => (string) $pdo->query('SELECT @@character_set_client')->fetchColumn(),
+    ];
+    $checks = [];
+    $run = static function (string $label, callable $fn) use (&$checks): void {
+        try {
+            $checks[$label] = 'ok' . (($extra = $fn()) !== null ? ' ' . $extra : '');
+        } catch (Throwable $e) {
+            $checks[$label] = 'ERRO: ' . $e->getMessage();
         }
-        if ($inBlock) {
-            $keep[] = mb_substr($line, 0, 700);
+    };
+    $run('painel admin (codigo real + JSON)', static function () use ($pdo): string {
+        $data = qs_admin_overview($pdo);
+        $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($json === false) {
+            throw new RuntimeException('json_encode: ' . json_last_error_msg());
         }
-    }
-    $out['lines'] = array_slice($keep, -40);
+        return '(' . count($data['users']) . ' usuarios, ' . strlen($json) . ' bytes)';
+    });
+    $run('assinatura: UPDATE novo (0 linhas)', static function () use ($pdo): string {
+        $st = $pdo->prepare(QS_SQL_SAVE_PLAN);
+        $st->execute(['st' => 'active', 'pe' => null, 'cap' => 0, 'sid' => 'sub_diag', 'cid' => 'cus_diag', 'cur' => 'BRL', 'id' => 0]);
+        return '(' . $st->rowCount() . ' linhas)';
+    });
+    $run('antiga DATE_FORMAT = :m (esperado ERRO)', static function () use ($pdo): void {
+        $pdo->prepare("SELECT COUNT(*) FROM qs_ai_usage WHERE DATE_FORMAT(created_at, '%Y-%m') = :m")->execute(['m' => gmdate('Y-m')]);
+    });
+    $run('antiga NULLIF(:cid, \'\') (esperado ERRO)', static function () use ($pdo): void {
+        $pdo->prepare("UPDATE qs_users SET stripe_customer_id = COALESCE(NULLIF(:cid, ''), stripe_customer_id) WHERE id = 0")->execute(['cid' => 'cus_diag']);
+    });
+    $out['checks'] = $checks;
     return $out;
 }
