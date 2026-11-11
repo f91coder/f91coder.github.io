@@ -14,7 +14,6 @@ require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/billing.php';
 require_once __DIR__ . '/ai.php';
 require_once __DIR__ . '/admin.php';
-require_once __DIR__ . '/diag.php'; // TEMPORARIO
 
 header('X-Content-Type-Options: nosniff');
 
@@ -41,7 +40,6 @@ const QS_ROUTES = [
     'adminSetAiKey' => ['POST', 'qs_action_admin_set_ai_key'],
     'adminStripeConnect' => ['POST', 'qs_action_admin_stripe_connect'],
     'adminUser' => ['POST', 'qs_action_admin_user'],
-    'mailDiag' => ['GET', 'qs_action_mail_diag'], // TEMPORARIO
 ];
 
 $action = (string) ($_GET['action'] ?? '');

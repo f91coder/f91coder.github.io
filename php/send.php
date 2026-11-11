@@ -106,7 +106,12 @@ try {
 
     $mail->CharSet = 'UTF-8';
     $mail->setFrom($config['from_email'], $config['from_name'] ?: 'F91 - Inteligência Operacional');
-    $mail->addAddress($config['to_email']);
+    // to_email pode ter mais de um endereco, separados por virgula ou ponto e virgula.
+    foreach (preg_split('/[,;]+/', (string) $config['to_email']) ?: [] as $to) {
+        if (trim($to) !== '') {
+            $mail->addAddress(trim($to));
+        }
+    }
     $mail->addReplyTo($email, $nome);
 
     $fields = [

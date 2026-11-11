@@ -50,17 +50,22 @@ function qs_issue_code(PDO $pdo, array $user, string $lang, bool $silentCooldown
     }
 
     $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-    $pdo->prepare('UPDATE qs_codes SET attempts = ' . QS_CODE_MAX_ATTEMPTS . ' WHERE user_id = :u')->execute(['u' => $user['id']]);
     $pdo->prepare(
         'INSERT INTO qs_codes (user_id, code_hash, expires_at) VALUES (:u, :h, (NOW() + INTERVAL ' . QS_CODE_TTL_MINUTES . ' MINUTE))'
     )->execute(['u' => $user['id'], 'h' => qs_hash('code|' . $user['id'] . '|' . $code)]);
+    $codeId = (int) $pdo->lastInsertId();
 
     try {
         qs_send_verification_email($user['email'], $user['name'] !== '' ? $user['name'] : $user['email'], $code, $lang);
     } catch (Throwable $e) {
+        // Codigo que nao chegou nao conta no limite de reenvios, e o anterior (se houver) continua valendo.
+        $pdo->prepare('DELETE FROM qs_codes WHERE id = :id')->execute(['id' => $codeId]);
         error_log('quosheets mail (verify) failed: ' . $e->getMessage());
         throw new QsHttpException('mail_failed', 502);
     }
+    // Enviado: so o codigo novo vale a partir de agora.
+    $pdo->prepare('UPDATE qs_codes SET attempts = ' . QS_CODE_MAX_ATTEMPTS . ' WHERE user_id = :u AND id <> :id')
+        ->execute(['u' => $user['id'], 'id' => $codeId]);
 }
 
 function qs_action_register(PDO $pdo): array
