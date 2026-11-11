@@ -13,6 +13,11 @@ php/survey/db-config.local.php
 # Credenciais reais do FPV planner — mesmo padrao acima.
 php/fpv/config.local.php
 
+# Quosheets: overrides locais (testes) e dependencias do Composer (instaladas
+# pelo GitHub Actions antes do rsync, ver deploy.yml).
+php/quosheets/config.local.php
+php/quosheets/vendor/
+
 # Fotos enviadas pelos usuarios no FPV planner — nunca versionar (conteudo
 # gerado em runtime, excluido do deploy via rsync tambem, ver deploy.yml).
 img/fpv-uploads/*

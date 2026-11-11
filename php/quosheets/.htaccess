@@ -1,0 +1,12 @@
+# Quosheets backend: so api.php e publico. Dependencias (vendor/), config e modulos internos
+# nunca devem ser servidos diretamente.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^api\.php$ - [L]
+  RewriteRule ^ - [F]
+</IfModule>
+<IfModule mod_authz_core.c>
+  <FilesMatch "^(?!api\.php$).*">
+    Require all denied
+  </FilesMatch>
+</IfModule>

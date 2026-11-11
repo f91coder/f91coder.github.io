@@ -1,0 +1,16 @@
+{
+    "name": "f91/quosheets",
+    "description": "Quosheets backend dependencies (Anthropic PHP SDK + PSR-18 HTTP client).",
+    "type": "project",
+    "require": {
+        "php": ">=8.2",
+        "anthropic-ai/sdk": "^1.8",
+        "guzzlehttp/guzzle": "^7.9"
+    },
+    "config": {
+        "platform": { "php": "8.2.12" },
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": { "php-http/discovery": true }
+    }
+}

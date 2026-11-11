@@ -1,0 +1,8 @@
+# Templates do roteador: nunca acessados diretamente.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^ - [F]
+</IfModule>
+<IfModule mod_authz_core.c>
+  Require all denied
+</IfModule>

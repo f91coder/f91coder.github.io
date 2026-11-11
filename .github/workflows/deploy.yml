@@ -16,6 +16,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up PHP (Composer)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Quosheets dependencies (Anthropic PHP SDK)
+        run: composer install --no-dev --no-interaction --no-progress --prefer-dist --optimize-autoloader --working-dir=php/quosheets
+
       - name: Deploy via rsync over SSH
         uses: burnett01/rsync-deployments@7.0.1
         with:

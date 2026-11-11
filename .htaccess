@@ -16,4 +16,14 @@ Redirect 301 /f91_fpv_planner.html /fpv/planner
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d
   RewriteRule ^fpv/(.+)$ fpv/index.php?route=$1 [L,QSA]
+
+  # Quosheets (micro-SaaS): /quosheets, /quosheets/en/, /quosheets/app, /quosheets/login ...
+  # Arquivos reais (assets) sao servidos direto; pastas internas nao sao listadas.
+  RewriteRule ^quosheets/?$ quosheets/index.php [L,QSA]
+
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^quosheets/.+ - [F]
+
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteRule ^quosheets/(.+)$ quosheets/index.php?route=$1 [L,QSA]
 </IfModule>
