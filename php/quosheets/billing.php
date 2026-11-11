@@ -19,6 +19,11 @@ const QS_STRIPE_EVENTS = [
     'invoice.payment_failed',
 ];
 
+const QS_SQL_SAVE_PLAN = 'UPDATE qs_users SET plan_status = :st, current_period_end = :pe, cancel_at_period_end = :cap,
+        stripe_subscription_id = :sid, stripe_customer_id = COALESCE(:cid, stripe_customer_id),
+        plan_currency = COALESCE(:cur, plan_currency)
+     WHERE id = :id';
+
 function qs_stripe_configured(PDO $pdo): bool
 {
     return qs_setting($pdo, 'stripe_secret_key') !== ''
@@ -267,18 +272,15 @@ function qs_stripe_apply_subscription(PDO $pdo, array $sub, ?int $userIdHint = n
     $status = (string) ($sub['status'] ?? 'none');
     $customer = is_array($sub['customer'] ?? null) ? (string) $sub['customer']['id'] : (string) ($sub['customer'] ?? '');
 
-    $pdo->prepare(
-        'UPDATE qs_users SET plan_status = :st, current_period_end = :pe, cancel_at_period_end = :cap,
-            stripe_subscription_id = :sid, stripe_customer_id = COALESCE(NULLIF(:cid, \'\'), stripe_customer_id),
-            plan_currency = COALESCE(NULLIF(:cur, \'\'), plan_currency)
-         WHERE id = :id'
-    )->execute([
+    // Vazio vira NULL aqui no PHP (e o COALESCE mantem o valor atual). Nada de NULLIF(:param, '') no SQL:
+    // comparar parametro com texto fixo da erro 1267 (mistura de collations) no MySQL da Hostinger.
+    $pdo->prepare(QS_SQL_SAVE_PLAN)->execute([
         'st' => mb_substr($status, 0, 20),
         'pe' => $periodEnd > 0 ? gmdate('Y-m-d H:i:s', $periodEnd) : null,
         'cap' => !empty($sub['cancel_at_period_end']) ? 1 : 0,
         'sid' => (string) ($sub['id'] ?? ''),
-        'cid' => $customer,
-        'cur' => $currency,
+        'cid' => $customer !== '' ? $customer : null,
+        'cur' => $currency !== '' ? $currency : null,
         'id' => $userId,
     ]);
 }

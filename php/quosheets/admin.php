@@ -24,7 +24,20 @@ function qs_mask_secret(string $value): string
 function qs_action_admin_overview(PDO $pdo): array
 {
     qs_require_admin($pdo);
-    $month = gmdate('Y-m');
+    return qs_admin_overview($pdo);
+}
+
+/** Dados do painel. Sem checagem de acesso: quem chama garante que e admin. */
+function qs_admin_overview(PDO $pdo): array
+{
+    // Mes atual (UTC) como intervalo de datas. Comparar created_at com datas evita comparar textos, cujo
+    // collation varia entre servidores (no MySQL da Hostinger, DATE_FORMAT(...) = :m dava o erro 1267).
+    $year = (int) gmdate('Y');
+    $mon = (int) gmdate('n');
+    $monthRange = [
+        'from' => gmdate('Y-m-d H:i:s', gmmktime(0, 0, 0, $mon, 1, $year)),
+        'to' => gmdate('Y-m-d H:i:s', gmmktime(0, 0, 0, $mon + 1, 1, $year)),
+    ];
 
     $users = $pdo->query(
         "SELECT COUNT(*) AS total,
@@ -41,9 +54,9 @@ function qs_action_admin_overview(PDO $pdo): array
     $usageStmt = $pdo->prepare(
         "SELECT COUNT(*) AS calls, COALESCE(SUM(cost_usd), 0) AS cost, COALESCE(SUM(GREATEST(credits, 0)), 0) AS credits,
                 COALESCE(SUM(rows_count), 0) AS rows_processed
-         FROM qs_ai_usage WHERE mode <> 'grant' AND DATE_FORMAT(created_at, '%Y-%m') = :m"
+         FROM qs_ai_usage WHERE mode <> 'grant' AND created_at >= :from AND created_at < :to"
     );
-    $usageStmt->execute(['m' => $month]);
+    $usageStmt->execute($monthRange);
     $usage = $usageStmt->fetch();
 
     $daily = $pdo->query(
@@ -56,10 +69,10 @@ function qs_action_admin_overview(PDO $pdo): array
         "SELECT u.id, u.email, u.name, u.locale, u.created_at, u.email_verified_at, u.trial_ends_at, u.plan_status,
                 u.plan_currency, u.current_period_end, u.comp_until, u.last_login_at,
                 COALESCE((SELECT SUM(a.cost_usd) FROM qs_ai_usage a WHERE a.user_id = u.id AND a.mode <> 'grant'
-                          AND DATE_FORMAT(a.created_at, '%Y-%m') = :m), 0) AS ai_cost_month
+                          AND a.created_at >= :from AND a.created_at < :to), 0) AS ai_cost_month
          FROM qs_users u ORDER BY u.id DESC LIMIT 200"
     );
-    $list->execute(['m' => $month]);
+    $list->execute($monthRange);
     $rows = array_map(static function (array $u) use ($pdo): array {
         $full = qs_user_row($pdo, (int) $u['id']);
         $access = qs_access($full);
