@@ -1,4 +1,9 @@
-const CACHE_NAME = 'f91-static-v3';
+// Service worker do site institucional (registrado por js/script.js com escopo "/").
+// So cuida dos arquivos listados abaixo: busca sempre a versao publicada e usa o cache apenas offline.
+// Todo o resto do dominio (apps, APIs, landings: /quosheets, /fpv, /emaper, /ttreino, /php/...) vai direto
+// para a rede. A versao v3 guardava qualquer GET para sempre (inclusive respostas de API e paginas antigas);
+// trocar o nome do cache apaga essas copias no navegador de quem ja tinha o site salvo.
+const CACHE_NAME = 'f91-static-v4';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -20,6 +25,14 @@ const PRECACHE_URLS = [
   './img/icon-android-192.png?v=20260915',
   './img/icon-android-512.png?v=20260915'
 ];
+const SITE_FILES = new Set(PRECACHE_URLS.map((path) => {
+  const url = new URL(path, self.location.href);
+  return url.pathname + url.search;
+}));
+
+function deleteOldCaches() {
+  return caches.keys().then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))));
+}
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
@@ -31,37 +44,35 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(
-    caches
-      .keys()
-      .then((keys) => Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))))
-      .then(() => self.clients.claim())
-  );
+  event.waitUntil(deleteOldCaches().then(() => self.clients.claim()));
 });
 
 self.addEventListener('fetch', (event) => {
-  if (event.request.method !== 'GET') {
+  const { request } = event;
+  if (request.method !== 'GET') {
     return;
   }
 
-  const requestUrl = new URL(event.request.url);
-  if (requestUrl.origin !== self.location.origin) {
+  // Na troca de versao o service worker anterior ainda termina alguns downloads e pode recriar o cache
+  // antigo depois do "activate"; por isso a limpeza se repete a cada pagina aberta.
+  if (request.mode === 'navigate') {
+    event.waitUntil(deleteOldCaches());
+  }
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin || !SITE_FILES.has(url.pathname + url.search)) {
     return;
   }
 
   event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) {
-        return cached;
-      }
-
-      return fetch(event.request)
-        .then((response) => {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseClone));
-          return response;
-        })
-        .catch(() => caches.match('./index.html'));
-    })
+    fetch(request)
+      .then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      })
+      .catch(() => caches.open(CACHE_NAME).then((cache) => cache.match(request).then((cached) => cached || cache.match('./index.html'))))
   );
 });
