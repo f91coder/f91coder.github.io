@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>eMaper® | Prospecção de clientes locais no mapa — em breve</title>
+  <meta name="description" content="O eMaper mapeia estabelecimentos físicos, reúne o máximo de informações sobre cada um e organiza seus leads em classificação, funil de vendas e tarefas da equipe. Entre na lista de espera." />
+  <link rel="canonical" href="https://www.f91.tech/emaper/" />
+  <meta name="color-scheme" content="light" />
+  <meta name="theme-color" content="#F6F8F7" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/emaper/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/emaper/icon-192.png" />
+  <link rel="apple-touch-icon" href="/emaper/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="eMaper®" />
+  <meta property="og:url" content="https://www.f91.tech/emaper/" />
+  <meta property="og:title" content="eMaper® — seus próximos clientes já estão no mapa" />
+  <meta property="og:description" content="Mapeie estabelecimentos físicos, colete informações sobre cada um e organize leads, funil de vendas e tarefas da equipe num só lugar. Em breve: entre na lista de espera." />
+  <meta property="og:image" content="https://www.f91.tech/emaper/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Tailwind CSS (Play CDN, mesmo padrao da pagina do Ttreino) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Fontes: Sora (titulos), Inter (texto) e JetBrains Mono (rotulos) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Icones (versao fixa) e animacoes -->
+  <script src="https://unpkg.com/lucide@1.72.0/dist/umd/lucide.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Sora', 'Inter', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            // Cores do logo: teal #0E6E7F, laranja #E73F03, ambar #F39A1C
+            ink: { 950: '#061A1F', 900: '#0B2A31', 800: '#173940', 700: '#2B4B52', 600: '#43595F', 500: '#5E7278', 400: '#8C9DA2', 300: '#B9C5C8', 200: '#DCE4E6', 100: '#ECF1F2', 50: '#F5F8F8' },
+            sea: { 950: '#06252B', 900: '#0B3C45', 800: '#0C4954', 700: '#0D5A68', 600: '#0E6E7F', 500: '#1A8392', 400: '#3A9DAA', 300: '#6CBCC6', 200: '#A2D7DD', 100: '#CFEBEE', 50: '#EBF6F7' },
+            ember: { 900: '#6C220D', 800: '#84260B', 700: '#A42C06', 600: '#C93503', 500: '#E73F03', 400: '#F8622E', 300: '#FE9366', 200: '#FFC0A3', 100: '#FFE2D3', 50: '#FFF3ED' },
+            sun: { 800: '#904610', 700: '#B25B0C', 600: '#D77B0C', 500: '#F39A1C', 400: '#F6A834', 300: '#F9BA55', 200: '#FCD48D', 100: '#FEEBC8', 50: '#FFF8EB' },
+          },
+          boxShadow: {
+            card: '0 1px 2px rgba(11,42,49,0.04), 0 14px 34px -22px rgba(11,42,49,0.22)',
+            window: '0 50px 100px -50px rgba(11,42,49,0.45), 0 18px 40px -26px rgba(11,42,49,0.30)',
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    :root { --bg: #F6F8F7; }
+    * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: #0B2A31; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    ::selection { background: #0E6E7F; color: #fff; }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(16px) saturate(1.4);
+      -webkit-backdrop-filter: blur(16px) saturate(1.4);
+      border: 1px solid rgba(255, 255, 255, 0.95);
+      box-shadow: 0 1px 0 rgba(11, 42, 49, 0.04), 0 14px 34px -20px rgba(11, 42, 49, 0.28);
+    }
+
+    /* Laranja do logo, um pouco mais escuro no botao para o texto branco ter contraste */
+    .btn-primary {
+      background: linear-gradient(135deg, #D63C05 0%, #B52F04 100%);
+      color: #fff;
+      box-shadow: 0 14px 30px -14px rgba(214, 60, 5, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s ease, opacity 0.2s ease;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 18px 36px -14px rgba(214, 60, 5, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.3); }
+    .btn-primary:disabled { cursor: wait; opacity: 0.75; transform: none; }
+
+    a:focus-visible, button:focus-visible, summary:focus-visible, select:focus-visible, [tabindex]:focus-visible {
+      outline: 3px solid rgba(14, 110, 127, 0.45);
+      outline-offset: 2px;
+    }
+
+    /* Mapa decorativo atras do hero: mais forte nas laterais, quase sumindo atras do texto */
+    .hero-map {
+      -webkit-mask-image: radial-gradient(ellipse 60% 70% at 50% 38%, rgba(0, 0, 0, 0.28) 0%, #000 58%, transparent 92%);
+      mask-image: radial-gradient(ellipse 60% 70% at 50% 38%, rgba(0, 0, 0, 0.28) 0%, #000 58%, transparent 92%);
+    }
+
+    @keyframes pin-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+    .pin-float { animation: pin-float 5.5s ease-in-out infinite; transform-box: fill-box; }
+
+    @keyframes ring-ping { 0% { transform: scale(0.35); opacity: 0.55; } 100% { transform: scale(2.3); opacity: 0; } }
+    .ring-ping { transform-box: fill-box; transform-origin: center; animation: ring-ping 2.8s ease-out infinite; }
+
+    @keyframes radius-breathe { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.55; } }
+    .radius-breathe { animation: radius-breathe 4s ease-in-out infinite; }
+
+    .map-pin { cursor: pointer; outline: none; }
+    .map-pin:focus-visible .pin-shape { stroke: #0B2A31; stroke-width: 3; }
+    .map-pin:hover .pin-shape { filter: brightness(1.06); }
+
+    .no-scrollbar { scrollbar-width: none; }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .thin-scrollbar { scrollbar-width: thin; scrollbar-color: #B9C5C8 transparent; }
+    .thin-scrollbar::-webkit-scrollbar { height: 6px; }
+    .thin-scrollbar::-webkit-scrollbar-thumb { background: #B9C5C8; border-radius: 9999px; }
+
+    details > summary { list-style: none; }
+    details > summary::-webkit-details-marker { display: none; }
+    details[open] .faq-chevron { transform: rotate(180deg); }
+
+    .field { transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+    .field:focus-within { border-color: #1A8392; box-shadow: 0 0 0 4px rgba(14, 110, 127, 0.12); }
+    .field.is-valid { border-color: #3A9DAA; }
+    .field.is-invalid { border-color: #E73F03; box-shadow: 0 0 0 4px rgba(231, 63, 3, 0.08); }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .pin-float, .ring-ping, .radius-breathe, .animate-ping { animation: none !important; }
+    }
+  </style>
+</head>
+<body class="relative min-h-screen">
+
+  <!-- Mapa decorativo do topo -->
+  <div class="pointer-events-none absolute inset-x-0 top-0 h-[1000px] overflow-hidden" aria-hidden="true">
+    <svg class="hero-map absolute left-1/2 top-0 -translate-x-1/2 w-[1600px] h-[1000px]" viewBox="0 0 1600 1000" fill="none">
+      <path d="M-60 780 C 200 700, 380 840, 620 770 S 1000 630, 1200 700 S 1520 840, 1680 770" stroke="#D5E9EF" stroke-width="44" stroke-linecap="round"/>
+      <rect x="70" y="190" width="200" height="140" rx="18" fill="#E2EEE5"/>
+      <rect x="1300" y="430" width="210" height="150" rx="18" fill="#E2EEE5"/>
+      <g stroke="#E9EFED" stroke-width="9">
+        <path d="M0 110 H1600"/><path d="M0 260 H1600"/><path d="M0 420 H1600"/><path d="M0 610 H1600"/><path d="M0 900 H1600"/>
+        <path d="M120 0 V1000"/><path d="M300 0 V1000"/><path d="M760 0 V1000"/><path d="M930 0 V1000"/><path d="M1300 0 V1000"/><path d="M1490 0 V1000"/>
+      </g>
+      <path d="M-20 560 L1620 290" stroke="#E2E9E7" stroke-width="22"/>
+      <path d="M430 -20 L570 1020" stroke="#E2E9E7" stroke-width="18"/>
+      <path d="M1190 -20 C 1120 300, 1250 620, 1150 1020" stroke="#E2E9E7" stroke-width="18"/>
+
+      <!-- Pinos nas cores do logo -->
+      <g class="pin-float" style="animation-delay:-1.2s">
+        <circle class="ring-ping" cx="236" cy="362" r="16" fill="#E73F03"/>
+        <path transform="translate(218 316) scale(1.2)" d="M15 0C6.7 0 0 6.6 0 14.8 0 25.9 15 40 15 40s15-14.1 15-25.2C30 6.6 23.3 0 15 0z" fill="#E73F03"/>
+        <circle cx="236" cy="333.5" r="6.4" fill="#fff"/>
+      </g>
+      <g class="pin-float" style="animation-delay:-3.4s">
+        <path transform="translate(330 610) scale(0.95)" d="M15 0C6.7 0 0 6.6 0 14.8 0 25.9 15 40 15 40s15-14.1 15-25.2C30 6.6 23.3 0 15 0z" fill="#F39A1C"/>
+        <circle cx="344.3" cy="623.8" r="5" fill="#fff"/>
+      </g>
+      <g class="pin-float" style="animation-delay:-2.2s">
+        <circle class="ring-ping" cx="1316" cy="292" r="16" fill="#0E6E7F" style="animation-delay:-1.4s"/>
+        <path transform="translate(1298 246) scale(1.2)" d="M15 0C6.7 0 0 6.6 0 14.8 0 25.9 15 40 15 40s15-14.1 15-25.2C30 6.6 23.3 0 15 0z" fill="#0E6E7F"/>
+        <circle cx="1316" cy="263.5" r="6.4" fill="#fff"/>
+      </g>
+      <g class="pin-float" style="animation-delay:-0.4s">
+        <path transform="translate(1418 640) scale(0.95)" d="M15 0C6.7 0 0 6.6 0 14.8 0 25.9 15 40 15 40s15-14.1 15-25.2C30 6.6 23.3 0 15 0z" fill="#E73F03"/>
+        <circle cx="1432.3" cy="653.8" r="5" fill="#fff"/>
+      </g>
+      <g class="pin-float" style="animation-delay:-4.6s">
+        <path transform="translate(1180 128) scale(0.8)" d="M15 0C6.7 0 0 6.6 0 14.8 0 25.9 15 40 15 40s15-14.1 15-25.2C30 6.6 23.3 0 15 0z" fill="#F39A1C"/>
+        <circle cx="1192" cy="139.6" r="4.2" fill="#fff"/>
+      </g>
+      <g class="pin-float" style="animation-delay:-2.8s">
+        <path transform="translate(150 92) scale(0.8)" d="M15 0C6.7 0 0 6.6 0 14.8 0 25.9 15 40 15 40s15-14.1 15-25.2C30 6.6 23.3 0 15 0z" fill="#0E6E7F"/>
+        <circle cx="162" cy="103.6" r="4.2" fill="#fff"/>
+      </g>
+    </svg>
+  </div>
+
+  <!-- ==================== CABECALHO ==================== -->
+  <header class="fixed top-0 inset-x-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-3 sm:pt-4">
+      <div class="glass rounded-2xl pl-4 pr-2.5 sm:pl-5 sm:pr-3 py-2.5 flex items-center justify-between gap-3">
+        <a href="#topo" class="flex items-center shrink-0" aria-label="eMaper®">
+          <img src="/img/app-3.png" alt="eMaper®" width="620" height="190" class="h-8 sm:h-9 w-auto" />
+        </a>
+
+        <nav class="hidden xl:flex items-center gap-7 whitespace-nowrap text-sm font-medium text-ink-600" aria-label="Seções">
+          <a href="#previa" class="hover:text-ink-900 transition-colors" data-i18n="nav.preview">Prévia</a>
+          <a href="#como-funciona" class="hover:text-ink-900 transition-colors" data-i18n="nav.how">Como funciona</a>
+          <a href="#recursos" class="hover:text-ink-900 transition-colors" data-i18n="nav.features">Recursos</a>
+          <a href="#para-quem" class="hover:text-ink-900 transition-colors" data-i18n="nav.audience">Para quem é</a>
+          <a href="#duvidas" class="hover:text-ink-900 transition-colors" data-i18n="nav.faq">Dúvidas</a>
+        </nav>
+
+        <div class="flex items-center gap-2 sm:gap-3">
+          <div class="flex items-center rounded-xl bg-ink-100/80 p-1 text-xs font-semibold" role="group" aria-label="Idioma / Language">
+            <button type="button" class="lang-btn px-2.5 py-1 rounded-lg transition" data-lang="pt" aria-pressed="true">PT</button>
+            <button type="button" class="lang-btn px-2.5 py-1 rounded-lg transition" data-lang="en" aria-pressed="false">EN</button>
+            <button type="button" class="lang-btn px-2.5 py-1 rounded-lg transition" data-lang="es" aria-pressed="false">ES</button>
+          </div>
+          <a href="#lista" class="btn-primary hidden sm:inline-flex items-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-sm font-semibold">
+            <span data-i18n="nav.cta">Lista de espera</span>
+            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="topo" class="relative z-10">
+
+    <!-- ==================== HERO ==================== -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-32 sm:pt-40 pb-12 sm:pb-16">
+      <div class="max-w-4xl mx-auto text-center flex flex-col items-center">
+        <div class="hero-reveal inline-flex items-center gap-2.5 rounded-full border border-sea-100 bg-white/85 px-4 py-1.5 shadow-sm mb-7">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-ember-500 opacity-60"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-ember-500"></span>
+          </span>
+          <span class="font-mono text-[11px] sm:text-xs font-semibold uppercase tracking-[0.16em] text-sea-700" data-i18n="hero.badge">Em breve • Lista de espera aberta</span>
+        </div>
+
+        <h1 class="hero-reveal font-display font-extrabold tracking-tight text-ink-900 text-[40px] leading-[1.08] sm:text-6xl lg:text-[70px] lg:leading-[1.04] mb-6">
+          <span data-i18n="hero.title1">Seus próximos clientes já estão</span>
+          <span class="relative inline-block whitespace-nowrap text-ember-500">
+            <span data-i18n="hero.titleHighlight">no mapa.</span>
+            <svg class="absolute left-0 -bottom-1.5 sm:-bottom-2.5 w-full h-3 sm:h-4" viewBox="0 0 300 16" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M4 11 C 80 4, 170 3, 296 8" stroke="#F39A1C" stroke-width="5" stroke-linecap="round" fill="none"/>
+            </svg>
+          </span>
+        </h1>
+
+        <p class="hero-reveal text-base sm:text-xl text-ink-600 leading-relaxed max-w-2xl mb-9" data-i18n="hero.subtitle">
+          O eMaper mapeia os estabelecimentos físicos da região que você escolher, reúne o máximo de informações sobre cada um e organiza tudo num só lugar: classificação de leads, funil de vendas e tarefas da equipe.
+        </p>
+
+        <div class="hero-reveal flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto mb-10">
+          <a href="#lista" class="btn-primary w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl px-8 py-4 font-display font-bold text-base">
+            <span data-i18n="hero.ctaPrimary">Quero entrar na lista</span>
+            <i data-lucide="arrow-right" class="w-5 h-5"></i>
+          </a>
+          <a href="#previa" class="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 rounded-2xl border border-ink-200 bg-white/85 px-7 py-4 text-base font-semibold text-ink-800 hover:bg-white hover:border-ink-300 transition">
+            <i data-lucide="mouse-pointer-click" class="w-5 h-5 text-sea-600"></i>
+            <span data-i18n="hero.ctaSecondary">Ver o eMaper em ação</span>
+          </a>
+        </div>
+
+        <ul class="hero-reveal flex flex-wrap items-center justify-center gap-x-6 gap-y-2.5 text-sm text-ink-600">
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sea-600"></i><span data-i18n="hero.point1">Mapeamento por região e segmento</span></li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sea-600"></i><span data-i18n="hero.point2">Ficha completa de cada lugar</span></li>
+          <li class="flex items-center gap-2"><i data-lucide="check" class="w-4 h-4 text-sea-600"></i><span data-i18n="hero.point3">Funil e tarefas da equipe</span></li>
+        </ul>
+
+        <!-- Numero real de inscritos (php/waitlist); so aparece a partir de WAITLIST_PROOF_MIN -->
+        <p id="waitlist-proof" class="hidden mt-7 items-center gap-2 rounded-full bg-white/85 border border-ink-200 px-4 py-1.5 text-sm text-ink-600">
+          <i data-lucide="users" class="w-4 h-4 text-sea-600"></i>
+          <strong id="waitlist-count" class="text-ink-900">0</strong>
+          <span data-i18n="hero.proof">pessoas já estão na lista de espera</span>
+        </p>
+      </div>
+    </section>
+
+    <!-- ==================== PREVIA INTERATIVA ==================== -->
+    <section id="previa" class="scroll-mt-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-20 sm:pb-24">
+      <div class="flex flex-col items-center mb-7">
+        <span class="font-mono text-[11px] sm:text-xs uppercase tracking-[0.16em] text-ink-500 mb-3 text-center" data-i18n="sim.kicker">Prévia interativa • clique para explorar</span>
+        <div class="glass rounded-2xl p-1.5 flex flex-wrap items-center justify-center gap-1" role="tablist" aria-label="Prévia do eMaper">
+          <button type="button" role="tab" class="sim-tab inline-flex items-center gap-2 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold transition" data-tab="map" aria-controls="panel-map" aria-selected="true">
+            <i data-lucide="map-pinned" class="w-4 h-4"></i><span data-i18n="sim.tabMap">Mapear</span>
+          </button>
+          <button type="button" role="tab" class="sim-tab inline-flex items-center gap-2 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold transition" data-tab="leads" aria-controls="panel-leads" aria-selected="false">
+            <i data-lucide="tags" class="w-4 h-4"></i><span data-i18n="sim.tabLeads">Classificar</span>
+          </button>
+          <button type="button" role="tab" class="sim-tab inline-flex items-center gap-2 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold transition" data-tab="pipeline" aria-controls="panel-pipeline" aria-selected="false">
+            <i data-lucide="kanban" class="w-4 h-4"></i><span data-i18n="sim.tabPipeline">Funil de vendas</span>
+          </button>
+          <button type="button" role="tab" class="sim-tab inline-flex items-center gap-2 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold transition" data-tab="tasks" aria-controls="panel-tasks" aria-selected="false">
+            <i data-lucide="list-checks" class="w-4 h-4"></i><span data-i18n="sim.tabTasks">Tarefas da equipe</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="relative">
+        <div class="absolute -inset-3 sm:-inset-8 -z-10 rounded-[44px] bg-gradient-to-tr from-sea-200/50 via-white/0 to-sun-200/60 blur-2xl" aria-hidden="true"></div>
+        <div id="sim-window" class="relative overflow-hidden rounded-[24px] sm:rounded-[28px] border border-ink-200 bg-white shadow-window">
+
+          <!-- Barra da janela -->
+          <div class="flex items-center justify-between gap-3 border-b border-ink-200/80 bg-ink-50/80 px-4 sm:px-5 py-3">
+            <div class="flex items-center gap-3 min-w-0">
+              <div class="hidden sm:flex items-center gap-1.5" aria-hidden="true">
+                <span class="w-3 h-3 rounded-full bg-ink-200"></span><span class="w-3 h-3 rounded-full bg-ink-200"></span><span class="w-3 h-3 rounded-full bg-ink-200"></span>
+              </div>
+              <img src="/emaper/favicon-32.png" alt="" width="32" height="32" class="w-4 h-4 sm:ml-2" />
+              <span class="truncate text-xs sm:text-sm font-medium text-ink-700" data-i18n="sim.windowTitle">Campanha: Alimentação • Pinheiros, São Paulo</span>
+            </div>
+            <span class="shrink-0 rounded-full border border-sun-200 bg-sun-50 px-2.5 py-0.5 font-mono text-[10px] sm:text-[11px] font-semibold text-sun-800" data-i18n="sim.demoBadge">Dados ilustrativos</span>
+          </div>
+
+          <div class="relative lg:min-h-[620px]">
+
+            <!-- PAINEL 1: MAPA + FICHA -->
+            <div id="panel-map" role="tabpanel" class="sim-panel grid lg:grid-cols-[minmax(0,1fr)_340px]">
+              <div class="min-w-0 border-b lg:border-b-0 lg:border-r border-ink-200/80">
+                <div class="flex flex-wrap items-center gap-2 p-3 sm:p-4">
+                  <div class="flex min-w-0 flex-1 basis-56 items-center gap-2 rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm text-ink-800">
+                    <i data-lucide="search" class="w-4 h-4 shrink-0 text-ink-500"></i>
+                    <span class="truncate" data-i18n="sim.query">Padarias, cafés e restaurantes</span>
+                  </div>
+                  <span class="inline-flex items-center gap-1.5 rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm text-ink-700"><i data-lucide="map-pin" class="w-4 h-4 text-ember-600"></i>Pinheiros, SP</span>
+                  <span class="inline-flex items-center gap-1.5 rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm text-ink-700"><i data-lucide="circle-dot" class="w-4 h-4 text-sea-600"></i><span data-i18n="sim.radius">Raio de 1,5 km</span></span>
+                  <button type="button" id="map-scan-btn" class="btn-primary inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold">
+                    <i data-lucide="radar" class="w-4 h-4"></i><span data-i18n="sim.scan">Mapear</span>
+                  </button>
+                </div>
+
+                <div class="relative aspect-[800/520] w-full overflow-hidden bg-[#E8EEEA]" id="map-stage">
+                  <svg id="map-svg" class="absolute inset-0 w-full h-full" viewBox="0 0 800 520" aria-hidden="false" role="group" aria-label="Mapa ilustrativo">
+                    <rect width="800" height="520" fill="#E8EEEA"/>
+                    <g stroke="#FFFFFF" stroke-width="12" stroke-linecap="square">
+                      <path d="M0 70 H800"/><path d="M0 160 H800"/><path d="M0 255 H800"/><path d="M0 345 H800"/><path d="M0 440 H800"/>
+                      <path d="M95 0 V520"/><path d="M205 0 V520"/><path d="M315 0 V520"/><path d="M425 0 V520"/><path d="M535 0 V520"/><path d="M645 0 V520"/><path d="M745 0 V520"/>
+                    </g>
+                    <path d="M590 -20 C 630 50, 700 92, 820 78" stroke="#CDE5EE" stroke-width="30" fill="none"/>
+                    <rect x="322" y="352" width="96" height="81" rx="5" fill="#D3EAD6"/>
+                    <g fill="#BEDFC5"><circle cx="340" cy="372" r="7"/><circle cx="362" cy="392" r="8"/><circle cx="392" cy="371" r="6"/><circle cx="398" cy="414" r="7"/><circle cx="344" cy="417" r="6"/></g>
+                    <path d="M-10 474 L810 86" stroke="#FFFFFF" stroke-width="26" fill="none"/>
+                    <path d="M-10 474 L810 86" stroke="#FBE6B0" stroke-width="18" fill="none"/>
+                    <g font-family="Inter, sans-serif" font-size="11" fill="#7F918F" letter-spacing="0.3">
+                      <text transform="translate(96 433) rotate(-25.3)">Av. das Palmeiras</text>
+                      <text x="594" y="164">R. das Acácias</text>
+                      <text x="20" y="259">R. da Harmonia</text>
+                      <text x="332" y="447" font-size="10">Praça do Mercado</text>
+                    </g>
+
+                    <!-- Raio da busca -->
+                    <circle class="radius-breathe" cx="400" cy="260" r="200" fill="rgba(14,110,127,0.07)" stroke="#0E6E7F" stroke-opacity="0.55" stroke-width="2" stroke-dasharray="7 7"/>
+                    <defs>
+                      <linearGradient id="radar-grad" x1="400" y1="260" x2="600" y2="260" gradientUnits="userSpaceOnUse">
+                        <stop offset="0" stop-color="#0E6E7F" stop-opacity="0.32"/>
+                        <stop offset="1" stop-color="#0E6E7F" stop-opacity="0"/>
+                      </linearGradient>
+                    </defs>
+                    <g id="radar" opacity="0">
+                      <path d="M400 260 L600 260 A200 200 0 0 0 541.4 118.6 Z" fill="url(#radar-grad)"/>
+                    </g>
+                    <circle cx="400" cy="260" r="5" fill="#0E6E7F"/>
+                    <circle class="ring-ping" cx="400" cy="260" r="10" fill="#0E6E7F"/>
+
+                    <g id="map-dots"></g>
+                    <g id="map-pins"></g>
+                  </svg>
+
+                  <div id="map-tip" class="pointer-events-none absolute z-10 hidden -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-ink-900 px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-white shadow-lg"></div>
+
+                  <div class="absolute right-2 top-2 sm:right-3 sm:top-3 rounded-lg bg-white/90 px-2.5 py-1 text-[11px] sm:text-xs font-semibold text-ink-800 shadow-sm" id="map-found"></div>
+
+                  <div class="absolute bottom-3 left-3 hidden sm:flex items-center gap-3 rounded-lg bg-white/90 px-3 py-1.5 text-[11px] text-ink-600 shadow-sm">
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-ember-500"></span><span data-i18n="temp.hot">Quente</span></span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sun-500"></span><span data-i18n="temp.warm">Morno</span></span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sea-600"></span><span data-i18n="temp.cold">Frio</span></span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-ink-300"></span><span data-i18n="temp.none">Sem classificação</span></span>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar px-3 sm:px-4 py-3" id="map-results" aria-label="Resultados"></div>
+              </div>
+
+              <aside class="p-5 sm:p-6" id="lead-card" aria-live="polite"></aside>
+            </div>
+
+            <!-- PAINEL 2: CLASSIFICAR -->
+            <div id="panel-leads" role="tabpanel" class="sim-panel hidden p-4 sm:p-6">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div>
+                  <h3 class="font-display font-bold text-ink-900 text-lg" data-i18n="sim.leadsTitle">Leads mapeados</h3>
+                  <p class="text-xs sm:text-sm text-ink-500" data-i18n="sim.leadsHint">Clique na temperatura para reclassificar. O pino no mapa muda junto.</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5" id="lead-filters" role="group" aria-label="Filtro"></div>
+              </div>
+              <div class="hidden md:grid grid-cols-[minmax(0,1.6fr)_130px_minmax(0,1fr)_minmax(0,1.3fr)_48px] gap-4 px-4 pb-2 font-mono text-[10px] uppercase tracking-wider text-ink-500">
+                <span data-i18n="sim.colLead">Lead</span><span data-i18n="sim.colTemp">Temperatura</span><span data-i18n="sim.colScore">Potencial</span><span data-i18n="sim.colTags">Etiquetas</span><span class="text-right" data-i18n="sim.colOwner">Resp.</span>
+              </div>
+              <div class="space-y-2" id="lead-rows"></div>
+            </div>
+
+            <!-- PAINEL 3: FUNIL -->
+            <div id="panel-pipeline" role="tabpanel" class="sim-panel hidden p-4 sm:p-6">
+              <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <div>
+                  <h3 class="font-display font-bold text-ink-900 text-lg" data-i18n="sim.pipelineTitle">Funil de vendas</h3>
+                  <p class="text-xs sm:text-sm text-ink-500" data-i18n="sim.pipelineHint">Clique em “Avançar” para mover o lead para a próxima etapa.</p>
+                </div>
+                <div class="flex flex-wrap gap-2 text-xs sm:text-sm" id="pipeline-totals"></div>
+              </div>
+              <div class="overflow-x-auto thin-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0 pb-2">
+                <div class="grid grid-cols-5 gap-3 min-w-[900px]" id="pipeline-board"></div>
+              </div>
+            </div>
+
+            <!-- PAINEL 4: TAREFAS -->
+            <div id="panel-tasks" role="tabpanel" class="sim-panel hidden grid lg:grid-cols-[270px_minmax(0,1fr)]">
+              <aside class="border-b lg:border-b-0 lg:border-r border-ink-200/80 p-5 sm:p-6">
+                <h3 class="font-mono text-[11px] uppercase tracking-wider text-ink-500 mb-3" data-i18n="sim.team">Equipe</h3>
+                <div class="space-y-2" id="team-list"></div>
+                <button type="button" id="invite-btn" class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-xl border border-dashed border-ink-300 px-3 py-2.5 text-sm font-semibold text-ink-600 hover:border-sea-400 hover:text-sea-700 transition">
+                  <i data-lucide="user-plus" class="w-4 h-4"></i><span data-i18n="sim.invite">Convidar pessoa</span>
+                </button>
+              </aside>
+              <div class="p-5 sm:p-6 min-w-0">
+                <div class="flex flex-wrap items-end justify-between gap-3 mb-3">
+                  <h3 class="font-display font-bold text-ink-900 text-lg" data-i18n="sim.weekTasks">Tarefas da semana</h3>
+                  <span class="text-xs sm:text-sm font-medium text-ink-600" id="tasks-progress-label"></span>
+                </div>
+                <div class="h-2 w-full overflow-hidden rounded-full bg-ink-100 mb-5"><div id="tasks-progress-bar" class="h-full rounded-full bg-gradient-to-r from-sea-500 to-sea-400 transition-all duration-500" style="width:0%"></div></div>
+                <div class="space-y-2" id="task-list"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Rodape da janela -->
+          <div class="flex flex-wrap items-center justify-between gap-2 border-t border-ink-200/80 bg-ink-50/80 px-4 sm:px-5 py-3 text-[11px] sm:text-xs text-ink-500">
+            <span class="flex items-center gap-1.5"><i data-lucide="info" class="w-3.5 h-3.5"></i><span data-i18n="sim.footerNote">Prévia ilustrativa: nomes, contatos e valores são fictícios.</span></span>
+            <span class="font-mono" data-i18n="sim.footerRight">eMaper • em desenvolvimento</span>
+          </div>
+
+          <div id="sim-toast" class="pointer-events-none absolute bottom-16 left-1/2 z-20 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 translate-y-3 rounded-xl bg-ink-900 px-4 py-2.5 text-center text-xs sm:text-sm font-medium text-white opacity-0 shadow-xl transition duration-300" role="status"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== COMO FUNCIONA ==================== -->
+    <section id="como-funciona" class="scroll-mt-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+      <div class="reveal text-center max-w-2xl mx-auto mb-12">
+        <span class="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-ember-600" data-i18n="how.kicker">Como funciona</span>
+        <h2 class="font-display text-3xl sm:text-[44px] sm:leading-[1.12] font-extrabold tracking-tight text-ink-900 mt-3" data-i18n="how.title">Três passos entre você e a próxima venda.</h2>
+      </div>
+      <ol class="relative grid gap-5 md:grid-cols-3">
+        <li class="reveal relative rounded-3xl border border-ink-200 bg-white p-7 shadow-card">
+          <div class="flex items-center justify-between mb-6">
+            <span class="w-12 h-12 rounded-2xl bg-sea-50 text-sea-700 flex items-center justify-center"><i data-lucide="map" class="w-6 h-6"></i></span>
+            <span class="font-mono text-sm font-semibold text-ink-300">01</span>
+          </div>
+          <h3 class="font-display text-xl font-bold text-ink-900 mb-2" data-i18n="how.s1Title">Escolha a região</h3>
+          <p class="text-ink-600 leading-relaxed" data-i18n="how.s1Desc">Informe o bairro, a cidade ou um raio e o tipo de negócio que você atende.</p>
+        </li>
+        <li class="reveal relative rounded-3xl border border-ink-200 bg-white p-7 shadow-card">
+          <div class="flex items-center justify-between mb-6">
+            <span class="w-12 h-12 rounded-2xl bg-sun-50 text-sun-700 flex items-center justify-center"><i data-lucide="radar" class="w-6 h-6"></i></span>
+            <span class="font-mono text-sm font-semibold text-ink-300">02</span>
+          </div>
+          <h3 class="font-display text-xl font-bold text-ink-900 mb-2" data-i18n="how.s2Title">O eMaper mapeia e coleta</h3>
+          <p class="text-ink-600 leading-relaxed" data-i18n="how.s2Desc">Os estabelecimentos aparecem no mapa, cada um com a ficha mais completa possível.</p>
+        </li>
+        <li class="reveal relative rounded-3xl border border-ink-200 bg-white p-7 shadow-card">
+          <div class="flex items-center justify-between mb-6">
+            <span class="w-12 h-12 rounded-2xl bg-ember-50 text-ember-600 flex items-center justify-center"><i data-lucide="handshake" class="w-6 h-6"></i></span>
+            <span class="font-mono text-sm font-semibold text-ink-300">03</span>
+          </div>
+          <h3 class="font-display text-xl font-bold text-ink-900 mb-2" data-i18n="how.s3Title">Venda em equipe</h3>
+          <p class="text-ink-600 leading-relaxed" data-i18n="how.s3Desc">Classifique os leads, avance no funil e divida as tarefas com o seu time.</p>
+        </li>
+      </ol>
+    </section>
+
+    <!-- ==================== RECURSOS ==================== -->
+    <section id="recursos" class="scroll-mt-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+      <div class="reveal text-center max-w-3xl mx-auto mb-12">
+        <span class="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-ember-600" data-i18n="features.kicker">Tudo num só lugar</span>
+        <h2 class="font-display text-3xl sm:text-[44px] sm:leading-[1.12] font-extrabold tracking-tight text-ink-900 mt-3" data-i18n="features.title">Da rua ao contrato, sem planilha no meio do caminho.</h2>
+        <p class="text-ink-600 text-base sm:text-lg mt-4" data-i18n="features.subtitle">Prospecção, informações, classificação, funil e tarefas no mesmo ambiente, para você e para a sua equipe.</p>
+      </div>
+
+      <div class="grid gap-5 md:grid-cols-12">
+        <article class="reveal md:col-span-7 rounded-3xl border border-ink-200 bg-white p-7 sm:p-8 shadow-card flex flex-col justify-between">
+          <div>
+            <span class="w-12 h-12 rounded-2xl bg-sea-50 text-sea-700 flex items-center justify-center mb-6"><i data-lucide="map-pinned" class="w-6 h-6"></i></span>
+            <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-sea-700" data-i18n="features.c1Tag">Mapeamento</span>
+            <h3 class="font-display text-2xl font-bold text-ink-900 mt-2 mb-3" data-i18n="features.c1Title">Escolha a região e o segmento. O eMaper mostra quem está lá.</h3>
+            <p class="text-ink-600 leading-relaxed" data-i18n="features.c1Desc">Bairro, cidade ou raio a partir de um ponto: cada estabelecimento físico encontrado aparece no mapa, pronto para virar lead.</p>
+          </div>
+          <div class="mt-7 pt-5 border-t border-ink-100 flex flex-wrap gap-2 text-xs font-medium">
+            <span class="rounded-full bg-ink-100 px-3 py-1 text-ink-700" data-i18n="features.c1Pill1">Padarias</span>
+            <span class="rounded-full bg-ink-100 px-3 py-1 text-ink-700" data-i18n="features.c1Pill2">Academias</span>
+            <span class="rounded-full bg-ink-100 px-3 py-1 text-ink-700" data-i18n="features.c1Pill3">Pet shops</span>
+            <span class="rounded-full bg-ink-100 px-3 py-1 text-ink-700" data-i18n="features.c1Pill4">Clínicas</span>
+            <span class="rounded-full bg-ink-100 px-3 py-1 text-ink-700" data-i18n="features.c1Pill5">Oficinas</span>
+            <span class="rounded-full bg-sea-50 px-3 py-1 text-sea-700" data-i18n="features.c1Pill6">e muito mais</span>
+          </div>
+        </article>
+
+        <article class="reveal md:col-span-5 rounded-3xl border border-ink-200 bg-white p-7 sm:p-8 shadow-card flex flex-col justify-between">
+          <div>
+            <span class="w-12 h-12 rounded-2xl bg-sun-50 text-sun-700 flex items-center justify-center mb-6"><i data-lucide="scan-search" class="w-6 h-6"></i></span>
+            <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-sun-700" data-i18n="features.c2Tag">Informações</span>
+            <h3 class="font-display text-2xl font-bold text-ink-900 mt-2 mb-3" data-i18n="features.c2Title">O máximo de informação sobre cada lugar</h3>
+            <p class="text-ink-600 leading-relaxed" data-i18n="features.c2Desc">Endereço, telefone, WhatsApp, site, redes sociais, horário e avaliações reunidos numa ficha só, sem abrir dez abas.</p>
+          </div>
+          <div class="mt-7 pt-5 border-t border-ink-100 grid grid-cols-6 gap-2 text-ink-600" aria-hidden="true">
+            <span class="aspect-square rounded-xl bg-ink-50 flex items-center justify-center"><i data-lucide="map-pin" class="w-4 h-4"></i></span>
+            <span class="aspect-square rounded-xl bg-ink-50 flex items-center justify-center"><i data-lucide="phone" class="w-4 h-4"></i></span>
+            <span class="aspect-square rounded-xl bg-ink-50 flex items-center justify-center"><i data-lucide="message-circle" class="w-4 h-4"></i></span>
+            <span class="aspect-square rounded-xl bg-ink-50 flex items-center justify-center"><i data-lucide="globe" class="w-4 h-4"></i></span>
+            <span class="aspect-square rounded-xl bg-ink-50 flex items-center justify-center"><i data-lucide="clock" class="w-4 h-4"></i></span>
+            <span class="aspect-square rounded-xl bg-ink-50 flex items-center justify-center"><i data-lucide="star" class="w-4 h-4"></i></span>
+          </div>
+        </article>
+
+        <article class="reveal md:col-span-5 rounded-3xl border border-ink-200 bg-white p-7 sm:p-8 shadow-card flex flex-col justify-between">
+          <div>
+            <span class="w-12 h-12 rounded-2xl bg-ember-50 text-ember-600 flex items-center justify-center mb-6"><i data-lucide="tags" class="w-6 h-6"></i></span>
+            <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-ember-600" data-i18n="features.c3Tag">Classificação</span>
+            <h3 class="font-display text-2xl font-bold text-ink-900 mt-2 mb-3" data-i18n="features.c3Title">Saiba por onde começar</h3>
+            <p class="text-ink-600 leading-relaxed" data-i18n="features.c3Desc">Marque temperatura, potencial e etiquetas. Filtre e priorize quem tem mais chance de comprar.</p>
+          </div>
+          <div class="mt-7 pt-5 border-t border-ink-100 flex flex-wrap gap-2 text-xs font-semibold">
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-ember-50 px-3 py-1 text-ember-700"><i data-lucide="flame" class="w-3.5 h-3.5"></i><span data-i18n="temp.hot">Quente</span></span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-sun-50 px-3 py-1 text-sun-800"><i data-lucide="sun" class="w-3.5 h-3.5"></i><span data-i18n="temp.warm">Morno</span></span>
+            <span class="inline-flex items-center gap-1.5 rounded-full bg-sea-50 px-3 py-1 text-sea-700"><i data-lucide="snowflake" class="w-3.5 h-3.5"></i><span data-i18n="temp.cold">Frio</span></span>
+          </div>
+        </article>
+
+        <article class="reveal md:col-span-7 rounded-3xl border border-ink-200 bg-white p-7 sm:p-8 shadow-card flex flex-col justify-between">
+          <div>
+            <span class="w-12 h-12 rounded-2xl bg-sea-50 text-sea-700 flex items-center justify-center mb-6"><i data-lucide="kanban" class="w-6 h-6"></i></span>
+            <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-sea-700" data-i18n="features.c4Tag">Funil de vendas</span>
+            <h3 class="font-display text-2xl font-bold text-ink-900 mt-2 mb-3" data-i18n="features.c4Title">Cada negociação na etapa certa</h3>
+            <p class="text-ink-600 leading-relaxed" data-i18n="features.c4Desc">Do primeiro contato ao fechamento: avance os leads pelas etapas e veja o que está parado e quanto está em negociação.</p>
+          </div>
+          <div class="mt-7 pt-5 border-t border-ink-100 space-y-1.5" aria-hidden="true">
+            <div class="h-2.5 rounded-full bg-sea-600" style="width:100%"></div>
+            <div class="h-2.5 rounded-full bg-sea-500" style="width:78%"></div>
+            <div class="h-2.5 rounded-full bg-sea-400" style="width:56%"></div>
+            <div class="h-2.5 rounded-full bg-sun-500" style="width:36%"></div>
+            <div class="h-2.5 rounded-full bg-ember-500" style="width:20%"></div>
+          </div>
+        </article>
+
+        <article class="reveal md:col-span-12 rounded-3xl border border-ink-200 bg-gradient-to-br from-white to-sea-50/60 p-7 sm:p-8 shadow-card grid gap-8 md:grid-cols-2 md:items-center">
+          <div>
+            <span class="w-12 h-12 rounded-2xl bg-white border border-ink-200 text-sea-700 flex items-center justify-center mb-6"><i data-lucide="users" class="w-6 h-6"></i></span>
+            <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-sea-700" data-i18n="features.c5Tag">Equipe</span>
+            <h3 class="font-display text-2xl font-bold text-ink-900 mt-2 mb-3" data-i18n="features.c5Title">Tarefas organizadas com o seu time</h3>
+            <p class="text-ink-600 leading-relaxed" data-i18n="features.c5Desc">Distribua visitas, ligações e follow-ups com responsável e prazo. Todo mundo sabe o que fazer hoje, e você acompanha o que já foi feito.</p>
+          </div>
+          <div class="rounded-2xl border border-ink-200 bg-white p-4 space-y-2.5" aria-hidden="true">
+            <div class="flex items-center gap-3 rounded-xl bg-ink-50 px-3 py-2.5">
+              <span class="w-5 h-5 rounded-md bg-sea-600 text-white flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></span>
+              <span class="flex-1 text-sm text-ink-500 line-through" data-i18n="features.c5Task1">Visitar Padaria Grão Dourado</span>
+              <span class="w-7 h-7 rounded-full bg-ember-100 text-ember-700 text-[10px] font-bold flex items-center justify-center">AL</span>
+            </div>
+            <div class="flex items-center gap-3 rounded-xl bg-ink-50 px-3 py-2.5">
+              <span class="w-5 h-5 rounded-md border-2 border-ink-300"></span>
+              <span class="flex-1 text-sm text-ink-800" data-i18n="features.c5Task2">Ligar para Café Ipê Amarelo</span>
+              <span class="w-7 h-7 rounded-full bg-sea-100 text-sea-800 text-[10px] font-bold flex items-center justify-center">BR</span>
+            </div>
+            <div class="flex items-center gap-3 rounded-xl bg-ink-50 px-3 py-2.5">
+              <span class="w-5 h-5 rounded-md border-2 border-ink-300"></span>
+              <span class="flex-1 text-sm text-ink-800" data-i18n="features.c5Task3">Enviar proposta para Empório Santa Fé</span>
+              <span class="w-7 h-7 rounded-full bg-sun-100 text-sun-800 text-[10px] font-bold flex items-center justify-center">CM</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ==================== PARA QUEM E ==================== -->
+    <section id="para-quem" class="scroll-mt-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+      <div class="reveal text-center max-w-2xl mx-auto mb-12">
+        <span class="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-ember-600" data-i18n="audience.kicker">Para quem é</span>
+        <h2 class="font-display text-3xl sm:text-[44px] sm:leading-[1.12] font-extrabold tracking-tight text-ink-900 mt-3" data-i18n="audience.title">Para quem vende para negócios locais.</h2>
+        <p class="text-ink-600 text-base sm:text-lg mt-4" data-i18n="audience.subtitle">Se o seu cliente tem endereço, porta e balcão, o eMaper ajuda você a encontrá-lo.</p>
+      </div>
+      <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div class="reveal flex gap-4 rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-sea-50 text-sea-700 flex items-center justify-center"><i data-lucide="briefcase" class="w-5 h-5"></i></span>
+          <div><h3 class="font-semibold text-ink-900" data-i18n="audience.a1Title">Representantes comerciais</h3><p class="text-sm text-ink-600 mt-1 leading-relaxed" data-i18n="audience.a1Desc">Descubra todos os pontos de venda da sua área antes da próxima visita.</p></div>
+        </div>
+        <div class="reveal flex gap-4 rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-sun-50 text-sun-700 flex items-center justify-center"><i data-lucide="truck" class="w-5 h-5"></i></span>
+          <div><h3 class="font-semibold text-ink-900" data-i18n="audience.a2Title">Distribuidores e atacadistas</h3><p class="text-sm text-ink-600 mt-1 leading-relaxed" data-i18n="audience.a2Desc">Encontre comércios que ainda não compram de você.</p></div>
+        </div>
+        <div class="reveal flex gap-4 rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-ember-50 text-ember-600 flex items-center justify-center"><i data-lucide="megaphone" class="w-5 h-5"></i></span>
+          <div><h3 class="font-semibold text-ink-900" data-i18n="audience.a3Title">Agências de marketing local</h3><p class="text-sm text-ink-600 mt-1 leading-relaxed" data-i18n="audience.a3Desc">Ache negócios sem site ou com poucas avaliações e ofereça ajuda.</p></div>
+        </div>
+        <div class="reveal flex gap-4 rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-sea-50 text-sea-700 flex items-center justify-center"><i data-lucide="laptop" class="w-5 h-5"></i></span>
+          <div><h3 class="font-semibold text-ink-900" data-i18n="audience.a4Title">Software e serviços para PMEs</h3><p class="text-sm text-ink-600 mt-1 leading-relaxed" data-i18n="audience.a4Desc">Prospecte o segmento certo, bairro por bairro.</p></div>
+        </div>
+        <div class="reveal flex gap-4 rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-sun-50 text-sun-700 flex items-center justify-center"><i data-lucide="store" class="w-5 h-5"></i></span>
+          <div><h3 class="font-semibold text-ink-900" data-i18n="audience.a5Title">Franquias em expansão</h3><p class="text-sm text-ink-600 mt-1 leading-relaxed" data-i18n="audience.a5Desc">Entenda a concorrência e o potencial de uma região antes de abrir.</p></div>
+        </div>
+        <div class="reveal flex gap-4 rounded-2xl border border-ink-200 bg-white p-5 shadow-card">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-ember-50 text-ember-600 flex items-center justify-center"><i data-lucide="handshake" class="w-5 h-5"></i></span>
+          <div><h3 class="font-semibold text-ink-900" data-i18n="audience.a6Title">Consultores e prestadores B2B</h3><p class="text-sm text-ink-600 mt-1 leading-relaxed" data-i18n="audience.a6Desc">Transforme uma lista de lugares numa carteira de clientes.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DUVIDAS ==================== -->
+    <section id="duvidas" class="scroll-mt-24 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+      <div class="reveal text-center mb-10">
+        <span class="font-mono text-xs font-semibold uppercase tracking-[0.16em] text-ember-600" data-i18n="faq.kicker">Dúvidas</span>
+        <h2 class="font-display text-3xl sm:text-[40px] font-extrabold tracking-tight text-ink-900 mt-3" data-i18n="faq.title">Perguntas frequentes</h2>
+      </div>
+      <div class="space-y-3">
+        <details class="reveal group rounded-2xl border border-ink-200 bg-white px-5 sm:px-6 shadow-card">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 py-5 font-semibold text-ink-900"><span data-i18n="faq.q1">Quando o eMaper vai ser lançado?</span><i data-lucide="chevron-down" class="faq-chevron w-5 h-5 shrink-0 text-ink-500 transition-transform"></i></summary>
+          <p class="pb-5 -mt-1 text-ink-600 leading-relaxed" data-i18n="faq.a1">Ainda não temos uma data pública. Quem está na lista de espera recebe o convite para o acesso antecipado antes de todo mundo.</p>
+        </details>
+        <details class="reveal group rounded-2xl border border-ink-200 bg-white px-5 sm:px-6 shadow-card">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 py-5 font-semibold text-ink-900"><span data-i18n="faq.q2">Quanto vai custar?</span><i data-lucide="chevron-down" class="faq-chevron w-5 h-5 shrink-0 text-ink-500 transition-transform"></i></summary>
+          <p class="pb-5 -mt-1 text-ink-600 leading-relaxed" data-i18n="faq.a2">Os planos e preços serão anunciados no lançamento. Quem está na lista fica sabendo primeiro.</p>
+        </details>
+        <details class="reveal group rounded-2xl border border-ink-200 bg-white px-5 sm:px-6 shadow-card">
+          <summary class="flex cursor-pointer items-center justify-between gap-4 py-5 font-semibold text-ink-900"><span data-i18n="faq.q3">O que acontece depois que eu entro na lista?</span><i data-lucide="chevron-down" class="faq-chevron w-5 h-5 shrink-0 text-ink-500 transition-transform"></i></summary>
+          <p class="pb-5 -mt-1 text-ink-600 leading-relaxed" data-i18n="faq.a3">Nada de spam. Vamos falar com você por e-mail ou WhatsApp quando o acesso antecipado abrir, e você pode pedir para sair da lista quando quiser.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ==================== LISTA DE ESPERA ==================== -->
+    <section id="lista" class="scroll-mt-24 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24">
+      <div class="reveal relative overflow-hidden rounded-[32px] bg-sea-900 p-6 sm:p-12 shadow-window">
+        <div class="pointer-events-none absolute -right-24 -top-24 w-80 h-80 rounded-full bg-sea-500/30 blur-3xl" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -left-20 -bottom-28 w-80 h-80 rounded-full bg-ember-500/20 blur-3xl" aria-hidden="true"></div>
+        <svg class="pointer-events-none absolute inset-0 w-full h-full opacity-[0.07]" aria-hidden="true"><defs><pattern id="grid-dots" width="28" height="28" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.4" fill="#fff"/></pattern></defs><rect width="100%" height="100%" fill="url(#grid-dots)"/></svg>
+
+        <div class="relative grid gap-10 lg:grid-cols-12 lg:items-center">
+          <div class="lg:col-span-5 text-white">
+            <span class="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wider text-sun-300">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i><span data-i18n="form.badge">Lista de espera</span>
+            </span>
+            <h2 class="font-display text-3xl sm:text-[42px] sm:leading-[1.1] font-extrabold tracking-tight mt-5" data-i18n="form.title">Seja um dos primeiros a usar o eMaper.</h2>
+            <p class="mt-4 text-sea-100/90 text-base sm:text-lg leading-relaxed" data-i18n="form.subtitle">Deixe seu contato e avisamos você assim que o acesso antecipado abrir.</p>
+            <ul class="mt-7 space-y-3.5 text-sea-50">
+              <li class="flex items-start gap-3"><span class="mt-0.5 w-6 h-6 shrink-0 rounded-full bg-white/10 text-sun-300 flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></span><span data-i18n="form.perk1">Convite para o acesso antecipado, antes do lançamento</span></li>
+              <li class="flex items-start gap-3"><span class="mt-0.5 w-6 h-6 shrink-0 rounded-full bg-white/10 text-sun-300 flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></span><span data-i18n="form.perk2">Espaço para sugerir o que o eMaper precisa ter</span></li>
+              <li class="flex items-start gap-3"><span class="mt-0.5 w-6 h-6 shrink-0 rounded-full bg-white/10 text-sun-300 flex items-center justify-center"><i data-lucide="check" class="w-3.5 h-3.5"></i></span><span data-i18n="form.perk3">Aviso por e-mail ou WhatsApp, sem spam</span></li>
+            </ul>
+          </div>
+
+          <div class="lg:col-span-7">
+            <form id="wl-form" class="relative rounded-3xl bg-white p-6 sm:p-8 shadow-2xl space-y-5" novalidate>
+              <fieldset>
+                <legend class="mb-2 font-mono text-[11px] font-semibold uppercase tracking-wider text-ink-500" data-i18n="form.teamLabel">Quantas pessoas vendem com você?</legend>
+                <div class="grid grid-cols-3 gap-1.5 rounded-xl bg-ink-100 p-1" id="team-size">
+                  <button type="button" class="team-btn rounded-lg px-2 py-2 text-xs sm:text-sm font-semibold transition" data-size="solo" aria-pressed="true" data-i18n="form.teamSolo">Só eu</button>
+                  <button type="button" class="team-btn rounded-lg px-2 py-2 text-xs sm:text-sm font-semibold transition" data-size="team" aria-pressed="false" data-i18n="form.teamTeam">2 a 10</button>
+                  <button type="button" class="team-btn rounded-lg px-2 py-2 text-xs sm:text-sm font-semibold transition" data-size="large" aria-pressed="false" data-i18n="form.teamLarge">Mais de 10</button>
+                </div>
+              </fieldset>
+
+              <div>
+                <label for="wl-name" class="mb-1.5 block text-sm font-medium text-ink-800" data-i18n="form.nameLabel">Seu nome</label>
+                <div class="field flex items-center gap-3 rounded-xl border border-ink-200 bg-white px-3.5 py-3" id="wl-name-field">
+                  <i data-lucide="user" class="w-4 h-4 shrink-0 text-ink-500"></i>
+                  <input id="wl-name" name="name" type="text" autocomplete="name" maxlength="120" class="w-full bg-transparent text-[15px] text-ink-900 placeholder-ink-400 focus:outline-none" placeholder="Ex.: Ana Lima" data-i18n-placeholder="form.namePh" />
+                </div>
+                <p id="wl-name-error" class="mt-1.5 hidden text-xs text-ember-700"></p>
+              </div>
+
+              <div>
+                <label for="wl-email" class="mb-1.5 block text-sm font-medium text-ink-800" data-i18n="form.emailLabel">E-mail</label>
+                <div class="field flex items-center gap-3 rounded-xl border border-ink-200 bg-white px-3.5 py-3" id="wl-email-field">
+                  <i data-lucide="mail" class="w-4 h-4 shrink-0 text-ink-500"></i>
+                  <input id="wl-email" name="email" type="email" autocomplete="email" inputmode="email" maxlength="190" class="w-full bg-transparent text-[15px] text-ink-900 placeholder-ink-400 focus:outline-none" placeholder="voce@empresa.com.br" data-i18n-placeholder="form.emailPh" />
+                </div>
+                <button type="button" id="wl-email-fix" class="mt-2 hidden items-center gap-1.5 rounded-lg bg-sea-50 px-2.5 py-1 text-xs font-medium text-sea-800 hover:bg-sea-100 transition"><i data-lucide="wand-sparkles" class="w-3.5 h-3.5"></i><span id="wl-email-fix-text"></span></button>
+                <p id="wl-email-error" class="mt-1.5 hidden text-xs text-ember-700"></p>
+              </div>
+
+              <div>
+                <label for="wl-phone" class="mb-1.5 block text-sm font-medium text-ink-800">WhatsApp</label>
+                <div class="flex gap-2">
+                  <div class="field relative flex shrink-0 items-center gap-1.5 rounded-xl border border-ink-200 bg-white pl-3.5 pr-2.5 py-3">
+                    <span id="wl-ddi-label" class="font-mono text-sm font-semibold text-ink-800">+55</span>
+                    <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-ink-500"></i>
+                    <select id="wl-country" class="absolute inset-0 h-full w-full cursor-pointer opacity-0" aria-label="País / Country"></select>
+                  </div>
+                  <div class="field flex min-w-0 flex-1 items-center gap-3 rounded-xl border border-ink-200 bg-white px-3.5 py-3" id="wl-phone-field">
+                    <i data-lucide="message-circle" class="w-4 h-4 shrink-0 text-sea-600"></i>
+                    <input id="wl-phone" name="whatsapp" type="tel" autocomplete="tel-national" inputmode="tel" class="w-full min-w-0 bg-transparent font-mono text-[15px] text-ink-900 placeholder-ink-400 focus:outline-none" placeholder="(11) 9 8765-4321" />
+                  </div>
+                </div>
+                <p id="wl-phone-error" class="mt-1.5 hidden text-xs text-ember-700"></p>
+              </div>
+
+              <!-- Campo armadilha para robos (escondido de pessoas; se vier preenchido, a inscricao e descartada) -->
+              <div class="absolute -left-[9999px] top-0 h-px w-px overflow-hidden" aria-hidden="true">
+                <label for="wl-website">Website</label>
+                <input id="wl-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <p id="wl-submit-error" class="hidden rounded-xl border border-ember-200 bg-ember-50 px-3.5 py-2.5 text-sm text-ember-800" role="alert"></p>
+
+              <button type="submit" id="wl-submit" class="btn-primary w-full inline-flex items-center justify-center gap-2.5 rounded-2xl px-6 py-4 font-display text-base font-bold">
+                <span id="wl-submit-label" data-i18n="form.submit">Entrar na lista de espera</span>
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+              </button>
+
+              <p class="flex flex-wrap items-center justify-center gap-1.5 text-center text-xs text-ink-500">
+                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                <span data-i18n="form.privacy">Usamos seus dados só para falar com você sobre o eMaper.</span>
+                <a href="/policy.html" target="_blank" rel="noopener" class="font-medium text-sea-700 underline underline-offset-2 hover:text-sea-900" data-i18n="form.privacyLink">Política de privacidade</a>
+              </p>
+            </form>
+
+            <div id="wl-success" class="hidden rounded-3xl bg-white p-7 sm:p-10 text-center shadow-2xl" aria-live="polite">
+              <div class="mx-auto mb-5 w-16 h-16 rounded-2xl bg-sea-50 text-sea-700 flex items-center justify-center"><i data-lucide="map-pin-check" class="w-8 h-8"></i></div>
+              <h3 id="wl-success-title" class="font-display text-2xl sm:text-3xl font-extrabold text-ink-900" data-i18n="success.title">Você está na lista!</h3>
+              <p id="wl-success-desc" class="mx-auto mt-3 max-w-md text-ink-600 leading-relaxed"></p>
+              <div class="mx-auto mt-6 flex max-w-sm items-center justify-between rounded-2xl border border-ink-200 bg-ink-50 px-5 py-4 text-left">
+                <span class="font-mono text-[11px] font-semibold uppercase tracking-wider text-ink-500" data-i18n="success.positionLabel">Sua posição na fila</span>
+                <span id="wl-position" class="font-mono text-2xl font-extrabold text-sea-700">—</span>
+              </div>
+              <div class="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <button type="button" id="wl-share" class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl bg-sea-600 px-5 py-3 text-sm font-semibold text-white hover:bg-sea-700 transition">
+                  <i data-lucide="share-2" class="w-4 h-4"></i><span id="wl-share-label" data-i18n="success.share">Compartilhar com alguém</span>
+                </button>
+                <button type="button" id="wl-again" class="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-xl border border-ink-200 px-5 py-3 text-sm font-semibold text-ink-700 hover:bg-ink-50 transition">
+                  <i data-lucide="user-plus" class="w-4 h-4"></i><span data-i18n="success.again">Inscrever outra pessoa</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================== RODAPE ==================== -->
+  <footer class="relative z-10 border-t border-ink-200 bg-white/70">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+      <img src="/img/app-3.png" alt="eMaper®" width="620" height="190" class="h-8 w-auto" loading="lazy" />
+      <div class="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 text-center">
+        <p class="text-xs text-ink-500" data-i18n="footer.rights">© 2026 eMaper®. Todos os direitos reservados.</p>
+        <a href="/policy.html" class="text-xs text-ink-500 underline underline-offset-2 hover:text-ink-800" data-i18n="form.privacyLink">Política de privacidade</a>
+        <span class="hidden sm:inline-block h-3.5 w-px bg-ink-200"></span>
+        <a href="https://f91.tech" target="_blank" rel="noopener noreferrer" aria-label="Developed by F91" class="group inline-flex items-center gap-2 font-mono text-[11px] text-ink-500 hover:text-ink-800 transition">
+          <span>developed by</span>
+          <svg class="h-3.5 w-auto transition-transform duration-300 group-hover:scale-105" viewBox="0 0 380 90" fill="currentColor" aria-hidden="true">
+            <path d="M36 4 C41 0 46 0 53 0 H88 C93 0 95 4 91 9 L75 25 H46 L18 53 C14 57 9 54 10 48 L15 27 C16 22 20 18 24 14 L36 4 Z"/>
+            <path d="M47 38 H72 L40 70 C34 76 26 79 16 79 H4 C0 79 -1 74 3 70 L35 42 C39 39 43 38 47 38 Z"/>
+            <path d="M111 4 C115 0 121 0 125 4 L132 13 C135 17 136 22 134 28 L120 75 C118 82 112 87 104 87 H70 C65 87 63 82 67 78 L99 45 C103 41 103 32 97 32 H88 C83 32 82 27 86 23 L111 4 Z"/>
+            <path d="M174 28 C178 17 188 12 202 12 H256 C261 12 263 16 261 21 L258 29 C256 33 252 35 247 35 H203 C199 35 196 37 195 41 L193 46 H238 C243 46 245 50 243 54 L240 62 C238 66 234 68 229 68 H185 L179 83 C177 86 174 88 169 88 H155 C150 88 148 84 150 79 L174 28 Z"/>
+            <path d="M278 12 H324 C338 12 345 21 340 35 L326 70 C321 82 310 88 295 88 H249 C244 88 242 84 244 79 L247 72 C249 68 253 66 258 66 H294 C299 66 303 63 305 58 L306 55 H269 C255 55 249 46 254 33 L258 24 C262 15 270 12 278 12 Z M280 32 L277 38 C276 41 278 43 282 43 H310 L315 32 C316 29 314 27 310 27 H286 C283 27 281 29 280 32 Z"/>
+            <path d="M368 12 H377 C380 12 381 15 380 19 L356 82 C354 86 351 88 346 88 H332 C327 88 325 84 327 79 L344 35 L335 38 C331 39 328 36 330 31 L334 22 C335 19 338 17 342 16 L368 12 Z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ==========================================================================
+       1. TEXTOS (PT / EN / ES)
+       ========================================================================== */
+    const I18N = {
+      pt: {
+        meta: { title: 'eMaper® | Prospecção de clientes locais no mapa — em breve' },
+        nav: { preview: 'Prévia', how: 'Como funciona', features: 'Recursos', audience: 'Para quem é', faq: 'Dúvidas', cta: 'Lista de espera' },
+        hero: {
+          badge: 'Em breve • Lista de espera aberta',
+          title1: 'Seus próximos clientes já estão',
+          titleHighlight: 'no mapa.',
+          subtitle: 'O eMaper mapeia os estabelecimentos físicos da região que você escolher, reúne o máximo de informações sobre cada um e organiza tudo num só lugar: classificação de leads, funil de vendas e tarefas da equipe.',
+          ctaPrimary: 'Quero entrar na lista',
+          ctaSecondary: 'Ver o eMaper em ação',
+          point1: 'Mapeamento por região e segmento',
+          point2: 'Ficha completa de cada lugar',
+          point3: 'Funil e tarefas da equipe',
+          proof: 'pessoas já estão na lista de espera'
+        },
+        temp: { hot: 'Quente', warm: 'Morno', cold: 'Frio', none: 'Sem classificação' },
+        sim: {
+          kicker: 'Prévia interativa • clique para explorar',
+          tabMap: 'Mapear', tabLeads: 'Classificar', tabPipeline: 'Funil de vendas', tabTasks: 'Tarefas da equipe',
+          windowTitle: 'Campanha: Alimentação • Pinheiros, São Paulo',
+          demoBadge: 'Dados ilustrativos',
+          query: 'Padarias, cafés e restaurantes',
+          radius: 'Raio de 1,5 km',
+          scan: 'Mapear',
+          found: '{n} estabelecimentos encontrados',
+          more: '+{n} no mapa',
+          completeness: 'Ficha {n}% completa',
+          reviews: '{n} avaliações',
+          address: 'Endereço', phone: 'Telefone', whatsapp: 'WhatsApp', site: 'Site', instagram: 'Instagram', hours: 'Horário',
+          missing: 'Não encontrado',
+          noSite: 'Sem site',
+          addToPipeline: 'Adicionar ao funil',
+          inPipeline: 'No funil: {stage}',
+          createTask: 'Criar tarefa',
+          toastAdded: '{name} entrou no funil em “{stage}”.',
+          toastTask: 'Tarefa criada: visitar {name} amanhã, com {owner}.',
+          toastMoved: '{name} avançou para “{stage}”.',
+          toastInvite: 'Convites para a equipe chegam com o lançamento.',
+          leadsTitle: 'Leads mapeados',
+          leadsHint: 'Clique na temperatura para reclassificar. O pino no mapa muda junto.',
+          filterAll: 'Todos', filterHot: 'Quentes', filterWarm: 'Mornos', filterCold: 'Frios',
+          colLead: 'Lead', colTemp: 'Temperatura', colScore: 'Potencial', colTags: 'Etiquetas', colOwner: 'Resp.',
+          pipelineTitle: 'Funil de vendas',
+          pipelineHint: 'Clique em “Avançar” para mover o lead para a próxima etapa.',
+          stages: ['Mapeado', 'Primeiro contato', 'Visita agendada', 'Proposta enviada', 'Fechado'],
+          advance: 'Avançar',
+          perMonth: '/mês',
+          openValue: 'Em negociação',
+          wonValue: 'Fechado',
+          emptyStage: 'Nenhum lead aqui',
+          team: 'Equipe',
+          openTasks: '{n} tarefas abertas',
+          openTask: '1 tarefa aberta',
+          roles: { field: 'Vendas externas', inside: 'Pré-vendas', manager: 'Gestora comercial' },
+          invite: 'Convidar pessoa',
+          weekTasks: 'Tarefas da semana',
+          progress: '{d} de {t} concluídas',
+          taskVisit: 'Visitar {lead}', taskCall: 'Ligar para {lead}', taskProposal: 'Enviar proposta para {lead}', taskWhats: 'Follow-up no WhatsApp com {lead}',
+          due: { today10: 'Hoje, 10:00', today1430: 'Hoje, 14:30', today17: 'Hoje, 17:00', tomorrow: 'Amanhã', thu: 'Quinta', fri: 'Sexta' },
+          footerNote: 'Prévia ilustrativa: nomes, contatos e valores são fictícios.',
+          footerRight: 'eMaper • em desenvolvimento'
+        },
+        cat: { bakery: 'Padaria', cafe: 'Cafeteria', restaurant: 'Restaurante', confectionery: 'Confeitaria', snack: 'Lanchonete', grocery: 'Empório', pizza: 'Pizzaria', burger: 'Hamburgueria' },
+        tag: { delivery: 'Faz delivery', orders: 'Aceita encomendas', sundays: 'Abre aos domingos', noSupplier: 'Sem fornecedor fixo', newPlace: 'Inaugurado há pouco', events: 'Faz eventos' },
+        how: {
+          kicker: 'Como funciona',
+          title: 'Três passos entre você e a próxima venda.',
+          s1Title: 'Escolha a região', s1Desc: 'Informe o bairro, a cidade ou um raio e o tipo de negócio que você atende.',
+          s2Title: 'O eMaper mapeia e coleta', s2Desc: 'Os estabelecimentos aparecem no mapa, cada um com a ficha mais completa possível.',
+          s3Title: 'Venda em equipe', s3Desc: 'Classifique os leads, avance no funil e divida as tarefas com o seu time.'
+        },
+        features: {
+          kicker: 'Tudo num só lugar',
+          title: 'Da rua ao contrato, sem planilha no meio do caminho.',
+          subtitle: 'Prospecção, informações, classificação, funil e tarefas no mesmo ambiente, para você e para a sua equipe.',
+          c1Tag: 'Mapeamento', c1Title: 'Escolha a região e o segmento. O eMaper mostra quem está lá.',
+          c1Desc: 'Bairro, cidade ou raio a partir de um ponto: cada estabelecimento físico encontrado aparece no mapa, pronto para virar lead.',
+          c1Pill1: 'Padarias', c1Pill2: 'Academias', c1Pill3: 'Pet shops', c1Pill4: 'Clínicas', c1Pill5: 'Oficinas', c1Pill6: 'e muito mais',
+          c2Tag: 'Informações', c2Title: 'O máximo de informação sobre cada lugar',
+          c2Desc: 'Endereço, telefone, WhatsApp, site, redes sociais, horário e avaliações reunidos numa ficha só, sem abrir dez abas.',
+          c3Tag: 'Classificação', c3Title: 'Saiba por onde começar',
+          c3Desc: 'Marque temperatura, potencial e etiquetas. Filtre e priorize quem tem mais chance de comprar.',
+          c4Tag: 'Funil de vendas', c4Title: 'Cada negociação na etapa certa',
+          c4Desc: 'Do primeiro contato ao fechamento: avance os leads pelas etapas e veja o que está parado e quanto está em negociação.',
+          c5Tag: 'Equipe', c5Title: 'Tarefas organizadas com o seu time',
+          c5Desc: 'Distribua visitas, ligações e follow-ups com responsável e prazo. Todo mundo sabe o que fazer hoje, e você acompanha o que já foi feito.',
+          c5Task1: 'Visitar Padaria Grão Dourado', c5Task2: 'Ligar para Café Ipê Amarelo', c5Task3: 'Enviar proposta para Empório Santa Fé'
+        },
+        audience: {
+          kicker: 'Para quem é',
+          title: 'Para quem vende para negócios locais.',
+          subtitle: 'Se o seu cliente tem endereço, porta e balcão, o eMaper ajuda você a encontrá-lo.',
+          a1Title: 'Representantes comerciais', a1Desc: 'Descubra todos os pontos de venda da sua área antes da próxima visita.',
+          a2Title: 'Distribuidores e atacadistas', a2Desc: 'Encontre comércios que ainda não compram de você.',
+          a3Title: 'Agências de marketing local', a3Desc: 'Ache negócios sem site ou com poucas avaliações e ofereça ajuda.',
+          a4Title: 'Software e serviços para PMEs', a4Desc: 'Prospecte o segmento certo, bairro por bairro.',
+          a5Title: 'Franquias em expansão', a5Desc: 'Entenda a concorrência e o potencial de uma região antes de abrir.',
+          a6Title: 'Consultores e prestadores B2B', a6Desc: 'Transforme uma lista de lugares numa carteira de clientes.'
+        },
+        faq: {
+          kicker: 'Dúvidas',
+          title: 'Perguntas frequentes',
+          q1: 'Quando o eMaper vai ser lançado?', a1: 'Ainda não temos uma data pública. Quem está na lista de espera recebe o convite para o acesso antecipado antes de todo mundo.',
+          q2: 'Quanto vai custar?', a2: 'Os planos e preços serão anunciados no lançamento. Quem está na lista fica sabendo primeiro.',
+          q3: 'O que acontece depois que eu entro na lista?', a3: 'Nada de spam. Vamos falar com você por e-mail ou WhatsApp quando o acesso antecipado abrir, e você pode pedir para sair da lista quando quiser.'
+        },
+        form: {
+          badge: 'Lista de espera',
+          title: 'Seja um dos primeiros a usar o eMaper.',
+          subtitle: 'Deixe seu contato e avisamos você assim que o acesso antecipado abrir.',
+          perk1: 'Convite para o acesso antecipado, antes do lançamento',
+          perk2: 'Espaço para sugerir o que o eMaper precisa ter',
+          perk3: 'Aviso por e-mail ou WhatsApp, sem spam',
+          teamLabel: 'Quantas pessoas vendem com você?',
+          teamSolo: 'Só eu', teamTeam: '2 a 10', teamLarge: 'Mais de 10',
+          nameLabel: 'Seu nome', namePh: 'Ex.: Ana Lima',
+          emailLabel: 'E-mail', emailPh: 'voce@empresa.com.br',
+          submit: 'Entrar na lista de espera',
+          sending: 'Enviando...',
+          privacy: 'Usamos seus dados só para falar com você sobre o eMaper.',
+          privacyLink: 'Política de privacidade',
+          nameError: 'Digite seu nome.',
+          emailError: 'Digite um e-mail válido, como nome@empresa.com.',
+          emailTypo: 'Você quis dizer {email}?',
+          phoneErrorBR: 'Informe DDD + número (10 ou 11 dígitos).',
+          phoneErrorDDD: 'Esse DDD não existe. Confira os 2 primeiros dígitos.',
+          phoneError: 'Confira o número, com o código de área.',
+          errorGeneric: 'Não foi possível enviar agora. Verifique sua conexão e tente de novo.',
+          errorRate: 'Muitas inscrições seguidas desta rede. Tente de novo mais tarde.',
+          errorInvalid: 'Confira nome, e-mail e WhatsApp e tente de novo.'
+        },
+        success: {
+          title: 'Você está na lista!',
+          alreadyTitle: 'Você já estava na lista.',
+          desc: 'Vamos avisar você em {email} e no WhatsApp quando o acesso antecipado abrir.',
+          alreadyDesc: 'Atualizamos seus dados. Sua posição na fila continua a mesma.',
+          positionLabel: 'Sua posição na fila',
+          share: 'Compartilhar com alguém',
+          shareText: 'Conheça o eMaper: prospecção de clientes locais no mapa.',
+          copied: 'Link copiado!',
+          again: 'Inscrever outra pessoa'
+        },
+        footer: { rights: '© 2026 eMaper®. Todos os direitos reservados.' }
+      },
+
+      en: {
+        meta: { title: 'eMaper® | Find local customers on the map — coming soon' },
+        nav: { preview: 'Preview', how: 'How it works', features: 'Features', audience: "Who it's for", faq: 'FAQ', cta: 'Join the waitlist' },
+        hero: {
+          badge: 'Coming soon • Waitlist open',
+          title1: 'Your next customers are already',
+          titleHighlight: 'on the map.',
+          subtitle: 'eMaper maps the brick-and-mortar businesses in any area you choose, gathers as much information as possible about each one and keeps everything in one place: lead scoring, sales pipeline and team tasks.',
+          ctaPrimary: 'Join the waitlist',
+          ctaSecondary: 'See eMaper in action',
+          point1: 'Mapping by area and industry',
+          point2: 'A full profile for every place',
+          point3: 'Pipeline and team tasks',
+          proof: 'people are already on the waitlist'
+        },
+        temp: { hot: 'Hot', warm: 'Warm', cold: 'Cold', none: 'Not scored' },
+        sim: {
+          kicker: 'Interactive preview • click to explore',
+          tabMap: 'Map', tabLeads: 'Score', tabPipeline: 'Sales pipeline', tabTasks: 'Team tasks',
+          windowTitle: 'Campaign: Food service • Pinheiros, São Paulo',
+          demoBadge: 'Sample data',
+          query: 'Bakeries, cafés and restaurants',
+          radius: '1.5 km radius',
+          scan: 'Map it',
+          found: '{n} places found',
+          more: '+{n} on the map',
+          completeness: 'Profile {n}% complete',
+          reviews: '{n} reviews',
+          address: 'Address', phone: 'Phone', whatsapp: 'WhatsApp', site: 'Website', instagram: 'Instagram', hours: 'Hours',
+          missing: 'Not found',
+          noSite: 'No website',
+          addToPipeline: 'Add to pipeline',
+          inPipeline: 'In pipeline: {stage}',
+          createTask: 'Create task',
+          toastAdded: '{name} added to the pipeline under “{stage}”.',
+          toastTask: 'Task created: visit {name} tomorrow, assigned to {owner}.',
+          toastMoved: '{name} moved to “{stage}”.',
+          toastInvite: 'Team invites arrive at launch.',
+          leadsTitle: 'Mapped leads',
+          leadsHint: 'Click the temperature to re-score. The map pin updates too.',
+          filterAll: 'All', filterHot: 'Hot', filterWarm: 'Warm', filterCold: 'Cold',
+          colLead: 'Lead', colTemp: 'Temperature', colScore: 'Potential', colTags: 'Tags', colOwner: 'Owner',
+          pipelineTitle: 'Sales pipeline',
+          pipelineHint: 'Click “Advance” to move a lead to the next stage.',
+          stages: ['Mapped', 'First contact', 'Visit scheduled', 'Proposal sent', 'Won'],
+          advance: 'Advance',
+          perMonth: '/mo',
+          openValue: 'In negotiation',
+          wonValue: 'Won',
+          emptyStage: 'No leads here',
+          team: 'Team',
+          openTasks: '{n} open tasks',
+          openTask: '1 open task',
+          roles: { field: 'Field sales', inside: 'Inside sales', manager: 'Sales manager' },
+          invite: 'Invite teammate',
+          weekTasks: "This week's tasks",
+          progress: '{d} of {t} done',
+          taskVisit: 'Visit {lead}', taskCall: 'Call {lead}', taskProposal: 'Send proposal to {lead}', taskWhats: 'WhatsApp follow-up with {lead}',
+          due: { today10: 'Today, 10:00', today1430: 'Today, 2:30 pm', today17: 'Today, 5:00 pm', tomorrow: 'Tomorrow', thu: 'Thursday', fri: 'Friday' },
+          footerNote: 'Illustrative preview: names, contacts and values are fictional.',
+          footerRight: 'eMaper • in development'
+        },
+        cat: { bakery: 'Bakery', cafe: 'Café', restaurant: 'Restaurant', confectionery: 'Patisserie', snack: 'Snack bar', grocery: 'Deli', pizza: 'Pizzeria', burger: 'Burger joint' },
+        tag: { delivery: 'Delivers', orders: 'Takes orders', sundays: 'Open on Sundays', noSupplier: 'No fixed supplier', newPlace: 'Recently opened', events: 'Hosts events' },
+        how: {
+          kicker: 'How it works',
+          title: 'Three steps between you and your next sale.',
+          s1Title: 'Choose the area', s1Desc: 'Enter a neighborhood, a city or a radius, and the type of business you serve.',
+          s2Title: 'eMaper maps and collects', s2Desc: 'Businesses show up on the map, each with the most complete profile possible.',
+          s3Title: 'Sell as a team', s3Desc: 'Score leads, move them through the pipeline and split tasks with your team.'
+        },
+        features: {
+          kicker: 'All in one place',
+          title: 'From the street to the signed deal, no spreadsheets in between.',
+          subtitle: 'Prospecting, data, scoring, pipeline and tasks in the same workspace, for you and your team.',
+          c1Tag: 'Mapping', c1Title: "Pick an area and an industry. eMaper shows who's there.",
+          c1Desc: 'A neighborhood, a city or a radius around a point: every brick-and-mortar business found shows up on the map, ready to become a lead.',
+          c1Pill1: 'Bakeries', c1Pill2: 'Gyms', c1Pill3: 'Pet shops', c1Pill4: 'Clinics', c1Pill5: 'Auto repair', c1Pill6: 'and much more',
+          c2Tag: 'Data', c2Title: 'As much information as possible on every place',
+          c2Desc: 'Address, phone, WhatsApp, website, social media, opening hours and reviews in a single profile, without opening ten tabs.',
+          c3Tag: 'Scoring', c3Title: 'Know where to start',
+          c3Desc: 'Set temperature, potential and tags. Filter and prioritize the leads most likely to buy.',
+          c4Tag: 'Sales pipeline', c4Title: 'Every deal in the right stage',
+          c4Desc: "From first contact to closed deal: move leads through the stages and see what's stuck and how much is in negotiation.",
+          c5Tag: 'Team', c5Title: 'Tasks organized with your team',
+          c5Desc: "Assign visits, calls and follow-ups with an owner and a due date. Everyone knows what to do today, and you see what's already done.",
+          c5Task1: 'Visit Padaria Grão Dourado', c5Task2: 'Call Café Ipê Amarelo', c5Task3: 'Send proposal to Empório Santa Fé'
+        },
+        audience: {
+          kicker: "Who it's for",
+          title: 'For anyone who sells to local businesses.',
+          subtitle: 'If your customer has an address, a door and a counter, eMaper helps you find them.',
+          a1Title: 'Sales reps', a1Desc: 'Find every point of sale in your territory before the next visit.',
+          a2Title: 'Distributors and wholesalers', a2Desc: "Find businesses that don't buy from you yet.",
+          a3Title: 'Local marketing agencies', a3Desc: 'Spot businesses with no website or few reviews and offer help.',
+          a4Title: 'Software and services for SMBs', a4Desc: 'Prospect the right industry, neighborhood by neighborhood.',
+          a5Title: 'Growing franchises', a5Desc: 'Understand the competition and potential of an area before opening.',
+          a6Title: 'B2B consultants and providers', a6Desc: 'Turn a list of places into a client portfolio.'
+        },
+        faq: {
+          kicker: 'FAQ',
+          title: 'Frequently asked questions',
+          q1: 'When will eMaper launch?', a1: "We don't have a public date yet. People on the waitlist get the early access invitation before anyone else.",
+          q2: 'How much will it cost?', a2: 'Plans and pricing will be announced at launch. People on the waitlist hear about it first.',
+          q3: 'What happens after I join the waitlist?', a3: "No spam. We'll reach out by email or WhatsApp when early access opens, and you can ask to leave the list at any time."
+        },
+        form: {
+          badge: 'Waitlist',
+          title: 'Be one of the first to use eMaper.',
+          subtitle: "Leave your contact details and we'll let you know as soon as early access opens.",
+          perk1: 'An invitation to early access, before launch',
+          perk2: 'A say in what eMaper should include',
+          perk3: 'A heads-up by email or WhatsApp, no spam',
+          teamLabel: 'How many people sell with you?',
+          teamSolo: 'Just me', teamTeam: '2 to 10', teamLarge: 'More than 10',
+          nameLabel: 'Your name', namePh: 'e.g. Ana Lima',
+          emailLabel: 'Email', emailPh: 'you@company.com',
+          submit: 'Join the waitlist',
+          sending: 'Sending...',
+          privacy: 'We only use your details to talk to you about eMaper.',
+          privacyLink: 'Privacy policy',
+          nameError: 'Enter your name.',
+          emailError: 'Enter a valid email, like name@company.com.',
+          emailTypo: 'Did you mean {email}?',
+          phoneErrorBR: 'Enter area code + number (10 or 11 digits).',
+          phoneErrorDDD: "That area code doesn't exist in Brazil. Check the first 2 digits.",
+          phoneError: 'Check the number, including the area code.',
+          errorGeneric: "We couldn't send it right now. Check your connection and try again.",
+          errorRate: 'Too many sign-ups from this network. Please try again later.',
+          errorInvalid: 'Please check your name, email and WhatsApp and try again.'
+        },
+        success: {
+          title: "You're on the list!",
+          alreadyTitle: 'You were already on the list.',
+          desc: "We'll let you know at {email} and on WhatsApp when early access opens.",
+          alreadyDesc: 'We updated your details. Your spot in line stays the same.',
+          positionLabel: 'Your spot in line',
+          share: 'Share with someone',
+          shareText: 'Check out eMaper: find local customers on the map.',
+          copied: 'Link copied!',
+          again: 'Sign up someone else'
+        },
+        footer: { rights: '© 2026 eMaper®. All rights reserved.' }
+      },
+
+      es: {
+        meta: { title: 'eMaper® | Prospección de clientes locales en el mapa — próximamente' },
+        nav: { preview: 'Vista previa', how: 'Cómo funciona', features: 'Funciones', audience: 'Para quién es', faq: 'Preguntas', cta: 'Lista de espera' },
+        hero: {
+          badge: 'Próximamente • Lista de espera abierta',
+          title1: 'Tus próximos clientes ya están',
+          titleHighlight: 'en el mapa.',
+          subtitle: 'eMaper mapea los establecimientos físicos de la zona que elijas, reúne la mayor cantidad de información sobre cada uno y lo organiza todo en un solo lugar: clasificación de leads, embudo de ventas y tareas del equipo.',
+          ctaPrimary: 'Quiero unirme a la lista',
+          ctaSecondary: 'Ver eMaper en acción',
+          point1: 'Mapeo por zona y segmento',
+          point2: 'Ficha completa de cada lugar',
+          point3: 'Embudo y tareas del equipo',
+          proof: 'personas ya están en la lista de espera'
+        },
+        temp: { hot: 'Caliente', warm: 'Tibio', cold: 'Frío', none: 'Sin clasificar' },
+        sim: {
+          kicker: 'Vista previa interactiva • haz clic para explorar',
+          tabMap: 'Mapear', tabLeads: 'Clasificar', tabPipeline: 'Embudo de ventas', tabTasks: 'Tareas del equipo',
+          windowTitle: 'Campaña: Alimentación • Pinheiros, São Paulo',
+          demoBadge: 'Datos ilustrativos',
+          query: 'Panaderías, cafés y restaurantes',
+          radius: 'Radio de 1,5 km',
+          scan: 'Mapear',
+          found: '{n} establecimientos encontrados',
+          more: '+{n} en el mapa',
+          completeness: 'Ficha {n}% completa',
+          reviews: '{n} reseñas',
+          address: 'Dirección', phone: 'Teléfono', whatsapp: 'WhatsApp', site: 'Sitio web', instagram: 'Instagram', hours: 'Horario',
+          missing: 'No encontrado',
+          noSite: 'Sin sitio web',
+          addToPipeline: 'Agregar al embudo',
+          inPipeline: 'En el embudo: {stage}',
+          createTask: 'Crear tarea',
+          toastAdded: '{name} entró al embudo en “{stage}”.',
+          toastTask: 'Tarea creada: visitar {name} mañana, con {owner}.',
+          toastMoved: '{name} avanzó a “{stage}”.',
+          toastInvite: 'Las invitaciones al equipo llegan con el lanzamiento.',
+          leadsTitle: 'Leads mapeados',
+          leadsHint: 'Haz clic en la temperatura para reclasificar. El pin del mapa cambia también.',
+          filterAll: 'Todos', filterHot: 'Calientes', filterWarm: 'Tibios', filterCold: 'Fríos',
+          colLead: 'Lead', colTemp: 'Temperatura', colScore: 'Potencial', colTags: 'Etiquetas', colOwner: 'Resp.',
+          pipelineTitle: 'Embudo de ventas',
+          pipelineHint: 'Haz clic en “Avanzar” para mover el lead a la siguiente etapa.',
+          stages: ['Mapeado', 'Primer contacto', 'Visita agendada', 'Propuesta enviada', 'Cerrado'],
+          advance: 'Avanzar',
+          perMonth: '/mes',
+          openValue: 'En negociación',
+          wonValue: 'Cerrado',
+          emptyStage: 'Ningún lead aquí',
+          team: 'Equipo',
+          openTasks: '{n} tareas abiertas',
+          openTask: '1 tarea abierta',
+          roles: { field: 'Ventas en campo', inside: 'Preventa', manager: 'Gerente comercial' },
+          invite: 'Invitar persona',
+          weekTasks: 'Tareas de la semana',
+          progress: '{d} de {t} completadas',
+          taskVisit: 'Visitar {lead}', taskCall: 'Llamar a {lead}', taskProposal: 'Enviar propuesta a {lead}', taskWhats: 'Seguimiento por WhatsApp con {lead}',
+          due: { today10: 'Hoy, 10:00', today1430: 'Hoy, 14:30', today17: 'Hoy, 17:00', tomorrow: 'Mañana', thu: 'Jueves', fri: 'Viernes' },
+          footerNote: 'Vista previa ilustrativa: nombres, contactos y valores son ficticios.',
+          footerRight: 'eMaper • en desarrollo'
+        },
+        cat: { bakery: 'Panadería', cafe: 'Cafetería', restaurant: 'Restaurante', confectionery: 'Pastelería', snack: 'Lonchería', grocery: 'Almacén', pizza: 'Pizzería', burger: 'Hamburguesería' },
+        tag: { delivery: 'Hace delivery', orders: 'Acepta encargos', sundays: 'Abre los domingos', noSupplier: 'Sin proveedor fijo', newPlace: 'Recién inaugurado', events: 'Hace eventos' },
+        how: {
+          kicker: 'Cómo funciona',
+          title: 'Tres pasos entre tú y tu próxima venta.',
+          s1Title: 'Elige la zona', s1Desc: 'Indica el barrio, la ciudad o un radio y el tipo de negocio que atiendes.',
+          s2Title: 'eMaper mapea y recopila', s2Desc: 'Los establecimientos aparecen en el mapa, cada uno con la ficha más completa posible.',
+          s3Title: 'Vende en equipo', s3Desc: 'Clasifica los leads, avanza en el embudo y reparte las tareas con tu equipo.'
+        },
+        features: {
+          kicker: 'Todo en un solo lugar',
+          title: 'De la calle al contrato, sin hojas de cálculo en el camino.',
+          subtitle: 'Prospección, información, clasificación, embudo y tareas en el mismo entorno, para ti y tu equipo.',
+          c1Tag: 'Mapeo', c1Title: 'Elige la zona y el segmento. eMaper te muestra quién está allí.',
+          c1Desc: 'Barrio, ciudad o radio desde un punto: cada establecimiento físico encontrado aparece en el mapa, listo para convertirse en lead.',
+          c1Pill1: 'Panaderías', c1Pill2: 'Gimnasios', c1Pill3: 'Tiendas de mascotas', c1Pill4: 'Clínicas', c1Pill5: 'Talleres', c1Pill6: 'y mucho más',
+          c2Tag: 'Información', c2Title: 'La mayor cantidad de información sobre cada lugar',
+          c2Desc: 'Dirección, teléfono, WhatsApp, sitio web, redes sociales, horario y reseñas en una sola ficha, sin abrir diez pestañas.',
+          c3Tag: 'Clasificación', c3Title: 'Sabe por dónde empezar',
+          c3Desc: 'Marca temperatura, potencial y etiquetas. Filtra y prioriza a quien tiene más probabilidades de comprar.',
+          c4Tag: 'Embudo de ventas', c4Title: 'Cada negociación en la etapa correcta',
+          c4Desc: 'Del primer contacto al cierre: avanza los leads por las etapas y ve qué está parado y cuánto está en negociación.',
+          c5Tag: 'Equipo', c5Title: 'Tareas organizadas con tu equipo',
+          c5Desc: 'Distribuye visitas, llamadas y seguimientos con responsable y plazo. Todos saben qué hacer hoy y tú ves lo que ya se hizo.',
+          c5Task1: 'Visitar Padaria Grão Dourado', c5Task2: 'Llamar a Café Ipê Amarelo', c5Task3: 'Enviar propuesta a Empório Santa Fé'
+        },
+        audience: {
+          kicker: 'Para quién es',
+          title: 'Para quien vende a negocios locales.',
+          subtitle: 'Si tu cliente tiene dirección, puerta y mostrador, eMaper te ayuda a encontrarlo.',
+          a1Title: 'Representantes comerciales', a1Desc: 'Descubre todos los puntos de venta de tu zona antes de la próxima visita.',
+          a2Title: 'Distribuidores y mayoristas', a2Desc: 'Encuentra comercios que todavía no te compran.',
+          a3Title: 'Agencias de marketing local', a3Desc: 'Encuentra negocios sin sitio web o con pocas reseñas y ofrece ayuda.',
+          a4Title: 'Software y servicios para pymes', a4Desc: 'Prospecta el segmento correcto, barrio por barrio.',
+          a5Title: 'Franquicias en expansión', a5Desc: 'Entiende la competencia y el potencial de una zona antes de abrir.',
+          a6Title: 'Consultores y proveedores B2B', a6Desc: 'Convierte una lista de lugares en una cartera de clientes.'
+        },
+        faq: {
+          kicker: 'Preguntas',
+          title: 'Preguntas frecuentes',
+          q1: '¿Cuándo se lanza eMaper?', a1: 'Todavía no tenemos una fecha pública. Quienes están en la lista de espera reciben la invitación al acceso anticipado antes que nadie.',
+          q2: '¿Cuánto costará?', a2: 'Los planes y precios se anunciarán en el lanzamiento. Quienes están en la lista se enteran primero.',
+          q3: '¿Qué pasa después de unirme a la lista?', a3: 'Nada de spam. Te contactaremos por correo o WhatsApp cuando se abra el acceso anticipado, y puedes pedir salir de la lista cuando quieras.'
+        },
+        form: {
+          badge: 'Lista de espera',
+          title: 'Sé de los primeros en usar eMaper.',
+          subtitle: 'Déjanos tu contacto y te avisamos en cuanto se abra el acceso anticipado.',
+          perk1: 'Invitación al acceso anticipado, antes del lanzamiento',
+          perk2: 'Espacio para sugerir lo que eMaper necesita tener',
+          perk3: 'Aviso por correo o WhatsApp, sin spam',
+          teamLabel: '¿Cuántas personas venden contigo?',
+          teamSolo: 'Solo yo', teamTeam: '2 a 10', teamLarge: 'Más de 10',
+          nameLabel: 'Tu nombre', namePh: 'Ej.: Ana Lima',
+          emailLabel: 'Correo electrónico', emailPh: 'tu@empresa.com',
+          submit: 'Unirme a la lista de espera',
+          sending: 'Enviando...',
+          privacy: 'Solo usamos tus datos para hablar contigo sobre eMaper.',
+          privacyLink: 'Política de privacidad',
+          nameError: 'Escribe tu nombre.',
+          emailError: 'Escribe un correo válido, como nombre@empresa.com.',
+          emailTypo: '¿Quisiste decir {email}?',
+          phoneErrorBR: 'Indica código de área + número (10 u 11 dígitos).',
+          phoneErrorDDD: 'Ese código de área no existe en Brasil. Revisa los 2 primeros dígitos.',
+          phoneError: 'Revisa el número, con el código de área.',
+          errorGeneric: 'No pudimos enviarlo ahora. Revisa tu conexión e inténtalo de nuevo.',
+          errorRate: 'Demasiados registros desde esta red. Inténtalo más tarde.',
+          errorInvalid: 'Revisa tu nombre, correo y WhatsApp e inténtalo de nuevo.'
+        },
+        success: {
+          title: '¡Estás en la lista!',
+          alreadyTitle: 'Ya estabas en la lista.',
+          desc: 'Te avisaremos en {email} y por WhatsApp cuando se abra el acceso anticipado.',
+          alreadyDesc: 'Actualizamos tus datos. Tu posición en la fila sigue igual.',
+          positionLabel: 'Tu posición en la fila',
+          share: 'Compartir con alguien',
+          shareText: 'Conoce eMaper: prospección de clientes locales en el mapa.',
+          copied: '¡Enlace copiado!',
+          again: 'Inscribir a otra persona'
+        },
+        footer: { rights: '© 2026 eMaper®. Todos los derechos reservados.' }
+      }
+    };
+
+    const LOCALES = { pt: 'pt-BR', en: 'en-US', es: 'es' };
+    const LANG_KEY = 'emaper_lang';
+    let lang = 'pt';
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    function lookup(dict, key) {
+      return key.split('.').reduce((obj, part) => (obj && obj[part] !== undefined ? obj[part] : undefined), dict);
+    }
+
+    function t(key, vars) {
+      let value = lookup(I18N[lang], key);
+      if (value === undefined) value = lookup(I18N.pt, key);
+      if (typeof value !== 'string') return value === undefined ? key : value;
+      return vars ? value.replace(/\{(\w+)\}/g, (match, name) => (vars[name] !== undefined ? vars[name] : match)) : value;
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+    }
+
+    function renderIcons() {
+      if (window.lucide) window.lucide.createIcons();
+    }
+
+    function setLanguage(next, remember) {
+      lang = I18N[next] ? next : 'pt';
+      if (remember) {
+        try { localStorage.setItem(LANG_KEY, lang); } catch (err) { /* navegacao privada: so nao lembra */ }
+      }
+      document.documentElement.lang = LOCALES[lang];
+      document.title = t('meta.title');
+      document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        const active = btn.dataset.lang === lang;
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        btn.className = 'lang-btn px-2.5 py-1 rounded-lg transition ' + (active ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-900');
+      });
+      renderSimulator();
+      renderCountryOptions();
+      refreshFormMessages();
+      renderIcons();
+    }
+
+    function detectLanguage() {
+      let saved = null;
+      try { saved = localStorage.getItem(LANG_KEY); } catch (err) { saved = null; }
+      if (saved && I18N[saved]) return saved;
+      const prefs = navigator.languages && navigator.languages.length ? navigator.languages : [navigator.language || 'pt-BR'];
+      for (const pref of prefs) {
+        const code = String(pref).toLowerCase();
+        if (code.startsWith('pt')) return 'pt';
+        if (code.startsWith('es')) return 'es';
+        if (code.startsWith('en')) return 'en';
+      }
+      return 'pt';
+    }
+
+    /* ==========================================================================
+       2. PREVIA INTERATIVA (dados ficticios)
+       ========================================================================== */
+    const TEMP_COLORS = { hot: '#E73F03', warm: '#F39A1C', cold: '#0E6E7F' };
+    const TEMP_ORDER = ['hot', 'warm', 'cold'];
+    const TEMP_STYLE = {
+      hot: { icon: 'flame', cls: 'bg-ember-50 text-ember-700 border-ember-200' },
+      warm: { icon: 'sun', cls: 'bg-sun-50 text-sun-800 border-sun-200' },
+      cold: { icon: 'snowflake', cls: 'bg-sea-50 text-sea-700 border-sea-200' }
+    };
+    const CAT_ICONS = { bakery: 'croissant', cafe: 'coffee', restaurant: 'utensils-crossed', confectionery: 'cake-slice', snack: 'sandwich', grocery: 'shopping-basket', pizza: 'pizza', burger: 'hamburger' };
+    const TEAM = {
+      AL: { name: 'Ana Lima', role: 'field', cls: 'bg-ember-100 text-ember-700' },
+      BR: { name: 'Bruno Reis', role: 'inside', cls: 'bg-sea-100 text-sea-800' },
+      CM: { name: 'Carla Mendes', role: 'manager', cls: 'bg-sun-100 text-sun-800' }
+    };
+    const HOURS = {
+      grao: ['Seg a sáb, 6h às 20h', 'Mon–Sat, 6 am–8 pm', 'Lun a sáb, 6 a 20 h'],
+      ipe: ['Todos os dias, 8h às 19h', 'Daily, 8 am–7 pm', 'Todos los días, 8 a 19 h'],
+      sabor: ['Ter a dom, 11h às 15h', 'Tue–Sun, 11 am–3 pm', 'Mar a dom, 11 a 15 h'],
+      doce: ['Seg a sáb, 9h às 19h', 'Mon–Sat, 9 am–7 pm', 'Lun a sáb, 9 a 19 h'],
+      esquina: ['Seg a sex, 7h às 22h', 'Mon–Fri, 7 am–10 pm', 'Lun a vie, 7 a 22 h'],
+      emporio: ['Seg a sáb, 8h às 21h', 'Mon–Sat, 8 am–9 pm', 'Lun a sáb, 8 a 21 h'],
+      bella: ['Todos os dias, 18h às 23h30', 'Daily, 6 pm–11:30 pm', 'Todos los días, 18 a 23:30 h'],
+      brasa: ['Ter a dom, 18h às 23h', 'Tue–Sun, 6 pm–11 pm', 'Mar a dom, 18 a 23 h']
+    };
+    const LEADS = [
+      { id: 'grao', name: 'Padaria Grão Dourado', cat: 'bakery', x: 338, y: 214, temp: 'hot', score: 92, rating: 4.7, reviews: 812, addr: 'Rua das Acácias, 120', phone: '(11) 3214-••••', wa: '(11) 9 8765-••••', site: 'graodourado.com.br', ig: '@graodourado', tags: ['delivery', 'orders'], owner: 'AL', stage: 2, value: 1800 },
+      { id: 'ipe', name: 'Café Ipê Amarelo', cat: 'cafe', x: 468, y: 170, temp: 'warm', score: 74, rating: 4.8, reviews: 356, addr: 'Rua da Harmonia, 58', phone: '(11) 3097-••••', wa: '(11) 9 9134-••••', site: null, ig: '@cafeipeamarelo', tags: ['sundays', 'noSupplier'], owner: 'BR', stage: 1, value: 950 },
+      { id: 'sabor', name: 'Restaurante Sabor da Casa', cat: 'restaurant', x: 520, y: 292, temp: 'hot', score: 88, rating: 4.5, reviews: 1204, addr: 'Av. das Palmeiras, 1.040', phone: '(11) 3812-••••', wa: '(11) 9 8890-••••', site: 'sabordacasa.com.br', ig: '@sabordacasa.rest', tags: ['events', 'delivery'], owner: 'CM', stage: 3, value: 2400 },
+      { id: 'doce', name: 'Confeitaria Doce Encanto', cat: 'confectionery', x: 292, y: 318, temp: 'warm', score: 69, rating: 4.9, reviews: 289, addr: 'Rua do Sol, 77', phone: null, wa: '(11) 9 7702-••••', site: null, ig: '@doceencanto.doces', tags: ['orders', 'newPlace'], owner: 'AL', stage: 1, value: 1300 },
+      { id: 'esquina', name: 'Lanchonete Esquina 22', cat: 'snack', x: 418, y: 352, temp: 'cold', score: 41, rating: 4.2, reviews: 97, addr: 'Rua 22 de Maio, 22', phone: '(11) 3031-••••', wa: null, site: null, ig: null, tags: ['noSupplier'], owner: 'BR', stage: 0, value: 700 },
+      { id: 'emporio', name: 'Empório Santa Fé', cat: 'grocery', x: 236, y: 236, temp: 'hot', score: 95, rating: 4.6, reviews: 530, addr: 'Rua Santa Fé, 310', phone: '(11) 3870-••••', wa: '(11) 9 9411-••••', site: 'emporiosantafe.com.br', ig: '@emporiosantafe', tags: ['delivery', 'sundays'], owner: 'CM', stage: 3, value: 3100 },
+      { id: 'bella', name: 'Pizzaria Forno Bella', cat: 'pizza', x: 560, y: 210, temp: 'hot', score: 90, rating: 4.4, reviews: 1873, addr: 'Rua dos Ipês, 415', phone: '(11) 3816-••••', wa: '(11) 9 8123-••••', site: 'fornobella.com.br', ig: '@fornobella', tags: ['delivery', 'events'], owner: 'AL', stage: 4, value: 1600 },
+      { id: 'brasa', name: 'Hamburgueria Brasa Viva', cat: 'burger', x: 372, y: 132, temp: 'cold', score: 47, rating: 4.3, reviews: 642, addr: 'Rua das Oliveiras, 233', phone: null, wa: '(11) 9 9650-••••', site: null, ig: '@brasaviva.burger', tags: ['newPlace', 'noSupplier'], owner: 'BR', stage: 0, value: 1100 }
+    ];
+    const OTHER_PLACES = [[300, 150], [452, 118], [538, 140], [598, 268], [566, 352], [486, 402], [300, 410], [262, 382], [224, 300], [252, 176], [330, 284], [446, 248], [502, 332], [404, 196]];
+    const TASKS = [
+      { type: 'visit', lead: 'grao', owner: 'AL', due: 'today10', done: true },
+      { type: 'call', lead: 'ipe', owner: 'BR', due: 'today1430', done: false },
+      { type: 'proposal', lead: 'emporio', owner: 'CM', due: 'today17', done: false },
+      { type: 'whats', lead: 'doce', owner: 'AL', due: 'tomorrow', done: true },
+      { type: 'visit', lead: 'sabor', owner: 'CM', due: 'tomorrow', done: false },
+      { type: 'call', lead: 'brasa', owner: 'BR', due: 'thu', done: false },
+      { type: 'whats', lead: 'bella', owner: 'AL', due: 'fri', done: true }
+    ];
+    const TASK_META = {
+      visit: { key: 'taskVisit', icon: 'map-pin' },
+      call: { key: 'taskCall', icon: 'phone' },
+      proposal: { key: 'taskProposal', icon: 'file-text' },
+      whats: { key: 'taskWhats', icon: 'message-circle' }
+    };
+    const PIN_PATH = 'M15 0C6.7 0 0 6.6 0 14.8 0 25.9 15 40 15 40s15-14.1 15-25.2C30 6.6 23.3 0 15 0z';
+
+    const sim = { tab: 'map', selected: 'grao', filter: 'all', toastTimer: null, scanTimeline: null };
+
+    function leadById(id) {
+      return LEADS.find(lead => lead.id === id);
+    }
+
+    function money(value) {
+      return new Intl.NumberFormat(LOCALES[lang], { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value);
+    }
+
+    function completeness(lead) {
+      const fields = [lead.addr, lead.phone, lead.wa, lead.site, lead.ig, HOURS[lead.id], lead.rating];
+      return Math.round((fields.filter(Boolean).length / fields.length) * 100);
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('sim-toast');
+      toast.textContent = message;
+      toast.classList.remove('opacity-0', 'translate-y-3');
+      clearTimeout(sim.toastTimer);
+      sim.toastTimer = setTimeout(() => toast.classList.add('opacity-0', 'translate-y-3'), 2800);
+    }
+
+    function setTab(tab, animate = true) {
+      sim.tab = tab;
+      document.querySelectorAll('.sim-tab').forEach(btn => {
+        const active = btn.dataset.tab === tab;
+        btn.setAttribute('aria-selected', active ? 'true' : 'false');
+        btn.className = 'sim-tab inline-flex items-center gap-2 rounded-xl px-3.5 sm:px-4 py-2.5 text-xs sm:text-sm font-semibold transition ' +
+          (active ? 'bg-ink-900 text-white shadow-md' : 'text-ink-600 hover:text-ink-900 hover:bg-white');
+      });
+      document.querySelectorAll('.sim-panel').forEach(panel => {
+        const active = panel.id === `panel-${tab}`;
+        panel.classList.toggle('hidden', !active);
+        if (active && animate && !reduceMotion && window.gsap) gsap.fromTo(panel, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+      });
+    }
+
+    // ---- Mapa
+    function renderMap() {
+      document.getElementById('map-dots').innerHTML = OTHER_PLACES.map(([x, y]) =>
+        `<circle class="map-dot" cx="${x}" cy="${y}" r="6" fill="#B9C5C8" stroke="#fff" stroke-width="2"/>`).join('');
+
+      document.getElementById('map-pins').innerHTML = LEADS
+        .slice()
+        .sort((a, b) => (a.id === sim.selected) - (b.id === sim.selected) || a.y - b.y)
+        .map(lead => {
+          const selected = lead.id === sim.selected;
+          const color = TEMP_COLORS[lead.temp];
+          const scale = selected ? 1.25 : 1;
+          return `<g class="map-pin" data-id="${lead.id}" transform="translate(${lead.x} ${lead.y})" tabindex="0" role="button" aria-label="${escapeHtml(lead.name)}" aria-pressed="${selected}">
+            <ellipse cx="0" cy="0" rx="${selected ? 9 : 7}" ry="3" fill="rgba(11,42,49,0.2)"/>
+            ${selected ? `<circle cx="0" cy="0" r="18" fill="${color}" opacity="0.16"/>` : ''}
+            <g class="pin-drop"><g transform="scale(${scale}) translate(-15 -40)">
+              <path class="pin-shape" d="${PIN_PATH}" fill="${color}" stroke="#fff" stroke-width="2"/>
+              <circle cx="15" cy="14.5" r="5.5" fill="#fff"/>
+            </g></g>
+          </g>`;
+        }).join('');
+
+      document.getElementById('map-found').textContent = t('sim.found', { n: LEADS.length + OTHER_PLACES.length });
+      positionTip();
+
+      document.getElementById('map-results').innerHTML = LEADS.map(lead => {
+        const active = lead.id === sim.selected;
+        return `<button type="button" class="map-result shrink-0 inline-flex items-center gap-2 rounded-full border px-3 py-1.5 text-xs font-semibold transition ${active ? 'border-ink-900 bg-ink-900 text-white' : 'border-ink-200 bg-white text-ink-700 hover:border-ink-300'}" data-id="${lead.id}">
+          <span class="w-2 h-2 rounded-full" style="background:${TEMP_COLORS[lead.temp]}"></span>${escapeHtml(lead.name)}</button>`;
+      }).join('') + `<span class="shrink-0 px-2 text-xs font-medium text-ink-500">${escapeHtml(t('sim.more', { n: OTHER_PLACES.length }))}</span>`;
+    }
+
+    function positionTip() {
+      const tip = document.getElementById('map-tip');
+      const lead = leadById(sim.selected);
+      if (!lead) { tip.classList.add('hidden'); return; }
+      // O mapa tem proporcao fixa 800x520, entao 1 unidade do SVG = largura/800 px.
+      const scale = document.getElementById('map-stage').clientWidth / 800;
+      tip.textContent = lead.name;
+      tip.style.left = `${lead.x * scale}px`;
+      tip.style.top = `${(lead.y - 52) * scale - 6}px`;
+      tip.classList.remove('hidden');
+    }
+
+    function renderLeadCard() {
+      const lead = leadById(sim.selected);
+      const langIndex = ['pt', 'en', 'es'].indexOf(lang);
+      const pct = completeness(lead);
+      // valueHtml (opcional) substitui o texto padrao de campo vazio.
+      const row = (icon, label, value, valueHtml) => `
+        <div class="flex items-start gap-3">
+          <span class="mt-0.5 w-7 h-7 shrink-0 rounded-lg bg-ink-50 text-ink-600 flex items-center justify-center"><i data-lucide="${icon}" class="w-3.5 h-3.5"></i></span>
+          <div class="min-w-0"><dt class="text-[11px] font-mono uppercase tracking-wider text-ink-500">${escapeHtml(label)}</dt>
+          <dd class="text-sm ${value ? 'text-ink-900' : 'text-ink-500'} truncate">${value ? escapeHtml(value) : (valueHtml || escapeHtml(t('sim.missing')))}</dd></div>
+        </div>`;
+      const noSiteChip = `<span class="inline-flex items-center rounded-md bg-sun-50 px-1.5 py-0.5 text-[11px] font-semibold text-sun-800">${escapeHtml(t('sim.noSite'))}</span>`;
+      const inPipeline = lead.stage > 0;
+      const stageName = t('sim.stages')[lead.stage];
+      document.getElementById('lead-card').innerHTML = `
+        <div class="flex items-start gap-3">
+          <span class="w-11 h-11 shrink-0 rounded-xl bg-sea-50 text-sea-700 flex items-center justify-center"><i data-lucide="${CAT_ICONS[lead.cat]}" class="w-5 h-5"></i></span>
+          <div class="min-w-0">
+            <span class="font-mono text-[11px] uppercase tracking-wider text-sea-700">${escapeHtml(t('cat.' + lead.cat))}</span>
+            <h4 class="font-display text-lg font-bold leading-snug text-ink-900">${escapeHtml(lead.name)}</h4>
+            <div class="mt-0.5 flex items-center gap-1.5 text-xs text-ink-500">
+              <i data-lucide="star" class="w-3.5 h-3.5 text-sun-500 fill-sun-400"></i>
+              <strong class="text-ink-800">${lead.rating.toLocaleString(LOCALES[lang])}</strong>
+              <span>· ${escapeHtml(t('sim.reviews', { n: lead.reviews.toLocaleString(LOCALES[lang]) }))}</span>
+            </div>
+          </div>
+        </div>
+        <div class="mt-4">
+          <div class="mb-1.5 flex items-center justify-between text-xs"><span class="font-medium text-ink-700">${escapeHtml(t('sim.completeness', { n: pct }))}</span>
+            <span class="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold ${TEMP_STYLE[lead.temp].cls}"><i data-lucide="${TEMP_STYLE[lead.temp].icon}" class="w-3 h-3"></i>${escapeHtml(t('temp.' + lead.temp))}</span></div>
+          <div class="h-1.5 overflow-hidden rounded-full bg-ink-100"><div class="h-full rounded-full bg-gradient-to-r from-sea-500 to-sea-400" style="width:${pct}%"></div></div>
+        </div>
+        <dl class="mt-5 space-y-3">
+          ${row('map-pin', t('sim.address'), `${lead.addr} — Pinheiros`)}
+          ${row('phone', t('sim.phone'), lead.phone)}
+          ${row('message-circle', t('sim.whatsapp'), lead.wa)}
+          ${row('globe', t('sim.site'), lead.site, noSiteChip)}
+          ${row('at-sign', t('sim.instagram'), lead.ig)}
+          ${row('clock', t('sim.hours'), HOURS[lead.id][langIndex])}
+        </dl>
+        <div class="mt-5 flex flex-wrap gap-1.5">${lead.tags.map(tag => `<span class="rounded-full bg-ink-100 px-2.5 py-1 text-[11px] font-medium text-ink-700">${escapeHtml(t('tag.' + tag))}</span>`).join('')}</div>
+        <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+          <button type="button" data-action="pipeline" class="${inPipeline ? 'border border-sea-200 bg-sea-50 text-sea-800' : 'btn-primary'} inline-flex items-center justify-center gap-1.5 rounded-xl px-3 py-2.5 text-xs sm:text-sm font-semibold">
+            <i data-lucide="${inPipeline ? 'check' : 'plus'}" class="w-4 h-4 shrink-0"></i><span class="truncate">${escapeHtml(inPipeline ? t('sim.inPipeline', { stage: stageName }) : t('sim.addToPipeline'))}</span>
+          </button>
+          <button type="button" data-action="task" class="inline-flex items-center justify-center gap-1.5 rounded-xl border border-ink-200 bg-white px-3 py-2.5 text-xs sm:text-sm font-semibold text-ink-800 hover:bg-ink-50 transition">
+            <i data-lucide="calendar-plus" class="w-4 h-4 shrink-0"></i><span class="truncate">${escapeHtml(t('sim.createTask'))}</span>
+          </button>
+        </div>`;
+    }
+
+    function selectLead(id) {
+      sim.selected = id;
+      renderMap();
+      renderLeadCard();
+      renderIcons();
+    }
+
+    function scanMap() {
+      renderMap();
+      if (reduceMotion || !window.gsap) return;
+      if (sim.scanTimeline) sim.scanTimeline.kill();
+      const total = LEADS.length + OTHER_PLACES.length;
+      const counter = { n: 0 };
+      const found = document.getElementById('map-found');
+      sim.scanTimeline = gsap.timeline()
+        .fromTo('#radar', { rotation: 0, opacity: 1 }, { rotation: 360, svgOrigin: '400 260', duration: 1.4, ease: 'none' }, 0)
+        .to('#radar', { opacity: 0, duration: 0.3 }, 1.4)
+        .fromTo('.map-dot', { opacity: 0, scale: 0, transformOrigin: '50% 50%' }, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.05, ease: 'back.out(2)' }, 0.35)
+        .fromTo('.pin-drop', { y: -34, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.09, ease: 'bounce.out' }, 0.6)
+        .fromTo('#map-tip', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 1.5)
+        .fromTo(counter, { n: 0 }, {
+          n: total, duration: 1.5, ease: 'power1.out',
+          onUpdate: () => { found.textContent = t('sim.found', { n: Math.round(counter.n) }); }
+        }, 0);
+    }
+
+    // ---- Classificar
+    function renderLeadFilters() {
+      const count = temp => LEADS.filter(lead => temp === 'all' || lead.temp === temp).length;
+      const labels = { all: 'sim.filterAll', hot: 'sim.filterHot', warm: 'sim.filterWarm', cold: 'sim.filterCold' };
+      document.getElementById('lead-filters').innerHTML = Object.keys(labels).map(key => {
+        const active = sim.filter === key;
+        return `<button type="button" data-filter="${key}" aria-pressed="${active}" class="rounded-full border px-3 py-1.5 text-xs font-semibold transition ${active ? 'border-ink-900 bg-ink-900 text-white' : 'border-ink-200 bg-white text-ink-700 hover:border-ink-300'}">${escapeHtml(t(labels[key]))} <span class="${active ? 'text-white/70' : 'text-ink-400'}">${count(key)}</span></button>`;
+      }).join('');
+    }
+
+    function renderLeadRows() {
+      const rows = LEADS.filter(lead => sim.filter === 'all' || lead.temp === sim.filter).sort((a, b) => b.score - a.score);
+      document.getElementById('lead-rows').innerHTML = rows.map(lead => {
+        const style = TEMP_STYLE[lead.temp];
+        return `<div class="grid grid-cols-[minmax(0,1fr)_auto] md:grid-cols-[minmax(0,1.6fr)_130px_minmax(0,1fr)_minmax(0,1.3fr)_48px] items-center gap-x-4 gap-y-3 rounded-2xl border border-ink-200 bg-white px-4 py-3 hover:border-ink-300 transition">
+          <div class="flex min-w-0 items-center gap-3">
+            <span class="w-9 h-9 shrink-0 rounded-xl bg-ink-50 text-ink-600 flex items-center justify-center"><i data-lucide="${CAT_ICONS[lead.cat]}" class="w-4 h-4"></i></span>
+            <div class="min-w-0"><p class="truncate text-sm font-semibold text-ink-900">${escapeHtml(lead.name)}</p><p class="truncate text-xs text-ink-500">${escapeHtml(t('cat.' + lead.cat))} · Pinheiros</p></div>
+          </div>
+          <button type="button" data-temp="${lead.id}" title="${escapeHtml(t('sim.leadsHint'))}" class="justify-self-end md:justify-self-start inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold transition hover:shadow-sm ${style.cls}">
+            <i data-lucide="${style.icon}" class="w-3.5 h-3.5"></i>${escapeHtml(t('temp.' + lead.temp))}
+          </button>
+          <div class="flex items-center gap-2.5">
+            <div class="h-1.5 flex-1 overflow-hidden rounded-full bg-ink-100"><div class="h-full rounded-full ${lead.score >= 80 ? 'bg-ember-500' : lead.score >= 60 ? 'bg-sun-500' : 'bg-sea-500'}" style="width:${lead.score}%"></div></div>
+            <span class="w-7 text-right font-mono text-xs font-semibold text-ink-700">${lead.score}</span>
+          </div>
+          <div class="hidden md:flex flex-wrap gap-1">${lead.tags.map(tag => `<span class="rounded-full bg-ink-100 px-2 py-0.5 text-[11px] text-ink-700">${escapeHtml(t('tag.' + tag))}</span>`).join('')}</div>
+          <span class="justify-self-end w-8 h-8 rounded-full ${TEAM[lead.owner].cls} text-[10px] font-bold flex items-center justify-center" title="${escapeHtml(TEAM[lead.owner].name)}">${lead.owner}</span>
+        </div>`;
+      }).join('');
+    }
+
+    function cycleTemp(id) {
+      const lead = leadById(id);
+      lead.temp = TEMP_ORDER[(TEMP_ORDER.indexOf(lead.temp) + 1) % TEMP_ORDER.length];
+      renderLeadFilters();
+      renderLeadRows();
+      renderMap();
+      renderLeadCard();
+      renderIcons();
+    }
+
+    // ---- Funil
+    function renderPipeline() {
+      const stages = t('sim.stages');
+      const open = LEADS.filter(lead => lead.stage >= 1 && lead.stage <= 3).reduce((sum, lead) => sum + lead.value, 0);
+      const won = LEADS.filter(lead => lead.stage === 4).reduce((sum, lead) => sum + lead.value, 0);
+      document.getElementById('pipeline-totals').innerHTML = `
+        <span class="inline-flex items-center gap-2 rounded-xl border border-ink-200 bg-white px-3 py-1.5"><span class="w-2 h-2 rounded-full bg-sun-500"></span>${escapeHtml(t('sim.openValue'))}: <strong class="text-ink-900">${money(open)}${escapeHtml(t('sim.perMonth'))}</strong></span>
+        <span class="inline-flex items-center gap-2 rounded-xl border border-ink-200 bg-white px-3 py-1.5"><span class="w-2 h-2 rounded-full bg-sea-600"></span>${escapeHtml(t('sim.wonValue'))}: <strong class="text-ink-900">${money(won)}${escapeHtml(t('sim.perMonth'))}</strong></span>`;
+
+      const stageColors = ['bg-ink-300', 'bg-sea-400', 'bg-sea-600', 'bg-sun-500', 'bg-ember-500'];
+      document.getElementById('pipeline-board').innerHTML = stages.map((stage, index) => {
+        const leads = LEADS.filter(lead => lead.stage === index);
+        const total = leads.reduce((sum, lead) => sum + lead.value, 0);
+        return `<div class="flex flex-col rounded-2xl bg-ink-50 p-2.5">
+          <div class="flex items-center justify-between gap-2 px-1.5 pb-2.5 pt-1">
+            <span class="flex min-w-0 items-center gap-2 text-xs font-semibold text-ink-800"><span class="w-2 h-2 shrink-0 rounded-full ${stageColors[index]}"></span><span class="truncate">${escapeHtml(stage)}</span></span>
+            <span class="rounded-md bg-white px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink-600">${leads.length}</span>
+          </div>
+          <div class="space-y-2 min-h-[120px]">
+            ${leads.length ? leads.map(lead => `
+              <div class="pipeline-card rounded-xl border border-ink-200 bg-white p-3 shadow-sm" data-card="${lead.id}">
+                <p class="text-[13px] font-semibold leading-snug text-ink-900">${escapeHtml(lead.name)}</p>
+                <p class="mt-0.5 text-[11px] text-ink-500">${escapeHtml(t('cat.' + lead.cat))}</p>
+                <div class="mt-2.5 flex items-center justify-between gap-2">
+                  <span class="font-mono text-[11px] font-semibold text-ink-700">${money(lead.value)}${escapeHtml(t('sim.perMonth'))}</span>
+                  <span class="w-6 h-6 rounded-full ${TEAM[lead.owner].cls} text-[9px] font-bold flex items-center justify-center" title="${escapeHtml(TEAM[lead.owner].name)}">${lead.owner}</span>
+                </div>
+                ${index < stages.length - 1 ? `<button type="button" data-advance="${lead.id}" class="mt-2.5 w-full inline-flex items-center justify-center gap-1 rounded-lg border border-ink-200 py-1.5 text-[11px] font-semibold text-ink-700 hover:border-sea-400 hover:bg-sea-50 hover:text-sea-800 transition">${escapeHtml(t('sim.advance'))}<i data-lucide="arrow-right" class="w-3 h-3"></i></button>` : ''}
+              </div>`).join('') : `<p class="rounded-xl border border-dashed border-ink-200 px-3 py-6 text-center text-[11px] text-ink-400">${escapeHtml(t('sim.emptyStage'))}</p>`}
+          </div>
+          <p class="mt-2.5 px-1.5 font-mono text-[11px] text-ink-500">${money(total)}${escapeHtml(t('sim.perMonth'))}</p>
+        </div>`;
+      }).join('');
+    }
+
+    function advanceLead(id) {
+      const lead = leadById(id);
+      if (lead.stage >= 4) return;
+      lead.stage += 1;
+      renderPipeline();
+      renderLeadCard();
+      renderIcons();
+      showToast(t('sim.toastMoved', { name: lead.name, stage: t('sim.stages')[lead.stage] }));
+      const card = document.querySelector(`[data-card="${id}"]`);
+      if (card && !reduceMotion && window.gsap) gsap.fromTo(card, { scale: 0.92, opacity: 0.4, boxShadow: '0 0 0 3px rgba(14,110,127,0.35)' }, { scale: 1, opacity: 1, boxShadow: '0 0 0 0 rgba(14,110,127,0)', duration: 0.5, ease: 'back.out(2)' });
+    }
+
+    // ---- Tarefas
+    function renderTasks() {
+      const total = TASKS.length;
+      const done = TASKS.filter(task => task.done).length;
+      document.getElementById('tasks-progress-label').textContent = t('sim.progress', { d: done, t: total });
+      document.getElementById('tasks-progress-bar').style.width = `${Math.round((done / total) * 100)}%`;
+
+      document.getElementById('team-list').innerHTML = Object.entries(TEAM).map(([code, member]) => {
+        const openCount = TASKS.filter(task => task.owner === code && !task.done).length;
+        return `<div class="flex items-center gap-3 rounded-xl border border-ink-200 bg-white px-3 py-2.5">
+          <span class="w-9 h-9 shrink-0 rounded-full ${member.cls} text-xs font-bold flex items-center justify-center">${code}</span>
+          <div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-ink-900">${escapeHtml(member.name)}</p><p class="truncate text-xs text-ink-500">${escapeHtml(t('sim.roles.' + member.role))}</p></div>
+          <span class="shrink-0 rounded-md bg-ink-50 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-ink-600" title="${escapeHtml(openCount === 1 ? t('sim.openTask') : t('sim.openTasks', { n: openCount }))}">${openCount}</span>
+        </div>`;
+      }).join('');
+
+      document.getElementById('task-list').innerHTML = TASKS.map((task, index) => {
+        const meta = TASK_META[task.type];
+        const lead = leadById(task.lead);
+        const member = TEAM[task.owner];
+        return `<div class="flex items-center gap-3 rounded-xl border border-ink-200 ${task.done ? 'bg-ink-50' : 'bg-white'} px-3 py-2.5">
+          <button type="button" data-task="${index}" role="checkbox" aria-checked="${task.done}" aria-label="${escapeHtml(t('sim.' + meta.key, { lead: lead.name }))}" class="w-6 h-6 shrink-0 rounded-md flex items-center justify-center transition ${task.done ? 'bg-sea-600 text-white' : 'border-2 border-ink-300 hover:border-sea-500'}">${task.done ? '<i data-lucide="check" class="w-4 h-4"></i>' : ''}</button>
+          <span class="w-8 h-8 shrink-0 rounded-lg bg-ink-50 text-ink-600 flex items-center justify-center"><i data-lucide="${meta.icon}" class="w-4 h-4"></i></span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-medium ${task.done ? 'text-ink-400 line-through' : 'text-ink-900'}">${escapeHtml(t('sim.' + meta.key, { lead: lead.name }))}</p>
+            <p class="text-xs ${task.due.startsWith('today') && !task.done ? 'text-ember-700 font-medium' : 'text-ink-500'}">${escapeHtml(t('sim.due.' + task.due))}</p>
+          </div>
+          <span class="w-8 h-8 shrink-0 rounded-full ${member.cls} text-[10px] font-bold flex items-center justify-center" title="${escapeHtml(member.name)}">${task.owner}</span>
+        </div>`;
+      }).join('');
+    }
+
+    function renderSimulator() {
+      renderMap();
+      renderLeadCard();
+      renderLeadFilters();
+      renderLeadRows();
+      renderPipeline();
+      renderTasks();
+    }
+
+    function initSimulator() {
+      document.querySelectorAll('.sim-tab').forEach(btn => btn.addEventListener('click', () => setTab(btn.dataset.tab)));
+
+      const pins = document.getElementById('map-pins');
+      pins.addEventListener('click', e => { const pin = e.target.closest('.map-pin'); if (pin) selectLead(pin.dataset.id); });
+      pins.addEventListener('keydown', e => {
+        const pin = e.target.closest('.map-pin');
+        if (pin && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); selectLead(pin.dataset.id); }
+      });
+      document.getElementById('map-results').addEventListener('click', e => { const btn = e.target.closest('.map-result'); if (btn) selectLead(btn.dataset.id); });
+      document.getElementById('map-scan-btn').addEventListener('click', scanMap);
+
+      document.getElementById('lead-card').addEventListener('click', e => {
+        const btn = e.target.closest('[data-action]');
+        if (!btn) return;
+        const lead = leadById(sim.selected);
+        if (btn.dataset.action === 'pipeline') {
+          if (lead.stage === 0) {
+            lead.stage = 1;
+            renderPipeline();
+            showToast(t('sim.toastAdded', { name: lead.name, stage: t('sim.stages')[1] }));
+          } else {
+            setTab('pipeline');
+          }
+        } else {
+          TASKS.unshift({ type: 'visit', lead: lead.id, owner: lead.owner, due: 'tomorrow', done: false });
+          renderTasks();
+          showToast(t('sim.toastTask', { name: lead.name, owner: TEAM[lead.owner].name }));
+        }
+        renderLeadCard();
+        renderIcons();
+      });
+
+      document.getElementById('lead-filters').addEventListener('click', e => {
+        const btn = e.target.closest('[data-filter]');
+        if (!btn) return;
+        sim.filter = btn.dataset.filter;
+        renderLeadFilters();
+        renderLeadRows();
+        renderIcons();
+      });
+      document.getElementById('lead-rows').addEventListener('click', e => { const btn = e.target.closest('[data-temp]'); if (btn) cycleTemp(btn.dataset.temp); });
+      document.getElementById('pipeline-board').addEventListener('click', e => { const btn = e.target.closest('[data-advance]'); if (btn) advanceLead(btn.dataset.advance); });
+      document.getElementById('task-list').addEventListener('click', e => {
+        const btn = e.target.closest('[data-task]');
+        if (!btn) return;
+        const task = TASKS[Number(btn.dataset.task)];
+        task.done = !task.done;
+        renderTasks();
+        renderIcons();
+      });
+      document.getElementById('invite-btn').addEventListener('click', () => showToast(t('sim.toastInvite')));
+      window.addEventListener('resize', positionTip);
+    }
+
+    /* ==========================================================================
+       3. LISTA DE ESPERA (php/waitlist/api.php: banco do site + e-mail para o dono)
+       ========================================================================== */
+    const WAITLIST_API = '/php/waitlist/api.php';
+    const WAITLIST_PRODUCT = 'emaper';
+    const WAITLIST_PROOF_MIN = 25; // o contador do topo so aparece a partir deste numero de inscritos reais
+    const SHARE_URL = 'https://www.f91.tech/emaper/';
+    const pageOpenedAt = Date.now();
+    const COUNTRIES = [
+      { code: 'BR', ddi: '55', min: 10, max: 11, ph: '(11) 9 8765-4321' },
+      { code: 'PT', ddi: '351', min: 9, max: 9, ph: '912 345 678' },
+      { code: 'US', ddi: '1', min: 10, max: 10, ph: '(305) 555-0192' },
+      { code: 'AR', ddi: '54', min: 10, max: 11, ph: '11 2345-6789' },
+      { code: 'CL', ddi: '56', min: 9, max: 9, ph: '9 8765 4321' },
+      { code: 'CO', ddi: '57', min: 10, max: 10, ph: '300 123 4567' },
+      { code: 'MX', ddi: '52', min: 10, max: 10, ph: '55 1234 5678' },
+      { code: 'PY', ddi: '595', min: 9, max: 9, ph: '981 123 456' },
+      { code: 'UY', ddi: '598', min: 8, max: 9, ph: '94 123 456' },
+      { code: 'PE', ddi: '51', min: 9, max: 9, ph: '912 345 678' },
+      { code: 'ES', ddi: '34', min: 9, max: 9, ph: '612 34 56 78' }
+    ];
+    const BR_DDDS = new Set([11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 24, 27, 28, 31, 32, 33, 34, 35, 37, 38, 41, 42, 43, 44, 45, 46, 47, 48, 49, 51, 53, 54, 55, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 73, 74, 75, 77, 79, 81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 92, 93, 94, 95, 96, 97, 98, 99]);
+    const EMAIL_TYPOS = {
+      'gamil.com': 'gmail.com', 'gmial.com': 'gmail.com', 'gmal.com': 'gmail.com', 'gmail.co': 'gmail.com', 'gmail.con': 'gmail.com', 'gmail.com.br': 'gmail.com', 'gmaill.com': 'gmail.com',
+      'hotmial.com': 'hotmail.com', 'hotmai.com': 'hotmail.com', 'hotmail.con': 'hotmail.com', 'hotmal.com': 'hotmail.com',
+      'outlok.com': 'outlook.com', 'oulook.com': 'outlook.com', 'outlook.con': 'outlook.com',
+      'icloud.con': 'icloud.com', 'iclod.com': 'icloud.com', 'yaho.com': 'yahoo.com', 'yahooo.com': 'yahoo.com', 'yahoo.con': 'yahoo.com'
+    };
+
+    const form = {
+      teamSize: 'solo',
+      country: COUNTRIES[0],
+      touched: { name: false, email: false, phone: false },
+      emailSuggestion: ''
+    };
+
+    function regionName(code) {
+      try { return new Intl.DisplayNames([LOCALES[lang]], { type: 'region' }).of(code); } catch (err) { return code; }
+    }
+
+    function renderCountryOptions() {
+      const select = document.getElementById('wl-country');
+      select.innerHTML = COUNTRIES.map(c => `<option value="${c.code}"${c.code === form.country.code ? ' selected' : ''}>${escapeHtml(regionName(c.code))} (+${c.ddi})</option>`).join('');
+    }
+
+    function formatPhone(raw, country) {
+      const digits = raw.replace(/\D/g, '').slice(0, country.max);
+      if (!digits) return '';
+      if (country.code === 'BR') {
+        if (digits.length <= 2) return `(${digits}`;
+        if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+        if (digits.length <= 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6)}`;
+        return `(${digits.slice(0, 2)}) ${digits.slice(2, 3)} ${digits.slice(3, 7)}-${digits.slice(7)}`;
+      }
+      if (country.code === 'US') {
+        if (digits.length <= 3) return `(${digits}`;
+        if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+        return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+      }
+      return digits.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+    }
+
+    function setFieldState(name, error) {
+      const field = document.getElementById(`wl-${name}-field`);
+      const message = document.getElementById(`wl-${name}-error`);
+      field.classList.toggle('is-invalid', Boolean(error));
+      field.classList.toggle('is-valid', !error);
+      message.textContent = error || '';
+      message.classList.toggle('hidden', !error);
+    }
+
+    function clearFieldState(name) {
+      document.getElementById(`wl-${name}-field`).classList.remove('is-invalid', 'is-valid');
+      document.getElementById(`wl-${name}-error`).classList.add('hidden');
+    }
+
+    function nameError() {
+      return document.getElementById('wl-name').value.trim().length >= 2 ? '' : t('form.nameError');
+    }
+
+    function emailError() {
+      const value = document.getElementById('wl-email').value.trim().toLowerCase();
+      const [user, domain] = value.split('@');
+      form.emailSuggestion = user && domain && EMAIL_TYPOS[domain] ? `${user}@${EMAIL_TYPOS[domain]}` : '';
+      const fix = document.getElementById('wl-email-fix');
+      if (form.emailSuggestion) {
+        document.getElementById('wl-email-fix-text').textContent = t('form.emailTypo', { email: form.emailSuggestion });
+        fix.classList.remove('hidden');
+        fix.classList.add('inline-flex');
+      } else {
+        fix.classList.add('hidden');
+        fix.classList.remove('inline-flex');
+      }
+      const ok = /^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(value) && !value.includes('..');
+      return ok ? '' : t('form.emailError');
+    }
+
+    function phoneError() {
+      const digits = document.getElementById('wl-phone').value.replace(/\D/g, '');
+      const country = form.country;
+      if (country.code === 'BR') {
+        if (digits.length >= 2 && !BR_DDDS.has(Number(digits.slice(0, 2)))) return t('form.phoneErrorDDD');
+        if (digits.length === 10 || (digits.length === 11 && digits[2] === '9')) return '';
+        return t('form.phoneErrorBR');
+      }
+      return digits.length >= country.min && digits.length <= country.max ? '' : t('form.phoneError');
+    }
+
+    function validateField(name, force) {
+      if (force) form.touched[name] = true;
+      const value = document.getElementById(`wl-${name}`).value.trim();
+      const error = { name: nameError, email: emailError, phone: phoneError }[name]();
+      if (!form.touched[name] && !value) { clearFieldState(name); return !error; }
+      if (form.touched[name] || !error) setFieldState(name, error);
+      return !error;
+    }
+
+    function refreshFormMessages() {
+      ['name', 'email', 'phone'].forEach(name => { if (form.touched[name]) validateField(name); });
+      const submitLabel = document.getElementById('wl-submit-label');
+      if (document.getElementById('wl-submit').disabled) submitLabel.textContent = t('form.sending');
+      const success = document.getElementById('wl-success');
+      if (!success.classList.contains('hidden') && success.dataset.email !== undefined) fillSuccess(success.dataset.already === '1', success.dataset.email, success.dataset.position);
+    }
+
+    function selectTeamSize(size) {
+      form.teamSize = size;
+      document.querySelectorAll('.team-btn').forEach(btn => {
+        const active = btn.dataset.size === size;
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+        btn.className = 'team-btn rounded-lg px-2 py-2 text-xs sm:text-sm font-semibold transition ' + (active ? 'bg-white text-ink-900 shadow-sm' : 'text-ink-500 hover:text-ink-900');
+      });
+    }
+
+    function utmSource() {
+      const params = new URLSearchParams(window.location.search);
+      return ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term']
+        .filter(key => params.get(key))
+        .map(key => `${key}=${params.get(key)}`)
+        .join('&')
+        .slice(0, 255);
+    }
+
+    function showSubmitError(key) {
+      const box = document.getElementById('wl-submit-error');
+      box.textContent = t('form.' + key);
+      box.classList.remove('hidden');
+    }
+
+    function setSubmitting(isSubmitting) {
+      const btn = document.getElementById('wl-submit');
+      btn.disabled = isSubmitting;
+      document.getElementById('wl-submit-label').textContent = t(isSubmitting ? 'form.sending' : 'form.submit');
+    }
+
+    function fillSuccess(already, email, position) {
+      const success = document.getElementById('wl-success');
+      success.dataset.already = already ? '1' : '0';
+      success.dataset.email = email;
+      success.dataset.position = position || '';
+      const title = document.getElementById('wl-success-title');
+      title.dataset.i18n = already ? 'success.alreadyTitle' : 'success.title';
+      title.textContent = t(title.dataset.i18n);
+      document.getElementById('wl-success-desc').textContent = already ? t('success.alreadyDesc') : t('success.desc', { email });
+      document.getElementById('wl-position').textContent = position ? `#${String(position).padStart(4, '0')}` : '—';
+    }
+
+    async function submitWaitlist(event) {
+      event.preventDefault();
+      document.getElementById('wl-submit-error').classList.add('hidden');
+      const okName = validateField('name', true);
+      const okEmail = validateField('email', true);
+      const okPhone = validateField('phone', true);
+      if (!okName || !okEmail || !okPhone) {
+        const firstInvalid = ['name', 'email', 'phone'].find((name, i) => ![okName, okEmail, okPhone][i]);
+        document.getElementById(`wl-${firstInvalid}`).focus();
+        if (!reduceMotion && window.gsap) gsap.fromTo('#wl-form', { x: -6 }, { x: 0, duration: 0.45, ease: 'elastic.out(1, 0.25)' });
+        return;
+      }
+
+      const name = document.getElementById('wl-name').value.trim().replace(/\s+/g, ' ');
+      const email = document.getElementById('wl-email').value.trim();
+      const whatsapp = `+${form.country.ddi} ${document.getElementById('wl-phone').value.trim()}`;
+
+      let result = null;
+      setSubmitting(true);
+      try {
+        const res = await fetch(`${WAITLIST_API}?action=join`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            product: WAITLIST_PRODUCT,
+            name,
+            email,
+            whatsapp,
+            profile: form.teamSize,
+            lang,
+            website: document.getElementById('wl-website').value,
+            elapsed: Date.now() - pageOpenedAt,
+            source: utmSource(),
+            referrer: document.referrer.slice(0, 255)
+          })
+        });
+        result = await res.json().catch(() => null);
+        if (!res.ok || !result || !result.ok) {
+          showSubmitError(res.status === 429 ? 'errorRate' : (res.status === 422 ? 'errorInvalid' : 'errorGeneric'));
+          return;
+        }
+      } catch (err) {
+        showSubmitError('errorGeneric');
+        return;
+      } finally {
+        setSubmitting(false);
+      }
+
+      fillSuccess(Boolean(result.already), email, result.position);
+      document.getElementById('wl-form').classList.add('hidden');
+      const success = document.getElementById('wl-success');
+      success.classList.remove('hidden');
+      if (!reduceMotion && window.gsap) gsap.fromTo(success, { opacity: 0, y: 14, scale: 0.97 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, ease: 'power3.out' });
+      refreshWaitlistCount();
+    }
+
+    function resetWaitlistForm() {
+      const formEl = document.getElementById('wl-form');
+      formEl.reset();
+      form.touched = { name: false, email: false, phone: false };
+      ['name', 'email', 'phone'].forEach(clearFieldState);
+      document.getElementById('wl-email-fix').classList.add('hidden');
+      document.getElementById('wl-submit-error').classList.add('hidden');
+      document.getElementById('wl-success').classList.add('hidden');
+      delete document.getElementById('wl-success').dataset.email;
+      formEl.classList.remove('hidden');
+      document.getElementById('wl-name').focus();
+    }
+
+    async function shareEmaper() {
+      const label = document.getElementById('wl-share-label');
+      if (navigator.share) {
+        try { await navigator.share({ title: 'eMaper', text: t('success.shareText'), url: SHARE_URL }); } catch (err) { /* cancelado */ }
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(SHARE_URL);
+        label.textContent = t('success.copied');
+        setTimeout(() => { label.textContent = t('success.share'); }, 2200);
+      } catch (err) {
+        window.prompt('', SHARE_URL);
+      }
+    }
+
+    async function refreshWaitlistCount() {
+      try {
+        const res = await fetch(`${WAITLIST_API}?action=count&product=${WAITLIST_PRODUCT}`, { cache: 'no-store' });
+        const data = await res.json();
+        const count = data && data.ok ? Number(data.count) : 0;
+        if (count < WAITLIST_PROOF_MIN) return;
+        document.getElementById('waitlist-count').textContent = count.toLocaleString(LOCALES[lang]);
+        const proof = document.getElementById('waitlist-proof');
+        proof.classList.remove('hidden');
+        proof.classList.add('inline-flex');
+      } catch (err) {
+        // Sem contador: o resto da pagina segue normal.
+      }
+    }
+
+    function initWaitlistForm() {
+      renderCountryOptions();
+      selectTeamSize('solo');
+      document.getElementById('team-size').addEventListener('click', e => { const btn = e.target.closest('.team-btn'); if (btn) selectTeamSize(btn.dataset.size); });
+
+      ['name', 'email', 'phone'].forEach(name => {
+        const input = document.getElementById(`wl-${name}`);
+        input.addEventListener('blur', () => { if (input.value.trim()) validateField(name, true); });
+        input.addEventListener('input', () => {
+          if (name === 'phone') input.value = formatPhone(input.value, form.country);
+          validateField(name);
+        });
+      });
+
+      document.getElementById('wl-email-fix').addEventListener('click', () => {
+        document.getElementById('wl-email').value = form.emailSuggestion;
+        validateField('email', true);
+      });
+
+      document.getElementById('wl-country').addEventListener('change', e => {
+        form.country = COUNTRIES.find(c => c.code === e.target.value) || COUNTRIES[0];
+        document.getElementById('wl-ddi-label').textContent = `+${form.country.ddi}`;
+        const phone = document.getElementById('wl-phone');
+        phone.placeholder = form.country.ph;
+        phone.value = formatPhone(phone.value, form.country);
+        if (phone.value) validateField('phone', true);
+        phone.focus();
+      });
+
+      document.getElementById('wl-form').addEventListener('submit', submitWaitlist);
+      document.getElementById('wl-again').addEventListener('click', resetWaitlistForm);
+      document.getElementById('wl-share').addEventListener('click', shareEmaper);
+    }
+
+    /* ==========================================================================
+       4. ANIMACOES DE ENTRADA
+       ========================================================================== */
+    function initAnimations() {
+      if (reduceMotion || !window.gsap) { scanMap(); return; }
+      gsap.registerPlugin(ScrollTrigger);
+      gsap.fromTo('.hero-reveal', { y: 26, opacity: 0 }, { y: 0, opacity: 1, duration: 0.85, stagger: 0.1, ease: 'power3.out', delay: 0.05 });
+      gsap.fromTo('#sim-window', { y: 40, opacity: 0 }, {
+        y: 0, opacity: 1, duration: 0.9, ease: 'power3.out',
+        scrollTrigger: { trigger: '#previa', start: 'top 85%', once: true, onEnter: () => setTimeout(scanMap, 250) }
+      });
+      gsap.utils.toArray('.reveal').forEach(el => {
+        gsap.fromTo(el, { y: 28, opacity: 0 }, { y: 0, opacity: 1, duration: 0.75, ease: 'power3.out', scrollTrigger: { trigger: el, start: 'top 88%', once: true } });
+      });
+    }
+
+    /* ==========================================================================
+       INICIO
+       ========================================================================== */
+    document.addEventListener('DOMContentLoaded', () => {
+      initSimulator();
+      initWaitlistForm();
+      document.querySelectorAll('.lang-btn').forEach(btn => btn.addEventListener('click', () => setLanguage(btn.dataset.lang, true)));
+      setTab('map', false);
+      setLanguage(detectLanguage(), false);
+      initAnimations();
+      refreshWaitlistCount();
+    });
+  </script>
+</body>
+</html>

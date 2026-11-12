@@ -1,0 +1,2449 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ttreino® — Personal Trainers | O Sistema Operacional da Alta Performance</title>
+  <meta name="description" content="Ttreino®: prescrição de treinos, app do aluno com vídeos curtos em HD e avaliação física num só lugar. Entre na lista de acesso antecipado para Personal Trainers." />
+  <link rel="canonical" href="https://www.f91.tech/ttreino/" />
+  <meta name="theme-color" content="#04060A" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/ttreino/favicon-32.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/ttreino/icon-192.png" />
+  <link rel="apple-touch-icon" href="/ttreino/apple-touch-icon.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Ttreino®" />
+  <meta property="og:url" content="https://www.f91.tech/ttreino/" />
+  <meta property="og:title" content="Ttreino® — Personal Trainers" />
+  <meta property="og:description" content="Prescrição de treinos, app do aluno com vídeos curtos em HD e avaliação física. Lançamento 2026: garanta seu acesso antecipado." />
+  <meta property="og:image" content="https://www.f91.tech/ttreino/og.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="pt_BR" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Plus Jakarta Sans, Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@1.72.0/dist/umd/lucide.min.js"></script>
+  
+  <!-- GSAP & ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['"Plus Jakarta Sans"', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            obsidian: {
+              950: '#04060A',
+              900: '#070B12',
+              800: '#0D1320',
+              700: '#151E30',
+            },
+            ttreino: {
+              blue: '#0066CC',
+              royal: '#0052D4',
+              cyan: '#00C6FF',
+              pink: '#FF1E8A',
+              coral: '#FF5E62',
+              orange: '#FF9900'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    :root {
+      --bg-primary: #04060A;
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-highlight: rgba(255, 255, 255, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: #F8FAFC;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      selection-background-color: #0066CC;
+    }
+
+    /* Subtle tactile film noise overlay */
+    .noise-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 40;
+      pointer-events: none;
+      opacity: 0.028;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+
+    /* Architectural subtle grid */
+    .architectural-grid {
+      background-size: 64px 64px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+      mask-image: radial-gradient(ellipse 80% 60% at 50% 25%, #000 40%, transparent 100%);
+      -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 25%, #000 40%, transparent 100%);
+    }
+
+    /* Mouse-tracked Spotlight Card Effect */
+    .spotlight-card {
+      position: relative;
+      background: rgba(13, 19, 32, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      overflow: hidden;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+    }
+
+    .spotlight-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        600px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+        rgba(0, 198, 255, 0.09),
+        rgba(255, 30, 138, 0.04) 40%,
+        transparent 70%
+      );
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .spotlight-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 1px;
+      background: radial-gradient(
+        350px circle at var(--mouse-x, -500px) var(--mouse-y, -500px),
+        rgba(0, 198, 255, 0.55),
+        rgba(255, 30, 138, 0.35) 50%,
+        transparent 100%
+      );
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .spotlight-card:hover::before,
+    .spotlight-card:hover::after {
+      opacity: 1;
+    }
+
+    /* Specular glass pill */
+    .glass-pill {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      box-shadow: 0 1px 0 0 rgba(255, 255, 255, 0.1) inset;
+    }
+
+    /* Brand Gradient Text */
+    .text-gradient-brand {
+      background: linear-gradient(135deg, #38BDF8 0%, #0066CC 45%, #FF1E8A 80%, #FF9900 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #04060A;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1E293B;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* Shimmer border effect for primary button */
+    .btn-primary-glow {
+      position: relative;
+      background: linear-gradient(135deg, #0052D4 0%, #0088FF 50%, #00C6FF 100%);
+      box-shadow: 0 0 30px -5px rgba(0, 136, 255, 0.55), 0 1px 0 0 rgba(255, 255, 255, 0.35) inset;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-primary-glow:hover {
+      box-shadow: 0 0 45px -2px rgba(0, 198, 255, 0.75), 0 1px 0 0 rgba(255, 255, 255, 0.5) inset;
+      transform: translateY(-1px);
+    }
+
+    /* 3D Perspective Mockup Container */
+    .perspective-stage {
+      perspective: 1400px;
+    }
+    .mockup-3d-tilt {
+      transform-style: preserve-3d;
+      transition: transform 0.25s ease-out;
+    }
+
+    /* Animated pulse ring */
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      70% { transform: scale(1.6); opacity: 0; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    .animate-pulse-ring::before {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 9999px;
+      background: #10B981;
+      animation: pulse-ring 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    }
+
+    /* Input focus glow */
+    .smart-input-wrapper {
+      transition: all 0.25s ease;
+    }
+    .smart-input-wrapper:focus-within {
+      border-color: rgba(0, 198, 255, 0.6);
+      box-shadow: 0 0 0 3px rgba(0, 136, 255, 0.15);
+    }
+  </style>
+</head>
+<body class="relative min-h-screen selection:bg-ttreino-blue selection:text-white">
+
+  <!-- Film Noise Overlay -->
+  <div class="noise-overlay"></div>
+
+  <!-- Interactive Ambient Aurora Canvas -->
+  <canvas id="aurora-canvas" class="fixed inset-0 pointer-events-none z-0 opacity-75"></canvas>
+
+  <!-- Architectural Grid Overlay -->
+  <div class="fixed inset-0 architectural-grid pointer-events-none z-0"></div>
+
+  <!-- Auto-Detected Language Toast Banner -->
+  <div id="lang-toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-500 pointer-events-auto">
+    <div class="glass-pill px-4 py-2.5 rounded-full flex items-center gap-3 text-xs text-slate-300 shadow-2xl border border-white/10">
+      <span class="w-2 h-2 rounded-full bg-ttreino-cyan animate-pulse"></span>
+      <span id="lang-toast-text">Idioma detectado automaticamente: Português (BR)</span>
+      <button onclick="dismissLangToast()" class="text-slate-400 hover:text-white ml-1 p-0.5 rounded-full hover:bg-white/10 transition">
+        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== STICKY HEADER ==================== -->
+  <header class="fixed top-0 inset-x-0 z-40 transition-all duration-300" id="navbar">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-3">
+      <div class="glass-pill rounded-2xl px-4 sm:px-6 py-3 flex items-center justify-between">
+        
+        <!-- Exact Recreated SVG Brand Logo: Ttreino® PERSONAL TRAINERS -->
+        <a href="#" class="flex items-center gap-3 group focus:outline-none" aria-label="Ttreino Home">
+          <div class="relative flex items-center">
+            <!-- Custom Faithful Vector Recreation of the Uploaded Ttreino Logo -->
+            <svg class="h-10 sm:h-11 w-auto transition-transform duration-300 group-hover:scale-[1.02]" viewBox="0 0 430 115" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <!-- Electric Royal Blue to Cyan Gradient for the 'T' -->
+                <linearGradient id="ttreinoBlueGrad" x1="10" y1="75" x2="115" y2="25" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#0044BB" />
+                  <stop offset="52%" stop-color="#0077EE" />
+                  <stop offset="100%" stop-color="#00C6FF" />
+                </linearGradient>
+                <!-- Darker Blue 3D Fold Shadow -->
+                <linearGradient id="ttreinoStemShadow" x1="52" y1="35" x2="66" y2="95" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#002B80" />
+                  <stop offset="100%" stop-color="#0066CC" stop-opacity="0" />
+                </linearGradient>
+                <!-- Magenta to Pink Gradient for Head & Left Swoosh -->
+                <linearGradient id="ttreinoPinkGrad" x1="5" y1="10" x2="80" y2="35" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#8A1996" />
+                  <stop offset="45%" stop-color="#E61E8A" />
+                  <stop offset="100%" stop-color="#FF3E75" />
+                </linearGradient>
+                <!-- Pink to Vibrant Orange Gradient for Dynamic Lower Leg -->
+                <linearGradient id="ttreinoOrangeGrad" x1="65" y1="48" x2="88" y2="108" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#FF2A85" />
+                  <stop offset="50%" stop-color="#FF6A3D" />
+                  <stop offset="100%" stop-color="#FF9900" />
+                </linearGradient>
+              </defs>
+
+              <!-- Dynamic Figure Head (Pink/Magenta Circle) -->
+              <circle cx="64" cy="14" r="11.5" fill="url(#ttreinoPinkGrad)" />
+
+              <!-- Upper Left Dynamic Shoulder Swoosh -->
+              <path d="M3 19C20 18.5 41 21 55 27.5L32 27.5C20 24.5 11 21.5 3 19Z" fill="url(#ttreinoPinkGrad)" />
+
+              <!-- Lower Right Dynamic Running Leg Swoosh (Pink -> Orange) -->
+              <path d="M68 51C84 57 96 67 95 79C94 90 79 102 60 112C72 98 81 85 81 76C81 69 73 66 64 63L68 51Z" fill="url(#ttreinoOrangeGrad)" />
+
+              <!-- Main Geometric 'T' Crossbar & Slanted Stem (Blue -> Cyan) -->
+              <path d="M12 30H111L106 49H70L47 112L54 49H7L12 30Z" fill="url(#ttreinoBlueGrad)" />
+              
+              <!-- Subtle Bevel Fold on the 'T' Stem -->
+              <path d="M54 49L70 49L65 64L52.2 60L54 49Z" fill="url(#ttreinoStemShadow)" opacity="0.55" />
+
+              <!-- "Ttreino" Typography -->
+              <text x="128" y="83" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="800" font-size="76" letter-spacing="-1.5" fill="#0066CC">Ttreino</text>
+              <!-- Light reflection on dark background for legibility while keeping exact brand royal blue -->
+              <text x="128" y="83" font-family="'Plus Jakarta Sans', 'Inter', sans-serif" font-weight="800" font-size="76" letter-spacing="-1.5" fill="url(#ttreinoBlueGrad)" opacity="0.85">Ttreino</text>
+
+              <!-- Registered Trademark ® -->
+              <g transform="translate(396, 22)">
+                <circle cx="14" cy="14" r="12.5" stroke="#0077EE" stroke-width="2.6" fill="none" />
+                <text x="14" y="19.5" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="15.5" fill="#0077EE">R</text>
+              </g>
+
+              <!-- Subtitle: PERSONAL TRAINERS -->
+              <text x="134" y="106" font-family="'Inter', sans-serif" font-weight="500" font-size="13.5" letter-spacing="7.2" fill="#94A3B8">PERSONAL TRAINERS</text>
+            </svg>
+          </div>
+        </a>
+
+        <!-- Center Navigation Links (Desktop) -->
+        <nav class="hidden md:flex items-center gap-7 text-sm font-medium text-slate-300">
+          <a href="#preview-section" class="hover:text-white transition-colors" data-i18n="nav.platform">Plataforma</a>
+          <a href="#features-section" class="hover:text-white transition-colors" data-i18n="nav.features">Recursos</a>
+          <a href="#student-app" class="hover:text-white transition-colors" data-i18n="nav.studentApp">App do Aluno</a>
+          <a href="#early-access" class="hover:text-white transition-colors" data-i18n="nav.earlyAccess">Acesso Antecipado</a>
+        </nav>
+
+        <!-- Right Controls: Language Switcher Pill + Magnetic Early Access CTA -->
+        <div class="flex items-center gap-2.5 sm:gap-4">
+          <!-- Language Switcher -->
+          <div class="flex items-center bg-obsidian-950/90 p-1 rounded-xl border border-white/10" role="group" aria-label="Language Selector">
+            <button onclick="setLanguage('pt', true)" id="lang-btn-pt" class="lang-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 bg-white/10 text-white shadow-sm">
+              <span>🇧🇷</span><span class="hidden sm:inline">PT</span>
+            </button>
+            <button onclick="setLanguage('en', true)" id="lang-btn-en" class="lang-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white">
+              <span>🇺🇸</span><span class="hidden sm:inline">EN</span>
+            </button>
+            <button onclick="setLanguage('es', true)" id="lang-btn-es" class="lang-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white">
+              <span>🇪🇸</span><span class="hidden sm:inline">ES</span>
+            </button>
+          </div>
+
+          <!-- Header CTA Button -->
+          <a href="#early-access" class="magnetic-btn hidden sm:inline-flex items-center gap-2 btn-primary-glow text-white text-xs sm:text-sm font-semibold px-4 py-2.5 rounded-xl">
+            <span data-i18n="nav.cta">Lista VIP</span>
+            <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- ==================== MAIN CONTENT ==================== -->
+  <main class="relative z-10 pt-28 sm:pt-36 pb-24">
+
+    <!-- ==================== HERO SECTION ==================== -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 sm:pt-8 pb-16">
+      <div class="flex flex-col items-center text-center max-w-4xl mx-auto">
+        
+        <!-- Status Pill Badge -->
+        <div class="gsap-hero-reveal inline-flex items-center gap-2.5 glass-pill px-4 py-1.5 rounded-full mb-7 border border-ttreino-cyan/30">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-ttreino-cyan opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-ttreino-cyan"></span>
+          </span>
+          <span class="font-mono text-[11px] sm:text-xs uppercase tracking-widest text-ttreino-cyan font-semibold" data-i18n="hero.badge">
+            LANÇAMENTO OFICIAL 2026 • ACESSO ANTECIPADO LIMITADO
+          </span>
+        </div>
+
+        <!-- Hero Headline -->
+        <h1 class="gsap-hero-reveal font-display text-4xl sm:text-6xl lg:text-[68px] font-extrabold tracking-tight leading-[1.06] text-white mb-6">
+          <span data-i18n="hero.titlePart1">Eleve sua consultoria e treinos ao</span>
+          <span class="text-gradient-brand block sm:inline" data-i18n="hero.titleHighlight"> padrão de elite.</span>
+        </h1>
+
+        <!-- Hero Subtitle -->
+        <p class="gsap-hero-reveal text-base sm:text-xl text-slate-300/90 max-w-2xl font-normal leading-relaxed mb-10" data-i18n="hero.subtitle">
+          O ecossistema definitivo para Personal Trainers. Prescreva treinos individualizados em segundos, entregue um App exclusivo com vídeos curtos em HD para seus alunos e domine avaliações físicas com precisão clínica.
+        </p>
+
+        <!-- Primary & Secondary Hero CTAs -->
+        <div class="gsap-hero-reveal flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto mb-12">
+          <a href="#early-access" class="magnetic-btn w-full sm:w-auto btn-primary-glow px-8 py-4 rounded-2xl font-display font-bold text-base text-white flex items-center justify-center gap-3 group">
+            <span data-i18n="hero.primaryCta">Garantir Acesso Antecipado VIP</span>
+            <i data-lucide="sparkles" class="w-5 h-5 transition-transform group-hover:rotate-12"></i>
+          </a>
+          <a href="#preview-section" class="w-full sm:w-auto glass-pill hover:bg-white/10 text-slate-200 font-medium px-7 py-4 rounded-2xl text-base flex items-center justify-center gap-2.5 transition-all">
+            <i data-lucide="play-circle" class="w-5 h-5 text-ttreino-cyan"></i>
+            <span data-i18n="hero.secondaryCta">Explorar Interface Interativa</span>
+          </a>
+        </div>
+
+        <!-- Live Social Proof / Waitlist Counter: numero real de inscritos (php/waitlist), so aparece a partir de WAITLIST_PROOF_MIN -->
+        <div class="gsap-hero-reveal flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-xs sm:text-sm text-slate-400 border-t border-white/10 pt-7 w-full max-w-2xl">
+          <div id="waitlist-proof" class="hidden items-center gap-4 sm:gap-8">
+            <div class="flex items-center gap-3">
+              <div class="flex -space-x-2.5">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-ttreino-royal to-ttreino-cyan p-[1.5px]">
+                  <div class="w-full h-full rounded-full bg-obsidian-900 flex items-center justify-center text-white"><i data-lucide="user" class="w-3.5 h-3.5"></i></div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-ttreino-pink to-ttreino-orange p-[1.5px]">
+                  <div class="w-full h-full rounded-full bg-obsidian-900 flex items-center justify-center text-white"><i data-lucide="user" class="w-3.5 h-3.5"></i></div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-emerald-500 to-teal-400 p-[1.5px]">
+                  <div class="w-full h-full rounded-full bg-obsidian-900 flex items-center justify-center text-white"><i data-lucide="user" class="w-3.5 h-3.5"></i></div>
+                </div>
+                <div id="waitlist-proof-more" class="w-8 h-8 rounded-full bg-obsidian-800 border border-white/15 flex items-center justify-center text-[10px] font-mono text-ttreino-cyan">+0</div>
+              </div>
+              <span>
+                <strong class="text-white font-semibold" id="waitlist-count-display">0</strong>
+                <span data-i18n="hero.waitlistJoined">Personais na fila prioritária</span>
+              </span>
+            </div>
+
+            <div class="hidden sm:block h-4 w-[1px] bg-white/10"></div>
+          </div>
+
+          <div class="flex items-center gap-2 text-emerald-400 font-mono text-xs">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+            <span data-i18n="hero.founderBenefit">60 dias grátis + Selo Personal Fundador</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== INTERACTIVE DUAL PRODUCT PREVIEW (TRAINER + STUDENT APP) ==================== -->
+    <section id="preview-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-14">
+      
+      <!-- Interactive Mode Switcher Tabs -->
+      <div class="flex flex-col items-center mb-8">
+        <span class="font-mono text-xs uppercase tracking-widest text-slate-400 mb-3" data-i18n="preview.kicker">
+          SIMULADOR INTERATIVO • CLIQUE PARA TESTAR OS MÓDULOS
+        </span>
+        <div class="glass-pill p-1.5 rounded-2xl flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+          <button onclick="switchPreviewTab('workout')" id="tab-btn-workout" class="preview-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-gradient-to-r from-ttreino-royal to-ttreino-blue text-white shadow-lg">
+            <i data-lucide="dumbbell" class="w-4 h-4"></i>
+            <span data-i18n="preview.tab1">1. Prescrição & Cronograma</span>
+          </button>
+          <button onclick="switchPreviewTab('videos')" id="tab-btn-videos" class="preview-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/5">
+            <i data-lucide="clapperboard" class="w-4 h-4 text-ttreino-pink"></i>
+            <span data-i18n="preview.tab2">2. Vídeos Curtos HD & Dicas</span>
+          </button>
+          <button onclick="switchPreviewTab('assessment')" id="tab-btn-assessment" class="preview-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/5">
+            <i data-lucide="activity" class="w-4 h-4 text-ttreino-orange"></i>
+            <span data-i18n="preview.tab3">3. Avaliação Física & Evolução</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 3D Tilt Stage: Trainer Command Center + Student iPhone App -->
+      <div class="perspective-stage relative">
+        <!-- Ambient Backlight Glow -->
+        <div class="absolute -inset-4 bg-gradient-to-r from-ttreino-royal/25 via-ttreino-pink/15 to-ttreino-orange/20 rounded-3xl blur-3xl -z-10 opacity-75"></div>
+
+        <div id="interactive-stage" class="mockup-3d-tilt grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          
+          <!-- LEFT/MAIN: PERSONAL TRAINER COMMAND CENTER (8 COLS) -->
+          <div class="lg:col-span-8 spotlight-card rounded-3xl border border-white/10 bg-obsidian-900/90 backdrop-blur-2xl shadow-2xl flex flex-col justify-between overflow-hidden">
+            
+            <!-- Window Top Bar -->
+            <div class="px-5 py-3.5 border-b border-white/10 flex items-center justify-between bg-obsidian-950/60">
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-rose-500/80"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500/80"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500/80"></span>
+                <span class="ml-3 font-mono text-xs text-slate-400 flex items-center gap-1.5">
+                  <i data-lucide="shield-check" class="w-3.5 h-3.5 text-ttreino-cyan"></i>
+                  <span>app.ttreino.com/personal-studio</span>
+                </span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[11px] font-mono bg-ttreino-blue/20 text-ttreino-cyan border border-ttreino-cyan/30" data-i18n="preview.trainerViewBadge">
+                  Visão do Personal
+                </span>
+              </div>
+            </div>
+
+            <!-- Dynamic Trainer Content Area -->
+            <div class="p-5 sm:p-7 flex-1 flex flex-col justify-between">
+              
+              <!-- Student Header Bar Inside Mockup -->
+              <div class="flex flex-wrap items-center justify-between gap-4 pb-5 mb-6 border-b border-white/10">
+                <div class="flex items-center gap-3.5">
+                  <div class="relative">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-ttreino-blue via-ttreino-pink to-ttreino-orange p-[2px]">
+                      <div class="w-full h-full bg-obsidian-900 rounded-[14px] flex items-center justify-center font-display font-bold text-white">
+                        MF
+                      </div>
+                    </div>
+                    <span class="absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full bg-emerald-500 border-2 border-obsidian-900"></span>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="font-display font-bold text-white text-base sm:text-lg">Mariana Fontes</h3>
+                      <span class="text-[11px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" data-i18n="preview.studentGoal">Hipertrofia & Definição</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-0.5" data-i18n="preview.studentMeta">
+                      Microciclo 04 • Semana 3 de 6 • Frequência: 96% nos últimos 30 dias
+                    </p>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-mono text-slate-400 hidden sm:inline" data-i18n="preview.syncStatus">Sincronizado em tempo real</span>
+                  <span class="w-2 h-2 rounded-full bg-ttreino-cyan animate-ping"></span>
+                </div>
+              </div>
+
+              <!-- TAB 1 CONTENT: WORKOUT BUILDER -->
+              <div id="trainer-panel-workout" class="preview-panel space-y-4">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-xs font-mono uppercase tracking-wider text-ttreino-cyan" data-i18n="preview.workoutHeader">
+                    TREINO A — MEMBROS INFERIORES (FOCO QUADRÍCEPS)
+                  </h4>
+                  <span class="text-xs text-slate-400 font-mono">45–55 min • RPE 8.5</span>
+                </div>
+
+                <!-- Exercise Rows -->
+                <div class="space-y-2.5">
+                  <div class="p-3.5 rounded-2xl bg-obsidian-950/80 border border-white/10 hover:border-ttreino-cyan/40 transition flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                      <span class="w-8 h-8 rounded-xl bg-ttreino-blue/20 border border-ttreino-blue/40 text-ttreino-cyan font-mono text-xs font-bold flex items-center justify-center">01</span>
+                      <div>
+                        <p class="text-sm font-semibold text-white" data-i18n="preview.ex1Name">Agachamento Livre com Barra</p>
+                        <p class="text-xs text-slate-400" data-i18n="preview.ex1Tip">Dica do Personal: Cadência 3010, manter joelhos alinhados à ponta dos pés.</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 font-mono text-xs">
+                      <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-200">4 x 8-10</span>
+                      <span class="px-2.5 py-1 rounded-lg bg-ttreino-pink/15 text-ttreino-pink border border-ttreino-pink/30">72 kg</span>
+                      <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-400">90s</span>
+                    </div>
+                  </div>
+
+                  <div class="p-3.5 rounded-2xl bg-obsidian-950/80 border border-white/10 hover:border-ttreino-cyan/40 transition flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                      <span class="w-8 h-8 rounded-xl bg-ttreino-blue/20 border border-ttreino-blue/40 text-ttreino-cyan font-mono text-xs font-bold flex items-center justify-center">02</span>
+                      <div>
+                        <p class="text-sm font-semibold text-white" data-i18n="preview.ex2Name">Leg Press 45° Unilateral</p>
+                        <p class="text-xs text-slate-400" data-i18n="preview.ex2Tip">Dica do Personal: Amplitude máxima sem retirar o quadril do encosto.</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 font-mono text-xs">
+                      <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-200">3 x 12</span>
+                      <span class="px-2.5 py-1 rounded-lg bg-ttreino-pink/15 text-ttreino-pink border border-ttreino-pink/30">140 kg</span>
+                      <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-400">75s</span>
+                    </div>
+                  </div>
+
+                  <div class="p-3.5 rounded-2xl bg-obsidian-950/80 border border-white/10 hover:border-ttreino-cyan/40 transition flex flex-wrap sm:flex-nowrap items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                      <span class="w-8 h-8 rounded-xl bg-ttreino-blue/20 border border-ttreino-blue/40 text-ttreino-cyan font-mono text-xs font-bold flex items-center justify-center">03</span>
+                      <div>
+                        <p class="text-sm font-semibold text-white" data-i18n="preview.ex3Name">Cadeira Extensora (Drop-set Final)</p>
+                        <p class="text-xs text-slate-400" data-i18n="preview.ex3Tip">Dica do Personal: Pico de contração de 2s no topo de cada repetição.</p>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-2 font-mono text-xs">
+                      <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-200">4 x 15</span>
+                      <span class="px-2.5 py-1 rounded-lg bg-ttreino-pink/15 text-ttreino-pink border border-ttreino-pink/30">65 kg</span>
+                      <span class="px-2.5 py-1 rounded-lg bg-white/5 text-slate-400">60s</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 2 CONTENT: SHORT HD BIOMECHANICS VIDEOS -->
+              <div id="trainer-panel-videos" class="preview-panel hidden space-y-4">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-xs font-mono uppercase tracking-wider text-ttreino-pink" data-i18n="preview.videoHeader">
+                    BIBLIOTECA DE VÍDEOS CURTOS HD & CUES BIOMECÂNICOS
+                  </h4>
+                  <span class="text-xs text-slate-400 font-mono">4K 60FPS • Loop Automático</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <!-- Animated SVG Biomechanics Video Preview Card -->
+                  <div class="relative rounded-2xl bg-obsidian-950 border border-white/10 p-4 flex flex-col justify-between overflow-hidden">
+                    <div class="flex items-center justify-between z-10 mb-2">
+                      <span class="px-2.5 py-1 rounded-full text-[10px] font-mono bg-ttreino-pink/20 text-ttreino-pink border border-ttreino-pink/30">
+                        ● REC BIOMECÂNICA
+                      </span>
+                      <span class="font-mono text-xs text-slate-400">0:12s loop</span>
+                    </div>
+
+                    <!-- Vector Motion Graphic representing Exercise Posture Cue -->
+                    <div class="my-2 h-36 rounded-xl bg-gradient-to-b from-ttreino-royal/20 to-obsidian-900 border border-white/5 flex items-center justify-center relative overflow-hidden">
+                      <svg class="w-40 h-32" viewBox="0 0 200 140" fill="none">
+                        <!-- Grid lines -->
+                        <line x1="20" y1="120" x2="180" y2="120" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+                        <line x1="100" y1="15" x2="100" y2="120" stroke="#00C6FF" stroke-dasharray="4 4" stroke-width="1.5"/>
+                        <!-- Spine & Knee Angle Arc -->
+                        <path d="M85 40 L65 78 L98 92 L95 120" stroke="url(#ttreinoBlueGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+                        <circle cx="88" cy="26" r="9" fill="#FF1E8A"/>
+                        <!-- Barbell end -->
+                        <circle cx="82" cy="42" r="11" stroke="#FF9900" stroke-width="3" fill="rgba(255,153,0,0.2)"/>
+                        <!-- Joint tracking points -->
+                        <circle cx="65" cy="78" r="4" fill="#00C6FF"/>
+                        <circle cx="98" cy="92" r="4" fill="#00C6FF"/>
+                        <text x="112" y="88" fill="#00C6FF" font-family="JetBrains Mono" font-size="10">90° Ideal</text>
+                      </svg>
+                    </div>
+
+                    <div class="flex items-center justify-between text-xs text-slate-300 pt-1">
+                      <span data-i18n="preview.videoCue1">Ângulo patelar e alinhamento lombar</span>
+                      <span class="text-ttreino-cyan font-mono">HD</span>
+                    </div>
+                  </div>
+
+                  <!-- Trainer Audio/Text Tips Panel -->
+                  <div class="rounded-2xl bg-obsidian-950/80 border border-white/10 p-4 flex flex-col justify-between space-y-3">
+                    <div>
+                      <span class="text-xs font-mono text-ttreino-cyan uppercase" data-i18n="preview.customVideoTag">Upload Próprio ou Biblioteca Ttreino®</span>
+                      <h5 class="text-sm font-bold text-white mt-1" data-i18n="preview.customVideoTitle">Mais de 1.200 vídeos curtos prontos ou grave os seus em 5 segundos</h5>
+                      <p class="text-xs text-slate-400 mt-1.5 leading-relaxed" data-i18n="preview.customVideoDesc">
+                        O aluno visualiza o vídeo em tela cheia sem sair do treino, junto com suas observações personalizadas de postura e respiração.
+                      </p>
+                    </div>
+                    <div class="p-3 rounded-xl bg-white/[0.03] border border-white/5 flex items-center gap-3">
+                      <div class="w-8 h-8 rounded-lg bg-ttreino-pink/20 text-ttreino-pink flex items-center justify-center shrink-0">
+                        <i data-lucide="mic" class="w-4 h-4"></i>
+                      </div>
+                      <div class="text-xs">
+                        <p class="text-white font-medium" data-i18n="preview.voiceNoteTitle">Dica de Voz do Personal Anexada</p>
+                        <p class="text-slate-400" data-i18n="preview.voiceNoteSub">"Mariana, controle a descida em 3 segundos hoje!"</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- TAB 3 CONTENT: PHYSICAL ASSESSMENT & BODY EVOLUTION -->
+              <div id="trainer-panel-assessment" class="preview-panel hidden space-y-4">
+                <div class="flex items-center justify-between">
+                  <h4 class="text-xs font-mono uppercase tracking-wider text-ttreino-orange" data-i18n="preview.assessHeader">
+                    AVALIAÇÃO FÍSICA & COMPOSIÇÃO CORPORAL (POLLOCK 7 DOBRAS + BIOIMPEDÂNCIA)
+                  </h4>
+                  <span class="text-xs text-emerald-400 font-mono">Δ -4.8% Gordura Corporal</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div class="p-3.5 rounded-2xl bg-obsidian-950/90 border border-white/10">
+                    <span class="text-xs text-slate-400" data-i18n="preview.metricBF">Percentual de Gordura</span>
+                    <div class="flex items-baseline gap-2 mt-1">
+                      <span class="text-2xl font-display font-extrabold text-white">16.4%</span>
+                      <span class="text-xs font-mono text-emerald-400">-4.8%</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-white/10 rounded-full mt-2.5 overflow-hidden">
+                      <div class="h-full w-3/4 bg-gradient-to-r from-ttreino-cyan to-emerald-400 rounded-full"></div>
+                    </div>
+                  </div>
+
+                  <div class="p-3.5 rounded-2xl bg-obsidian-950/90 border border-white/10">
+                    <span class="text-xs text-slate-400" data-i18n="preview.metricLean">Massa Magra (Músculo)</span>
+                    <div class="flex items-baseline gap-2 mt-1">
+                      <span class="text-2xl font-display font-extrabold text-white">51.8 kg</span>
+                      <span class="text-xs font-mono text-ttreino-cyan">+3.2 kg</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-white/10 rounded-full mt-2.5 overflow-hidden">
+                      <div class="h-full w-4/5 bg-gradient-to-r from-ttreino-blue to-ttreino-cyan rounded-full"></div>
+                    </div>
+                  </div>
+
+                  <div class="p-3.5 rounded-2xl bg-obsidian-950/90 border border-white/10">
+                    <span class="text-xs text-slate-400" data-i18n="preview.metricSymmetry">Simetria & Perimetria</span>
+                    <div class="flex items-baseline gap-2 mt-1">
+                      <span class="text-2xl font-display font-extrabold text-white">98.4%</span>
+                      <span class="text-xs font-mono text-ttreino-orange">Ótimo</span>
+                    </div>
+                    <div class="w-full h-1.5 bg-white/10 rounded-full mt-2.5 overflow-hidden">
+                      <div class="h-full w-[92%] bg-gradient-to-r from-ttreino-pink to-ttreino-orange rounded-full"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Evolution SVG Line Chart -->
+                <div class="p-4 rounded-2xl bg-obsidian-950/70 border border-white/10">
+                  <div class="flex items-center justify-between text-xs text-slate-400 mb-2">
+                    <span data-i18n="preview.chartTitle">Curva de Evolução: Massa Magra vs. % Gordura (Últimas 12 Semanas)</span>
+                    <span class="font-mono text-ttreino-cyan">PDF / Link Interativo</span>
+                  </div>
+                  <svg class="w-full h-20" viewBox="0 0 500 75" fill="none">
+                    <path d="M10 62 Q 120 55, 220 38 T 490 12" stroke="#00C6FF" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <path d="M10 18 Q 140 28, 250 45 T 490 64" stroke="#FF1E8A" stroke-width="2.5" stroke-dasharray="5 5" fill="none" stroke-linecap="round"/>
+                    <circle cx="490" cy="12" r="4.5" fill="#00C6FF"/>
+                    <circle cx="490" cy="64" r="4.5" fill="#FF1E8A"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Bottom Status Bar Inside Trainer Mockup -->
+              <div class="mt-6 pt-4 border-t border-white/10 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="sparkles" class="w-4 h-4 text-ttreino-cyan"></i>
+                  <span data-i18n="preview.bottomHint">Qualquer alteração reflete instantaneamente no App do Aluno ao lado.</span>
+                </div>
+                <span class="font-mono text-[11px] text-slate-500">Ttreino Engine v2.6</span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- RIGHT: STUDENT MOBILE APP COMPANION PREVIEW (4 COLS) -->
+          <div class="lg:col-span-4 spotlight-card rounded-[36px] border-2 border-white/15 bg-obsidian-950 p-4 shadow-2xl flex flex-col justify-between relative overflow-hidden">
+            
+            <!-- Phone Dynamic Island -->
+            <div class="w-28 h-5 bg-black rounded-full mx-auto mb-3 flex items-center justify-between px-3 border border-white/10">
+              <span class="w-2 h-2 rounded-full bg-ttreino-cyan"></span>
+              <span class="font-mono text-[9px] text-slate-400">Ttreino App</span>
+            </div>
+
+            <!-- Mobile App Header -->
+            <div class="px-2 pb-3 border-b border-white/10 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] font-mono uppercase tracking-wider text-ttreino-pink" data-i18n="preview.mobileBadge">APP DO ALUNO (iOS & ANDROID)</span>
+                <h4 class="font-display font-bold text-white text-base" data-i18n="preview.mobileGreeting">Olá, Mariana 👋</h4>
+              </div>
+              <div class="w-9 h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-ttreino-cyan">
+                <i data-lucide="flame" class="w-4 h-4"></i>
+              </div>
+            </div>
+
+            <!-- Dynamic Mobile Screen Body -->
+            <div class="my-3 flex-1 flex flex-col justify-between space-y-3 px-1">
+              
+              <!-- Active Workout / Video Card on Phone -->
+              <div class="p-3.5 rounded-2xl bg-gradient-to-br from-ttreino-royal/30 via-obsidian-900 to-obsidian-900 border border-ttreino-cyan/30">
+                <div class="flex items-center justify-between text-xs mb-1.5">
+                  <span class="font-semibold text-white" id="mobile-active-title" data-i18n="preview.mobileCardTitle">Treino de Hoje: Inferior A</span>
+                  <span class="font-mono text-[11px] text-ttreino-cyan">65% concluído</span>
+                </div>
+                <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden mb-3">
+                  <div class="w-[65%] h-full bg-gradient-to-r from-ttreino-cyan to-ttreino-pink rounded-full"></div>
+                </div>
+
+                <!-- Interactive Checkable Set inside Student Phone -->
+                <div class="p-2.5 rounded-xl bg-obsidian-950/90 border border-white/10 flex items-center justify-between">
+                  <div>
+                    <p class="text-xs font-semibold text-white" data-i18n="preview.mobileExNow">Agachamento Livre • Série 3/4</p>
+                    <p class="text-[11px] text-slate-400 font-mono">72 kg • 10 reps • Descanso 90s</p>
+                  </div>
+                  <button onclick="toggleSetComplete(this)" class="px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold transition flex items-center gap-1">
+                    <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                    <span data-i18n="preview.mobileCheckBtn">Feito</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Short Video & Trainer Tip Box on Phone -->
+              <div class="p-3.5 rounded-2xl bg-obsidian-900/90 border border-white/10 space-y-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-[11px] font-mono text-ttreino-pink flex items-center gap-1.5">
+                    <i data-lucide="video" class="w-3.5 h-3.5"></i>
+                    <span data-i18n="preview.mobileVideoLabel">Vídeo Curto de Execução</span>
+                  </span>
+                  <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-white/5 text-slate-300">HD • 0:12s</span>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed" data-i18n="preview.mobileTipText">
+                  "Mantenha o core firme e desça de forma controlada. Assista ao vídeo de 12s caso tenha dúvida na postura."
+                </p>
+              </div>
+
+              <!-- Rest Timer Bar on Phone -->
+              <div class="p-3 rounded-2xl bg-obsidian-900 border border-white/10 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                  <div class="w-8 h-8 rounded-xl bg-ttreino-orange/20 text-ttreino-orange flex items-center justify-center">
+                    <i data-lucide="timer" class="w-4 h-4"></i>
+                  </div>
+                  <div>
+                    <p class="text-[11px] text-slate-400" data-i18n="preview.mobileTimerLabel">Cronômetro de Descanso</p>
+                    <p class="text-sm font-mono font-bold text-white" id="live-rest-timer">01:14</p>
+                  </div>
+                </div>
+                <span class="text-[11px] font-mono text-ttreino-cyan px-2.5 py-1 rounded-lg bg-ttreino-cyan/10" data-i18n="preview.mobileTimerActive">Ativo</span>
+              </div>
+
+            </div>
+
+            <!-- Phone Home Indicator -->
+            <div class="pt-2 flex justify-center">
+              <div class="w-28 h-1 rounded-full bg-white/20"></div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== BENTO GRID FEATURES SECTION ==================== -->
+    <section id="features-section" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      
+      <!-- Section Heading -->
+      <div class="text-center max-w-3xl mx-auto mb-14">
+        <span class="font-mono text-xs uppercase tracking-widest text-ttreino-cyan font-semibold" data-i18n="bento.kicker">
+          ARQUITETURA PENSADA PARA PERSONAIS
+        </span>
+        <h2 class="font-display text-3xl sm:text-5xl font-extrabold text-white mt-3 tracking-tight" data-i18n="bento.title">
+          Menos planilhas. Mais retenção e resultado para seus alunos.
+        </h2>
+        <p class="text-slate-400 mt-4 text-base sm:text-lg" data-i18n="bento.subtitle">
+          Cada detalhe do Ttreino® foi desenhado para eliminar o trabalho mecânico do Personal Trainer e entregar uma experiência digna de clube de elite ao aluno.
+        </p>
+      </div>
+
+      <!-- Mouse-Reactive Spotlight Bento Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-6" id="bento-grid">
+        
+        <!-- Card 1: Individualized Periodization (7 cols) -->
+        <div class="md:col-span-7 spotlight-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-ttreino-royal to-ttreino-cyan p-[1px] mb-6">
+              <div class="w-full h-full bg-obsidian-900 rounded-[15px] flex items-center justify-center text-ttreino-cyan">
+                <i data-lucide="Sliders" class="w-6 h-6"></i>
+              </div>
+            </div>
+            <span class="font-mono text-xs text-ttreino-cyan uppercase tracking-wider" data-i18n="bento.card1Tag">
+              GESTÃO DE AULAS & PERIODIZAÇÃO
+            </span>
+            <h3 class="font-display text-2xl font-bold text-white mt-2 mb-3" data-i18n="bento.card1Title">
+              Prescrição 100% individualizada em metade do tempo
+            </h3>
+            <p class="text-slate-400 text-sm sm:text-base leading-relaxed" data-i18n="bento.card1Desc">
+              Monte treinos do zero ou clone blocos inteligentes. Configure séries, repetições, cadência, RPE, bi-sets, drop-sets e agendas de aulas presenciais ou online com organização impecável.
+            </p>
+          </div>
+
+          <div class="mt-7 pt-5 border-t border-white/10 flex flex-wrap items-center gap-2">
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-white/5 text-slate-300 border border-white/10" data-i18n="bento.card1Pill1">Templates Reutilizáveis</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-white/5 text-slate-300 border border-white/10" data-i18n="bento.card1Pill2">Histórico de Cargas</span>
+            <span class="px-3 py-1 rounded-full text-xs font-mono bg-white/5 text-slate-300 border border-white/10" data-i18n="bento.card1Pill3">Controle de Aulas</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Short HD Execution Videos (5 cols) -->
+        <div class="md:col-span-5 spotlight-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-ttreino-pink to-ttreino-orange p-[1px] mb-6">
+              <div class="w-full h-full bg-obsidian-900 rounded-[15px] flex items-center justify-center text-ttreino-pink">
+                <i data-lucide="play" class="w-6 h-6"></i>
+              </div>
+            </div>
+            <span class="font-mono text-xs text-ttreino-pink uppercase tracking-wider" data-i18n="bento.card2Tag">
+              EXECUÇÃO PERFEITA
+            </span>
+            <h3 class="font-display text-2xl font-bold text-white mt-2 mb-3" data-i18n="bento.card2Title">
+              Vídeos curtos e dicas diretas no exercício
+            </h3>
+            <p class="text-slate-400 text-sm sm:text-base leading-relaxed" data-i18n="bento.card2Desc">
+              Acabe com as dúvidas no WhatsApp sobre "qual é esse aparelho?". Vídeos objetivos demonstram o movimento exato junto às suas dicas de postura.
+            </p>
+          </div>
+
+          <div class="mt-7 pt-5 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-300">
+            <span data-i18n="bento.card2Footer">Carregamento instantâneo no 4G/5G</span>
+            <span class="text-ttreino-pink">60 FPS</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Physical Assessment & Evolution Charts (5 cols) -->
+        <div class="md:col-span-5 spotlight-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-ttreino-orange to-amber-400 p-[1px] mb-6">
+              <div class="w-full h-full bg-obsidian-900 rounded-[15px] flex items-center justify-center text-ttreino-orange">
+                <i data-lucide="line-chart" class="w-6 h-6"></i>
+              </div>
+            </div>
+            <span class="font-mono text-xs text-ttreino-orange uppercase tracking-wider" data-i18n="bento.card3Tag">
+              AVALIAÇÃO FÍSICA COMPLETA
+            </span>
+            <h3 class="font-display text-2xl font-bold text-white mt-2 mb-3" data-i18n="bento.card3Title">
+              Evolução visível que fideliza o aluno por anos
+            </h3>
+            <p class="text-slate-400 text-sm sm:text-base leading-relaxed" data-i18n="bento.card3Desc">
+              Registre dobras cutâneas, perimetria, anamnese e comparativo fotográfico. O aluno acompanha os gráficos de evolução no próprio celular.
+            </p>
+          </div>
+
+          <div class="mt-7 pt-5 border-t border-white/10 flex items-center justify-between text-xs font-mono text-slate-300">
+            <span data-i18n="bento.card3Footer">Protocolos Pollock, Guedes & Bioimpedância</span>
+            <i data-lucide="award" class="w-4 h-4 text-ttreino-orange"></i>
+          </div>
+        </div>
+
+        <!-- Card 4: Exclusive Student App Experience (7 cols) -->
+        <div id="student-app" class="md:col-span-7 spotlight-card rounded-3xl p-7 sm:p-8 flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-ttreino-cyan p-[1px] mb-6">
+              <div class="w-full h-full bg-obsidian-900 rounded-[15px] flex items-center justify-center text-emerald-400">
+                <i data-lucide="smartphone" class="w-6 h-6"></i>
+              </div>
+            </div>
+            <span class="font-mono text-xs text-emerald-400 uppercase tracking-wider" data-i18n="bento.card4Tag">
+              EXPERIÊNCIA DO ALUNO
+            </span>
+            <h3 class="font-display text-2xl font-bold text-white mt-2 mb-3" data-i18n="bento.card4Title">
+              Um App que seu aluno realmente ama abrir todos os dias
+            </h3>
+            <p class="text-slate-400 text-sm sm:text-base leading-relaxed" data-i18n="bento.card4Desc">
+              O aluno baixa o Ttreino®, visualiza o cronograma semanal, marca séries concluídas, registra cargas utilizadas e envia feedback de percepção de esforço (PSE) ao final de cada sessão.
+            </p>
+          </div>
+
+          <div class="mt-7 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3 text-xs font-mono text-slate-300">
+              <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10">iOS App Store</span>
+              <span class="px-3 py-1 rounded-lg bg-white/5 border border-white/10">Google Play</span>
+            </div>
+            <span class="text-xs text-emerald-400 font-medium" data-i18n="bento.card4Highlight">100% Gratuito para seus alunos</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==================== SMART EARLY ACCESS LEAD CAPTURE SECTION ==================== -->
+    <section id="early-access" class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="spotlight-card rounded-[32px] border border-white/15 bg-gradient-to-b from-obsidian-800/90 to-obsidian-950/95 p-6 sm:p-12 shadow-2xl relative overflow-hidden">
+        
+        <!-- Decorative Top Gradient Line -->
+        <div class="absolute top-0 inset-x-0 h-[2px] bg-gradient-to-r from-transparent via-ttreino-cyan to-ttreino-pink"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+          
+          <!-- Left Pitch Column (5 cols) -->
+          <div class="lg:col-span-5 space-y-6">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ttreino-blue/20 border border-ttreino-cyan/30 text-ttreino-cyan text-xs font-mono">
+              <i data-lucide="key-round" class="w-3.5 h-3.5"></i>
+              <span data-i18n="form.badge">CONVITE BETA FECHADO</span>
+            </div>
+
+            <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-white tracking-tight leading-tight" data-i18n="form.title">
+              Seja um dos primeiros Personais a testar o Ttreino®.
+            </h2>
+
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed" data-i18n="form.subtitle">
+              Cadastre seu nome, e-mail e WhatsApp para receber seu acesso antecipado VIP com benefícios vitalícios de membro fundador.
+            </p>
+
+            <!-- VIP Perks List -->
+            <ul class="space-y-3.5 pt-2 text-sm text-slate-300">
+              <li class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                </div>
+                <span data-i18n="form.perk1">Acesso gratuito liberado no 1º lote de testes</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-ttreino-cyan/20 text-ttreino-cyan flex items-center justify-center shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                </div>
+                <span data-i18n="form.perk2">Condição vitalícia de Personal Fundador no lançamento</span>
+              </li>
+              <li class="flex items-start gap-3">
+                <div class="w-5 h-5 rounded-full bg-ttreino-pink/20 text-ttreino-pink flex items-center justify-center shrink-0 mt-0.5">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                </div>
+                <span data-i18n="form.perk3">Migração assistida da sua carteira atual de alunos</span>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Right Smart Form Column (7 cols) -->
+          <div class="lg:col-span-7">
+            
+            <!-- FORM CONTAINER -->
+            <form id="lead-form" onsubmit="handleLeadSubmit(event)" novalidate class="bg-obsidian-950/90 border border-white/10 rounded-3xl p-6 sm:p-8 space-y-5 shadow-inner">
+              
+              <!-- Profile Selector Segmented Control -->
+              <div>
+                <label class="block text-xs font-mono uppercase tracking-wider text-slate-400 mb-2" data-i18n="form.profileLabel">
+                  COMO VOCÊ ATUA HOJE?
+                </label>
+                <div class="grid grid-cols-3 gap-2 p-1 rounded-xl bg-obsidian-900 border border-white/10">
+                  <button type="button" onclick="selectTrainerType('presencial')" id="type-presencial" class="trainer-type-btn py-2 px-2 rounded-lg text-xs font-semibold transition-all bg-ttreino-blue text-white shadow">
+                    <span data-i18n="form.type1">Personal Presencial</span>
+                  </button>
+                  <button type="button" onclick="selectTrainerType('online')" id="type-online" class="trainer-type-btn py-2 px-2 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white">
+                    <span data-i18n="form.type2">Consultoria Online</span>
+                  </button>
+                  <button type="button" onclick="selectTrainerType('hibrido')" id="type-hibrido" class="trainer-type-btn py-2 px-2 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white">
+                    <span data-i18n="form.type3">Híbrido / Studio</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- 1. FULL NAME INPUT -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="lead-name" class="text-xs font-medium text-slate-300" data-i18n="form.nameLabel">Nome Completo</label>
+                  <span id="name-status-badge" class="text-[11px] font-mono hidden"></span>
+                </div>
+                <div id="name-wrapper" class="smart-input-wrapper relative flex items-center rounded-xl bg-obsidian-900 border border-white/10 px-3.5 py-3">
+                  <i data-lucide="user" class="w-4 h-4 text-slate-400 mr-3 shrink-0"></i>
+                  <input 
+                    type="text" 
+                    id="lead-name" 
+                    autocomplete="name"
+                    oninput="validateNameLive()"
+                    placeholder="Ex: Prof. Lucas Andrade" 
+                    data-i18n-placeholder="form.namePlaceholder"
+                    class="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+                    required
+                  />
+                  <span id="name-icon-valid" class="hidden text-emerald-400 ml-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                  </span>
+                </div>
+                <p id="name-feedback" class="text-[11px] mt-1 text-rose-400 hidden"></p>
+              </div>
+
+              <!-- 2. SMART EMAIL INPUT WITH DOMAIN TYPO AUTO-SUGGESTION -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="lead-email" class="text-xs font-medium text-slate-300" data-i18n="form.emailLabel">Seu Melhor E-mail Profissional</label>
+                  <span id="email-status-text" class="text-[11px] font-mono text-slate-400"></span>
+                </div>
+                <div id="email-wrapper" class="smart-input-wrapper relative flex items-center rounded-xl bg-obsidian-900 border border-white/10 px-3.5 py-3">
+                  <i data-lucide="mail" class="w-4 h-4 text-slate-400 mr-3 shrink-0"></i>
+                  <input 
+                    type="email" 
+                    id="lead-email" 
+                    autocomplete="email"
+                    oninput="validateEmailLive()"
+                    placeholder="lucas.personal@gmail.com" 
+                    data-i18n-placeholder="form.emailPlaceholder"
+                    class="w-full bg-transparent text-sm text-white placeholder-slate-500 focus:outline-none"
+                    required
+                  />
+                  <span id="email-icon-valid" class="hidden text-emerald-400 ml-2">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                  </span>
+                  <span id="email-icon-invalid" class="hidden text-rose-400 ml-2">
+                    <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                  </span>
+                </div>
+
+                <!-- Smart Domain Typo Suggestion Pill -->
+                <div id="email-typo-suggestion" class="hidden mt-2">
+                  <button type="button" onclick="applyEmailTypoFix()" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-ttreino-cyan/15 border border-ttreino-cyan/40 text-xs text-ttreino-cyan hover:bg-ttreino-cyan/25 transition">
+                    <i data-lucide="wand-2" class="w-3.5 h-3.5"></i>
+                    <span id="email-typo-text">Você quis dizer <strong>@gmail.com</strong>? Clique para corrigir</span>
+                  </button>
+                </div>
+
+                <p id="email-feedback" class="text-[11px] mt-1.5 hidden"></p>
+              </div>
+
+              <!-- 3. SMART WHATSAPP INPUT WITH DDI SELECTOR & DYNAMIC MASKING -->
+              <div>
+                <div class="flex items-center justify-between mb-1.5">
+                  <label for="lead-whatsapp" class="text-xs font-medium text-slate-300" data-i18n="form.whatsappLabel">WhatsApp (para liberação do convite VIP)</label>
+                  <span id="phone-type-badge" class="text-[11px] font-mono text-ttreino-cyan"></span>
+                </div>
+
+                <div class="relative flex items-stretch gap-2">
+                  
+                  <!-- Country DDI Dropdown Trigger -->
+                  <div class="relative" id="ddi-dropdown-container">
+                    <button 
+                      type="button" 
+                      onclick="toggleDdiDropdown()"
+                      id="ddi-trigger-btn"
+                      class="h-full px-3 py-3 rounded-xl bg-obsidian-900 border border-white/10 hover:border-white/25 flex items-center gap-2 text-sm text-white transition shrink-0 focus:outline-none focus:border-ttreino-cyan"
+                      aria-label="Select Country Code"
+                    >
+                      <span id="selected-country-flag" class="text-base">🇧🇷</span>
+                      <span id="selected-country-ddi" class="font-mono text-xs font-semibold text-slate-200">+55</span>
+                      <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-slate-400"></i>
+                    </button>
+
+                    <!-- Searchable Country DDI Popover Menu -->
+                    <div id="ddi-dropdown-menu" class="hidden absolute left-0 bottom-full mb-2 w-72 max-h-64 bg-obsidian-900 border border-white/15 rounded-2xl shadow-2xl z-50 overflow-hidden flex flex-col">
+                      <div class="p-2.5 border-b border-white/10 bg-obsidian-950">
+                        <div class="flex items-center bg-obsidian-900 rounded-lg px-2.5 py-1.5 border border-white/10">
+                          <i data-lucide="search" class="w-3.5 h-3.5 text-slate-400 mr-2"></i>
+                          <input 
+                            type="text" 
+                            id="ddi-search-input" 
+                            oninput="filterCountries()"
+                            placeholder="Buscar país ou +DDI..." 
+                            class="w-full bg-transparent text-xs text-white placeholder-slate-500 focus:outline-none"
+                          />
+                        </div>
+                      </div>
+                      <div id="ddi-countries-list" class="overflow-y-auto divide-y divide-white/5 p-1">
+                        <!-- Populated dynamically via JS -->
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- WhatsApp Masked Input Field -->
+                  <div id="whatsapp-wrapper" class="smart-input-wrapper flex-1 relative flex items-center rounded-xl bg-obsidian-900 border border-white/10 px-3.5 py-3">
+                    <i data-lucide="message-circle" class="w-4 h-4 text-emerald-400 mr-2.5 shrink-0"></i>
+                    <input 
+                      type="tel" 
+                      id="lead-whatsapp" 
+                      inputmode="numeric"
+                      oninput="handleWhatsAppInput(event)"
+                      placeholder="(11) 9 0000-0000" 
+                      class="w-full bg-transparent font-mono text-sm text-white placeholder-slate-500 focus:outline-none tracking-wide"
+                      required
+                    />
+                    <span id="whatsapp-icon-valid" class="hidden text-emerald-400 ml-2">
+                      <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    </span>
+                    <span id="whatsapp-icon-invalid" class="hidden text-rose-400 ml-2">
+                      <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                    </span>
+                  </div>
+
+                </div>
+
+                <!-- Dynamic Formatting Helper & Validation Message -->
+                <div class="flex items-center justify-between mt-1.5">
+                  <p id="whatsapp-feedback" class="text-[11px] text-slate-400" data-i18n="form.whatsappHelper">
+                    Formatação inteligente: (00) 9 0000-0000 (9 dígitos) ou (00) 0000-0000 (8 dígitos)
+                  </p>
+                </div>
+              </div>
+
+              <!-- Campo armadilha para robos (escondido de pessoas; se vier preenchido, a inscricao e descartada) -->
+              <div class="absolute -left-[9999px] top-0 w-px h-px overflow-hidden" aria-hidden="true">
+                <label for="lead-website">Website</label>
+                <input type="text" id="lead-website" name="website" tabindex="-1" autocomplete="off" />
+              </div>
+
+              <p id="lead-submit-error" class="hidden text-xs text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-xl px-3.5 py-2.5" role="alert"></p>
+
+              <!-- Submit CTA Button -->
+              <button
+                type="submit"
+                id="submit-lead-btn"
+                class="w-full btn-primary-glow py-4 px-6 rounded-2xl font-display font-bold text-base text-white flex items-center justify-center gap-3 group cursor-pointer"
+              >
+                <span data-i18n="form.submitBtn">Quero Ser Um dos Primeiros a Testar</span>
+                <i data-lucide="arrow-right" class="w-5 h-5 transition-transform group-hover:translate-x-1"></i>
+              </button>
+
+              <!-- Privacy Note -->
+              <p class="text-center text-[11px] text-slate-500 flex flex-wrap items-center justify-center gap-1.5">
+                <i data-lucide="lock" class="w-3 h-3 text-slate-400"></i>
+                <span data-i18n="form.privacy">Seus dados estão 100% seguros. Zero spam, apenas seu convite VIP.</span>
+                <a href="/policy.html" target="_blank" rel="noopener" class="underline underline-offset-2 hover:text-slate-300 transition" data-i18n="form.privacyLink">Política de privacidade</a>
+              </p>
+
+            </form>
+
+            <!-- VIP CONFIRMATION STATE (HIDDEN INITIALLY) -->
+            <div id="vip-success-card" class="hidden bg-obsidian-950/95 border border-emerald-500/30 rounded-3xl p-7 sm:p-9 text-center space-y-6 shadow-2xl">
+              <div class="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center mx-auto">
+                <i data-lucide="badge-check" class="w-9 h-9"></i>
+              </div>
+
+              <div class="space-y-2">
+                <span id="success-badge" class="px-3 py-1 rounded-full text-xs font-mono bg-emerald-500/15 text-emerald-400 border border-emerald-500/30" data-i18n="success.badge">
+                  PASSAPORTE VIP CONFIRMADO
+                </span>
+                <h3 class="font-display text-2xl sm:text-3xl font-extrabold text-white" id="success-greeting">
+                  Bem-vindo à elite, Personal!
+                </h3>
+                <p id="success-desc" class="text-sm text-slate-300 max-w-md mx-auto" data-i18n="success.desc">
+                  Reservamos sua vaga prioritária. Você receberá no seu WhatsApp e e-mail a chave de acesso exclusiva assim que liberarmos o lote.
+                </p>
+              </div>
+
+              <!-- Personalized Founding Member Card -->
+              <div class="p-4 rounded-2xl bg-gradient-to-r from-ttreino-royal/30 via-obsidian-900 to-ttreino-pink/20 border border-white/15 text-left flex items-center justify-between">
+                <div>
+                  <span class="text-[10px] font-mono uppercase tracking-widest text-ttreino-cyan">FOUNDING PERSONAL TRAINER</span>
+                  <p class="font-display font-bold text-white text-base mt-0.5" id="badge-holder-name">Prof. Lucas Andrade</p>
+                  <p class="font-mono text-xs text-slate-400 mt-0.5" id="badge-holder-contact"></p>
+                </div>
+                <div class="text-right">
+                  <span class="text-[10px] font-mono text-slate-400 block" data-i18n="success.queueLabel">POSIÇÃO NA FILA</span>
+                  <span class="font-mono text-xl font-extrabold text-emerald-400" id="success-position">—</span>
+                </div>
+              </div>
+
+              <button 
+                type="button" 
+                onclick="resetLeadForm()" 
+                class="text-xs font-mono text-slate-400 hover:text-white underline underline-offset-4 transition"
+                data-i18n="success.resetBtn"
+              >
+                Cadastrar outro profissional
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== FOOTER ==================== -->
+  <footer class="relative z-10 border-t border-white/10 bg-obsidian-950/80 py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div class="flex items-center gap-3">
+        <span class="font-display font-extrabold text-lg text-ttreino-blue">Ttreino®</span>
+        <span class="text-xs font-mono tracking-widest text-slate-500">PERSONAL TRAINERS</span>
+      </div>
+
+      <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+        <p class="text-xs text-slate-500 text-center sm:text-right" data-i18n="footer.rights">
+          © 2026 Ttreino® Tecnologias para Educação Física. Todos os direitos reservados.
+        </p>
+
+        <span class="hidden sm:inline-block h-3.5 w-[1px] bg-white/10"></span>
+
+        <!-- Discreet Developer Signature: developed by F91 (f91.tech) -->
+        <a 
+          href="https://f91.tech" 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          aria-label="Developed by F91 Tech"
+          class="group inline-flex items-center gap-2 text-[11px] font-mono text-slate-500 hover:text-slate-300 transition-all duration-300 opacity-60 hover:opacity-100"
+        >
+          <span>developed by</span>
+          <!-- Faithful Vector SVG Recreation of the F91 Logo -->
+          <svg class="h-3.5 w-auto text-white transition-transform duration-300 group-hover:scale-105 group-hover:drop-shadow-[0_0_8px_rgba(0,198,255,0.45)]" viewBox="0 0 380 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Left Geometric Slanted Emblem -->
+            <!-- Top-left angled wing -->
+            <path d="M36 4 C41 0 46 0 53 0 H88 C93 0 95 4 91 9 L75 25 H46 L18 53 C14 57 9 54 10 48 L15 27 C16 22 20 18 24 14 L36 4 Z" fill="currentColor"/>
+            <!-- Bottom-left inner slanted bar -->
+            <path d="M47 38 H72 L40 70 C34 76 26 79 16 79 H4 C0 79 -1 74 3 70 L35 42 C39 39 43 38 47 38 Z" fill="currentColor"/>
+            <!-- Right lightning/chevron slanted wing -->
+            <path d="M111 4 C115 0 121 0 125 4 L132 13 C135 17 136 22 134 28 L120 75 C118 82 112 87 104 87 H70 C65 87 63 82 67 78 L99 45 C103 41 103 32 97 32 H88 C83 32 82 27 86 23 L111 4 Z" fill="currentColor"/>
+            
+            <!-- Bold Slanted Futuristic Wordmark "F91" -->
+            <!-- Letter F -->
+            <path d="M174 28 C178 17 188 12 202 12 H256 C261 12 263 16 261 21 L258 29 C256 33 252 35 247 35 H203 C199 35 196 37 195 41 L193 46 H238 C243 46 245 50 243 54 L240 62 C238 66 234 68 229 68 H185 L179 83 C177 86 174 88 169 88 H155 C150 88 148 84 150 79 L174 28 Z" fill="currentColor"/>
+            <!-- Number 9 -->
+            <path d="M278 12 H324 C338 12 345 21 340 35 L326 70 C321 82 310 88 295 88 H249 C244 88 242 84 244 79 L247 72 C249 68 253 66 258 66 H294 C299 66 303 63 305 58 L306 55 H269 C255 55 249 46 254 33 L258 24 C262 15 270 12 278 12 Z M280 32 L277 38 C276 41 278 43 282 43 H310 L315 32 C316 29 314 27 310 27 H286 C283 27 281 29 280 32 Z" fill="currentColor"/>
+            <!-- Number 1 -->
+            <path d="M368 12 H377 C380 12 381 15 380 19 L356 82 C354 86 351 88 346 88 H332 C327 88 325 84 327 79 L344 35 L335 38 C331 39 328 36 330 31 L334 22 C335 19 338 17 342 16 L368 12 Z" fill="currentColor"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ==================== JAVASCRIPT ENGINE ==================== -->
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    /* ==========================================================================
+       1. MULTILINGUAL I18N DICTIONARY (PT-BR, EN-US, ES-ES) + AUTO-DETECTION
+       ========================================================================== */
+    const i18nDictionary = {
+      pt: {
+        toastAuto: "Idioma detectado automaticamente: Português",
+        nav: {
+          platform: "Plataforma",
+          features: "Recursos",
+          studentApp: "App do Aluno",
+          earlyAccess: "Acesso Antecipado",
+          cta: "Lista VIP"
+        },
+        hero: {
+          badge: "LANÇAMENTO OFICIAL 2026 • ACESSO ANTECIPADO LIMITADO",
+          titlePart1: "Eleve sua consultoria e treinos ao",
+          titleHighlight: " padrão de elite.",
+          subtitle: "O ecossistema definitivo para Personal Trainers. Prescreva treinos individualizados em segundos, entregue um App exclusivo com vídeos curtos em HD para seus alunos e domine avaliações físicas com precisão clínica.",
+          primaryCta: "Garantir Acesso Antecipado VIP",
+          secondaryCta: "Explorar Interface Interativa",
+          waitlistJoined: "Personais na fila prioritária",
+          founderBenefit: "60 dias grátis + Selo Personal Fundador"
+        },
+        preview: {
+          kicker: "SIMULADOR INTERATIVO • CLIQUE PARA TESTAR OS MÓDULOS",
+          tab1: "1. Prescrição & Cronograma",
+          tab2: "2. Vídeos Curtos HD & Dicas",
+          tab3: "3. Avaliação Física & Evolução",
+          trainerViewBadge: "Visão do Personal",
+          studentGoal: "Hipertrofia & Definição",
+          studentMeta: "Microciclo 04 • Semana 3 de 6 • Frequência: 96% nos últimos 30 dias",
+          syncStatus: "Sincronizado em tempo real",
+          workoutHeader: "TREINO A — MEMBROS INFERIORES (FOCO QUADRÍCEPS)",
+          ex1Name: "Agachamento Livre com Barra",
+          ex1Tip: "Dica do Personal: Cadência 3010, manter joelhos alinhados à ponta dos pés.",
+          ex2Name: "Leg Press 45° Unilateral",
+          ex2Tip: "Dica do Personal: Amplitude máxima sem retirar o quadril do encosto.",
+          ex3Name: "Cadeira Extensora (Drop-set Final)",
+          ex3Tip: "Dica do Personal: Pico de contração de 2s no topo de cada repetição.",
+          videoHeader: "BIBLIOTECA DE VÍDEOS CURTOS HD & CUES BIOMECÂNICOS",
+          videoCue1: "Ângulo patelar e alinhamento lombar",
+          customVideoTag: "Upload Próprio ou Biblioteca Ttreino®",
+          customVideoTitle: "Mais de 1.200 vídeos curtos prontos ou grave os seus em 5 segundos",
+          customVideoDesc: "O aluno visualiza o vídeo em tela cheia sem sair do treino, junto com suas observações personalizadas de postura e respiração.",
+          voiceNoteTitle: "Dica de Voz do Personal Anexada",
+          voiceNoteSub: "\"Mariana, controle a descida em 3 segundos hoje!\"",
+          assessHeader: "AVALIAÇÃO FÍSICA & COMPOSIÇÃO CORPORAL (POLLOCK 7 DOBRAS)",
+          metricBF: "Percentual de Gordura",
+          metricLean: "Massa Magra (Músculo)",
+          metricSymmetry: "Simetria & Perimetria",
+          chartTitle: "Curva de Evolução: Massa Magra vs. % Gordura (Últimas 12 Semanas)",
+          bottomHint: "Qualquer alteração reflete instantaneamente no App do Aluno ao lado.",
+          mobileBadge: "APP DO ALUNO (iOS & ANDROID)",
+          mobileGreeting: "Olá, Mariana 👋",
+          mobileCardTitle: "Treino de Hoje: Inferior A",
+          mobileExNow: "Agachamento Livre • Série 3/4",
+          mobileCheckBtn: "Feito",
+          mobileCheckDone: "Concluído ✓",
+          mobileVideoLabel: "Vídeo Curto de Execução",
+          mobileTipText: "\"Mantenha o core firme e desça de forma controlada. Assista ao vídeo de 12s caso tenha dúvida na postura.\"",
+          mobileTimerLabel: "Cronômetro de Descanso",
+          mobileTimerActive: "Ativo"
+        },
+        bento: {
+          kicker: "ARQUITETURA PENSADA PARA PERSONAIS",
+          title: "Menos planilhas. Mais retenção e resultado para seus alunos.",
+          subtitle: "Cada detalhe do Ttreino® foi desenhado para eliminar o trabalho mecânico do Personal Trainer e entregar uma experiência digna de clube de elite ao aluno.",
+          card1Tag: "GESTÃO DE AULAS & PERIODIZAÇÃO",
+          card1Title: "Prescrição 100% individualizada em metade do tempo",
+          card1Desc: "Monte treinos do zero ou clone blocos inteligentes. Configure séries, repetições, cadência, RPE, bi-sets, drop-sets e agendas de aulas presenciais ou online com organização impecável.",
+          card1Pill1: "Templates Reutilizáveis",
+          card1Pill2: "Histórico de Cargas",
+          card1Pill3: "Controle de Aulas",
+          card2Tag: "EXECUÇÃO PERFEITA",
+          card2Title: "Vídeos curtos e dicas diretas no exercício",
+          card2Desc: "Acabe com as dúvidas no WhatsApp sobre \"qual é esse aparelho?\". Vídeos objetivos demonstram o movimento exato junto às suas dicas de postura.",
+          card2Footer: "Carregamento instantâneo no 4G/5G",
+          card3Tag: "AVALIAÇÃO FÍSICA COMPLETA",
+          card3Title: "Evolução visível que fideliza o aluno por anos",
+          card3Desc: "Registre dobras cutâneas, perimetria, anamnese e comparativo fotográfico. O aluno acompanha os gráficos de evolução no próprio celular.",
+          card3Footer: "Protocolos Pollock, Guedes & Bioimpedância",
+          card4Tag: "EXPERIÊNCIA DO ALUNO",
+          card4Title: "Um App que seu aluno realmente ama abrir todos os dias",
+          card4Desc: "O aluno baixa o Ttreino®, visualiza o cronograma semanal, marca séries concluídas, registra cargas utilizadas e envia feedback de percepção de esforço (PSE) ao final de cada sessão.",
+          card4Highlight: "100% Gratuito para seus alunos"
+        },
+        form: {
+          badge: "CONVITE BETA FECHADO",
+          title: "Seja um dos primeiros Personais a testar o Ttreino®.",
+          subtitle: "Cadastre seu nome, e-mail e WhatsApp para receber seu acesso antecipado VIP com benefícios vitalícios de membro fundador.",
+          perk1: "Acesso gratuito liberado no 1º lote de testes",
+          perk2: "Condição vitalícia de Personal Fundador no lançamento",
+          perk3: "Migração assistida da sua carteira atual de alunos",
+          profileLabel: "COMO VOCÊ ATUA HOJE?",
+          type1: "Personal Presencial",
+          type2: "Consultoria Online",
+          type3: "Híbrido / Studio",
+          nameLabel: "Nome Completo",
+          namePlaceholder: "Ex: Prof. Lucas Andrade",
+          nameError: "Por favor, digite seu nome e sobrenome.",
+          emailLabel: "Seu Melhor E-mail Profissional",
+          emailPlaceholder: "lucas.personal@gmail.com",
+          emailValid: "E-mail válido ✓",
+          emailInvalid: "Digite um endereço de e-mail válido (ex: nome@dominio.com).",
+          emailTypoPrompt: "Você quis dizer",
+          emailTypoAction: "Clique para corrigir",
+          whatsappLabel: "WhatsApp (para liberação do convite VIP)",
+          whatsappHelper: "Formatação automática: (00) 9 0000-0000 (9 dígitos) ou (00) 0000-0000 (8 dígitos)",
+          whatsappMobile9: "Celular • 9 dígitos ✓",
+          whatsappFixed8: "Fixo/8 dígitos ✓",
+          whatsappValidIntl: "Número válido ✓",
+          whatsappInvalidBR: "Informe o DDD + número válido (10 ou 11 dígitos). Ex: (11) 9 0000-0000",
+          whatsappInvalidDDD: "DDD brasileiro inválido. Verifique os 2 primeiros dígitos.",
+          whatsappInvalidIntl: "Complete os dígitos do número para o país selecionado.",
+          submitBtn: "Quero Ser Um dos Primeiros a Testar",
+          privacy: "Seus dados estão 100% seguros. Zero spam, apenas seu convite VIP.",
+          privacyLink: "Política de privacidade",
+          sending: "Enviando...",
+          errorGeneric: "Não foi possível enviar agora. Verifique sua conexão e tente de novo.",
+          errorRate: "Muitas inscrições seguidas desta rede. Tente de novo mais tarde.",
+          errorInvalid: "Confira nome, e-mail e WhatsApp e tente de novo."
+        },
+        success: {
+          badge: "PASSAPORTE VIP CONFIRMADO",
+          alreadyBadge: "VOCÊ JÁ ESTAVA NA LISTA",
+          greetingPrefix: "Bem-vindo à elite,",
+          desc: "Reservamos sua vaga prioritária. Você receberá no seu WhatsApp e e-mail a chave de acesso exclusiva assim que liberarmos o lote.",
+          alreadyDesc: "Este e-mail já estava na lista. Atualizamos seus dados e sua posição continua a mesma.",
+          queueLabel: "POSIÇÃO NA FILA",
+          resetBtn: "Cadastrar outro profissional"
+        },
+        footer: {
+          rights: "© 2026 Ttreino® Tecnologias para Educação Física. Todos os direitos reservados."
+        }
+      },
+
+      en: {
+        toastAuto: "Language automatically detected: English",
+        nav: {
+          platform: "Platform",
+          features: "Features",
+          studentApp: "Client App",
+          earlyAccess: "Early Access",
+          cta: "VIP Waitlist"
+        },
+        hero: {
+          badge: "OFFICIAL 2026 LAUNCH • LIMITED EARLY ACCESS",
+          titlePart1: "Elevate your personal training & coaching to",
+          titleHighlight: " the elite standard.",
+          subtitle: "The ultimate operating system for Personal Trainers. Build individualized workouts in seconds, empower clients with a dedicated HD video companion app, and track physical assessments with clinical precision.",
+          primaryCta: "Claim VIP Early Access",
+          secondaryCta: "Explore Interactive Preview",
+          waitlistJoined: "Personal Trainers in priority queue",
+          founderBenefit: "60 days free + Founding Trainer Badge"
+        },
+        preview: {
+          kicker: "INTERACTIVE SIMULATOR • CLICK TO TEST MODULES",
+          tab1: "1. Workout Builder & Schedule",
+          tab2: "2. Short HD Videos & Cues",
+          tab3: "3. Body Assessment & Evolution",
+          trainerViewBadge: "Trainer Studio View",
+          studentGoal: "Hypertrophy & Conditioning",
+          studentMeta: "Microcycle 04 • Week 3 of 6 • Adherence: 96% over last 30 days",
+          syncStatus: "Real-time cloud sync",
+          workoutHeader: "WORKOUT A — LOWER BODY (QUAD FOCUS)",
+          ex1Name: "Barbell Back Squat",
+          ex1Tip: "Trainer Cue: 3010 tempo, keep knees aligned with toes throughout ascent.",
+          ex2Name: "Single-Leg 45° Leg Press",
+          ex2Tip: "Trainer Cue: Full range of motion without lifting hips off the pad.",
+          ex3Name: "Leg Extension (Final Drop-set)",
+          ex3Tip: "Trainer Cue: 2-second isometric peak contraction at the top of each rep.",
+          videoHeader: "SHORT-FORM HD VIDEO LIBRARY & BIOMECHANICS CUES",
+          videoCue1: "Patellar angle & lumbar alignment",
+          customVideoTag: "Custom Upload or Ttreino® Library",
+          customVideoTitle: "1,200+ ready-made HD micro-videos or record your own in 5 seconds",
+          customVideoDesc: "Clients watch full-screen execution loops without leaving their workout log, paired with your custom posture and breathing cues.",
+          voiceNoteTitle: "Trainer Voice Note Attached",
+          voiceNoteSub: "\"Mariana, control the eccentric phase for 3 full seconds today!\"",
+          assessHeader: "PHYSICAL ASSESSMENT & BODY COMPOSITION (7-SITE SKINFOLD)",
+          metricBF: "Body Fat Percentage",
+          metricLean: "Skeletal Muscle Mass",
+          metricSymmetry: "Symmetry & Girths",
+          chartTitle: "Progression Curve: Lean Mass vs. Body Fat % (Last 12 Weeks)",
+          bottomHint: "Any edit immediately syncs to the Client Companion App on the right.",
+          mobileBadge: "CLIENT APP (iOS & ANDROID)",
+          mobileGreeting: "Hey, Mariana 👋",
+          mobileCardTitle: "Today's Session: Lower Body A",
+          mobileExNow: "Barbell Squat • Set 3/4",
+          mobileCheckBtn: "Log Set",
+          mobileCheckDone: "Logged ✓",
+          mobileVideoLabel: "Short Execution Video",
+          mobileTipText: "\"Keep your core braced and control the descent. Watch the 12s clip if you need a posture refresher.\"",
+          mobileTimerLabel: "Rest Recovery Timer",
+          mobileTimerActive: "Running"
+        },
+        bento: {
+          kicker: "ENGINEERED FOR PERSONAL TRAINERS",
+          title: "Zero spreadsheets. Higher client retention and measurable results.",
+          subtitle: "Every pixel of Ttreino® is crafted to eliminate repetitive admin work and give your clients a world-class training experience.",
+          card1Tag: "CLASS & WORKOUT MANAGEMENT",
+          card1Title: "100% individualized programming in half the time",
+          card1Desc: "Build periodized programs from scratch or clone smart templates. Customize sets, reps, tempo, RPE, supersets, drop-sets, and 1-on-1 session calendars effortlessly.",
+          card1Pill1: "Reusable Templates",
+          card1Pill2: "Load Progression",
+          card1Pill3: "Class Scheduling",
+          card2Tag: "FLAWLESS FORM",
+          card2Title: "Short HD execution videos & coaching tips",
+          card2Desc: "End late-night texts asking \"how do I perform this exercise?\". Crisp micro-videos demonstrate exact biomechanics alongside your notes.",
+          card2Footer: "Instant streaming over 4G/5G",
+          card3Tag: "PHYSICAL ASSESSMENTS",
+          card3Title: "Visual progress analytics that retain clients for years",
+          card3Desc: "Log skinfolds, circumferences, anamnesis, and before/after photos. Clients view interactive evolution charts right on their phone.",
+          card3Footer: "Pollock, Jackson & Bioimpedance Protocols",
+          card4Tag: "DEDICATED CLIENT APP",
+          card4Title: "A mobile app your clients actually love opening daily",
+          card4Desc: "Clients download Ttreino®, follow their personalized training calendar, check off completed sets, log weights, and submit post-workout RPE feedback.",
+          card4Highlight: "100% Free for all your clients"
+        },
+        form: {
+          badge: "CLOSED BETA INVITATION",
+          title: "Be among the first Personal Trainers to test Ttreino®.",
+          subtitle: "Enter your name, professional email, and WhatsApp to unlock VIP early access and lifetime Founding Trainer perks.",
+          perk1: "Free access unlocked in Batch #1",
+          perk2: "Lifetime Founding Trainer rate upon launch",
+          perk3: "Concierge migration for your current client roster",
+          profileLabel: "HOW DO YOU COACH TODAY?",
+          type1: "In-Person Trainer",
+          type2: "Online Coaching",
+          type3: "Hybrid / Studio",
+          nameLabel: "Full Name",
+          namePlaceholder: "e.g., Coach Lucas Andrade",
+          nameError: "Please enter your first and last name.",
+          emailLabel: "Your Best Professional Email",
+          emailPlaceholder: "lucas.coach@gmail.com",
+          emailValid: "Valid email ✓",
+          emailInvalid: "Please enter a valid email address (e.g. name@domain.com).",
+          emailTypoPrompt: "Did you mean",
+          emailTypoAction: "Click to fix",
+          whatsappLabel: "WhatsApp Number (for VIP invite delivery)",
+          whatsappHelper: "Smart auto-formatting: (00) 9 0000-0000 (9-digit mobile) or (00) 0000-0000 (8-digit)",
+          whatsappMobile9: "Mobile • 9 digits ✓",
+          whatsappFixed8: "8-digit number ✓",
+          whatsappValidIntl: "Valid number ✓",
+          whatsappInvalidBR: "Enter valid area code + number (10 or 11 digits). E.g. (11) 9 0000-0000",
+          whatsappInvalidDDD: "Invalid Brazilian area code (DDD).",
+          whatsappInvalidIntl: "Please complete the phone digits for the selected country.",
+          submitBtn: "Get Priority Early Access",
+          privacy: "Your data is 100% encrypted. Zero spam—only your VIP beta invite.",
+          privacyLink: "Privacy policy",
+          sending: "Sending...",
+          errorGeneric: "We couldn't send it right now. Check your connection and try again.",
+          errorRate: "Too many sign-ups from this network. Please try again later.",
+          errorInvalid: "Please check your name, email and WhatsApp and try again."
+        },
+        success: {
+          badge: "VIP PASS CONFIRMED",
+          alreadyBadge: "YOU WERE ALREADY ON THE LIST",
+          greetingPrefix: "Welcome to the elite,",
+          desc: "Your priority spot is locked in. We'll send your exclusive activation key via WhatsApp and email as soon as the next wave opens.",
+          alreadyDesc: "This email was already on the list. We updated your details and your spot stays the same.",
+          queueLabel: "QUEUE POSITION",
+          resetBtn: "Register another trainer"
+        },
+        footer: {
+          rights: "© 2026 Ttreino® Fitness Technologies. All rights reserved."
+        }
+      },
+
+      es: {
+        toastAuto: "Idioma detectado automáticamente: Español",
+        nav: {
+          platform: "Plataforma",
+          features: "Funciones",
+          studentApp: "App del Alumno",
+          earlyAccess: "Acceso Anticipado",
+          cta: "Lista VIP"
+        },
+        hero: {
+          badge: "LANZAMIENTO OFICIAL 2026 • ACCESO ANTICIPADO LIMITADO",
+          titlePart1: "Lleva tu asesoría y entrenamientos al",
+          titleHighlight: " estándar de élite.",
+          subtitle: "El ecosistema definitivo para Entrenadores Personales. Prescribe rutinas individualizadas en segundos, ofrece una App exclusiva con videos cortos en HD para tus alumnos y domina las evaluaciones físicas con precisión clínica.",
+          primaryCta: "Asegurar Acceso Anticipado VIP",
+          secondaryCta: "Explorar Interfaz Interactiva",
+          waitlistJoined: "Entrenadores en fila prioritaria",
+          founderBenefit: "60 días gratis + Insignia Entrenador Fundador"
+        },
+        preview: {
+          kicker: "SIMULADOR INTERACTIVO • HAZ CLIC PARA PROBAR LOS MÓDULOS",
+          tab1: "1. Prescripción y Cronograma",
+          tab2: "2. Videos Cortos HD y Consejos",
+          tab3: "3. Evaluación Física y Evolución",
+          trainerViewBadge: "Vista del Entrenador",
+          studentGoal: "Hipertrofia y Definición",
+          studentMeta: "Microciclo 04 • Semana 3 de 6 • Asistencia: 96% últimos 30 días",
+          syncStatus: "Sincronizado en tiempo real",
+          workoutHeader: "ENTRENO A — TREN INFERIOR (ENFOQUE CUÁDRICEPS)",
+          ex1Name: "Sentadilla Libre con Barra",
+          ex1Tip: "Nota del Coach: Cadencia 3010, mantener rodillas alineadas con la punta del pie.",
+          ex2Name: "Prensa 45° Unilateral",
+          ex2Tip: "Nota del Coach: Rango completo sin despegar la cadera del respaldo.",
+          ex3Name: "Silla de Cuádriceps (Drop-set Final)",
+          ex3Tip: "Nota del Coach: Contracción isométrica de 2s arriba en cada repetición.",
+          videoHeader: "BIBLIOTECA DE VIDEOS CORTOS HD Y GUÍAS BIOMECÁNICAS",
+          videoCue1: "Ángulo rotuliano y alineación lumbar",
+          customVideoTag: "Subida Propia o Biblioteca Ttreino®",
+          customVideoTitle: "+1.200 videos cortos listos o graba los tuyos en 5 segundos",
+          customVideoDesc: "El alumno ve el video en pantalla completa sin salir de su rutina, junto con tus indicaciones personalizadas de postura.",
+          voiceNoteTitle: "Nota de Voz del Entrenador Adjunta",
+          voiceNoteSub: "\"¡Mariana, controla la bajada en 3 segundos hoy!\"",
+          assessHeader: "EVALUACIÓN FÍSICA Y COMPOSICIÓN CORPORAL (POLLOCK 7 PLIEGUES)",
+          metricBF: "Porcentaje de Grasa",
+          metricLean: "Masa Magra (Músculo)",
+          metricSymmetry: "Simetría y Perimetría",
+          chartTitle: "Curva de Evolución: Masa Magra vs. % Grasa (Últimas 12 Semanas)",
+          bottomHint: "Cualquier cambio se sincroniza al instante en la App del Alumno al lado.",
+          mobileBadge: "APP DEL ALUMNO (iOS Y ANDROID)",
+          mobileGreeting: "Hola, Mariana 👋",
+          mobileCardTitle: "Entreno de Hoy: Tren Inferior A",
+          mobileExNow: "Sentadilla Libre • Serie 3/4",
+          mobileCheckBtn: "Listo",
+          mobileCheckDone: "Completado ✓",
+          mobileVideoLabel: "Video Corto de Ejecución",
+          mobileTipText: "\"Mantén el core firme y baja controlado. Mira el video de 12s si tienes dudas con la postura.\"",
+          mobileTimerLabel: "Cronómetro de Descanso",
+          mobileTimerActive: "Activo"
+        },
+        bento: {
+          kicker: "ARQUITECTURA DISEÑADA PARA ENTRENADORES",
+          title: "Menos hojas de cálculo. Más retención y resultados para tus alumnos.",
+          subtitle: "Cada detalle de Ttreino® fue diseñado para eliminar el trabajo administrativo del Personal Trainer y brindar una experiencia premium al alumno.",
+          card1Tag: "GESTIÓN DE CLASES Y PERIODIZACIÓN",
+          card1Title: "Prescripción 100% individualizada en la mitad del tiempo",
+          card1Desc: "Crea rutinas desde cero o clona bloques inteligentes. Configura series, repeticiones, cadencia, RPE, biseries, drop-sets y agenda de clases presenciales u online.",
+          card1Pill1: "Plantillas Reutilizables",
+          card1Pill2: "Historial de Cargas",
+          card1Pill3: "Agenda de Clases",
+          card2Tag: "EJECUCIÓN PERFECTA",
+          card2Title: "Videos cortos y consejos directos en cada ejercicio",
+          card2Desc: "Elimina las dudas por WhatsApp sobre \"¿cuál es esta máquina?\". Videos cortos demuestran la técnica exacta junto a tus consejos.",
+          card2Footer: "Carga instantánea en 4G/5G",
+          card3Tag: "EVALUACIÓN FÍSICA COMPLETA",
+          card3Title: "Evolución visible que fideliza al alumno por años",
+          card3Desc: "Registra pliegues cutáneos, perímetros, anamnesis y fotos comparativas. El alumno sigue sus gráficos de progreso desde su móvil.",
+          card3Footer: "Protocolos Pollock, Guedes y Bioimpedancia",
+          card4Tag: "EXPERIENCIA DEL ALUMNO",
+          card4Title: "Una App que tus alumnos realmente aman abrir cada día",
+          card4Desc: "El alumno descarga Ttreino®, consulta su cronograma semanal, marca series completadas, registra pesos y envía su percepción del esfuerzo.",
+          card4Highlight: "100% Gratis para tus alumnos"
+        },
+        form: {
+          badge: "INVITACIÓN BETA CERRADA",
+          title: "Sé uno de los primeros Entrenadores en probar Ttreino®.",
+          subtitle: "Registra tu nombre, correo y WhatsApp para recibir acceso anticipado VIP con beneficios vitalicios de miembro fundador.",
+          perk1: "Acceso gratuito liberado en el 1º lote de pruebas",
+          perk2: "Tarifa vitalicia de Entrenador Fundador en el lanzamiento",
+          perk3: "Migración asistida de tu cartera actual de alumnos",
+          profileLabel: "¿CÓMO TRABAJAS HOY?",
+          type1: "Personal Presencial",
+          type2: "Asesoría Online",
+          type3: "Híbrido / Estudio",
+          nameLabel: "Nombre Completo",
+          namePlaceholder: "Ej: Prof. Lucas Andrade",
+          nameError: "Por favor, ingresa tu nombre y apellido.",
+          emailLabel: "Tu Mejor Correo Profesional",
+          emailPlaceholder: "lucas.personal@gmail.com",
+          emailValid: "Correo válido ✓",
+          emailInvalid: "Ingresa un correo electrónico válido (ej: nombre@dominio.com).",
+          emailTypoPrompt: "¿Quisiste decir",
+          emailTypoAction: "Haz clic para corregir",
+          whatsappLabel: "WhatsApp (para enviar tu invitación VIP)",
+          whatsappHelper: "Formato inteligente: (00) 9 0000-0000 (9 dígitos) o (00) 0000-0000 (8 dígitos)",
+          whatsappMobile9: "Móvil • 9 dígitos ✓",
+          whatsappFixed8: "Fijo/8 dígitos ✓",
+          whatsappValidIntl: "Número válido ✓",
+          whatsappInvalidBR: "Ingresa código de área + número válido (10 u 11 dígitos). Ej: (11) 9 0000-0000",
+          whatsappInvalidDDD: "Código de área (DDD) inválido.",
+          whatsappInvalidIntl: "Completa los dígitos del número para el país seleccionado.",
+          submitBtn: "Quiero Ser de los Primeros en Probar",
+          privacy: "Tus datos están 100% seguros. Cero spam, solo tu invitación VIP.",
+          privacyLink: "Política de privacidad",
+          sending: "Enviando...",
+          errorGeneric: "No pudimos enviarlo ahora. Revisa tu conexión e inténtalo de nuevo.",
+          errorRate: "Demasiados registros desde esta red. Inténtalo más tarde.",
+          errorInvalid: "Revisa tu nombre, correo y WhatsApp e inténtalo de nuevo."
+        },
+        success: {
+          badge: "PASAPORTE VIP CONFIRMADO",
+          alreadyBadge: "YA ESTABAS EN LA LISTA",
+          greetingPrefix: "Bienvenido a la élite,",
+          desc: "Reservamos tu cupo prioritario. Recibirás en tu WhatsApp y correo la clave exclusiva apenas liberemos el lote.",
+          alreadyDesc: "Este correo ya estaba en la lista. Actualizamos tus datos y tu posición sigue igual.",
+          queueLabel: "POSICIÓN EN FILA",
+          resetBtn: "Registrar otro profesional"
+        },
+        footer: {
+          rights: "© 2026 Ttreino® Tecnologías para Entrenadores Personales. Todos los derechos reservados."
+        }
+      }
+    };
+
+    let currentLang = 'pt';
+
+    function getNestedTranslation(lang, keyPath) {
+      return keyPath.split('.').reduce((obj, key) => (obj && obj[key] !== undefined) ? obj[key] : null, i18nDictionary[lang]);
+    }
+
+    function setLanguage(lang, manualClick = false) {
+      if (!i18nDictionary[lang]) lang = 'pt';
+      currentLang = lang;
+      document.documentElement.lang = lang === 'pt' ? 'pt-BR' : (lang === 'es' ? 'es-ES' : 'en-US');
+
+      // Update active state on header language pills
+      ['pt', 'en', 'es'].forEach(code => {
+        const btn = document.getElementById(`lang-btn-${code}`);
+        if (!btn) return;
+        if (code === lang) {
+          btn.className = "lang-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 bg-white/15 text-white shadow-sm border border-white/15";
+        } else {
+          btn.className = "lang-btn px-2.5 py-1 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 text-slate-400 hover:text-white";
+        }
+      });
+
+      // Translate all [data-i18n] text nodes
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const translated = getNestedTranslation(lang, key);
+        if (translated) el.textContent = translated;
+      });
+
+      // Translate all [data-i18n-placeholder] inputs
+      document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const translated = getNestedTranslation(lang, key);
+        if (translated) el.setAttribute('placeholder', translated);
+      });
+
+      // Re-validate fields if user already typed something so feedback updates in real time
+      if (document.getElementById('lead-email').value.trim().length > 0) validateEmailLive();
+      if (document.getElementById('lead-whatsapp').value.trim().length > 0) validateWhatsAppLive();
+
+      if (manualClick) {
+        showLangToast(i18nDictionary[lang].toastAuto.replace('automaticamente', '').replace('automatically', '').replace('automáticamente', ''));
+      }
+    }
+
+    function detectPreferredLanguage() {
+      const browserLangs = navigator.languages || [navigator.language || navigator.userLanguage || 'pt-BR'];
+      let detected = 'pt'; // fallback
+      for (const l of browserLangs) {
+        const lower = l.toLowerCase();
+        if (lower.startsWith('pt')) { detected = 'pt'; break; }
+        if (lower.startsWith('es')) { detected = 'es'; break; }
+        if (lower.startsWith('en')) { detected = 'en'; break; }
+      }
+      setLanguage(detected, false);
+      showLangToast(i18nDictionary[detected].toastAuto);
+    }
+
+    function showLangToast(message) {
+      const toast = document.getElementById('lang-toast');
+      const text = document.getElementById('lang-toast-text');
+      if (!toast || !text) return;
+      text.textContent = message;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      setTimeout(() => {
+        dismissLangToast();
+      }, 4800);
+    }
+
+    function dismissLangToast() {
+      const toast = document.getElementById('lang-toast');
+      if (toast) toast.classList.add('translate-y-20', 'opacity-0');
+    }
+
+    /* ==========================================================================
+       2. COUNTRIES DDI LIST + INTELLIGENT WHATSAPP FORMATTER & VALIDATOR
+       ========================================================================== */
+    const countriesDDI = [
+      { code: 'BR', name: 'Brasil', ddi: '+55', flag: '🇧🇷', placeholder: '(11) 9 0000-0000', minDigits: 10, maxDigits: 11 },
+      { code: 'US', name: 'United States', ddi: '+1', flag: '🇺🇸', placeholder: '(305) 555-0192', minDigits: 10, maxDigits: 10 },
+      { code: 'PT', name: 'Portugal', ddi: '+351', flag: '🇵🇹', placeholder: '912 345 678', minDigits: 9, maxDigits: 9 },
+      { code: 'ES', name: 'España', ddi: '+34', flag: '🇪🇸', placeholder: '612 34 56 78', minDigits: 9, maxDigits: 9 },
+      { code: 'MX', name: 'México', ddi: '+52', flag: '🇲🇽', placeholder: '55 1234 5678', minDigits: 10, maxDigits: 10 },
+      { code: 'AR', name: 'Argentina', ddi: '+54', flag: '🇦🇷', placeholder: '9 11 2345-6789', minDigits: 10, maxDigits: 11 },
+      { code: 'CO', name: 'Colombia', ddi: '+57', flag: '🇨🇴', placeholder: '300 123 4567', minDigits: 10, maxDigits: 10 },
+      { code: 'CL', name: 'Chile', ddi: '+56', flag: '🇨🇱', placeholder: '9 8765 4321', minDigits: 9, maxDigits: 9 },
+      { code: 'UY', name: 'Uruguay', ddi: '+598', flag: '🇺🇾', placeholder: '94 123 456', minDigits: 8, maxDigits: 9 },
+      { code: 'PY', name: 'Paraguay', ddi: '+595', flag: '🇵🇾', placeholder: '981 123 456', minDigits: 9, maxDigits: 9 },
+      { code: 'PE', name: 'Perú', ddi: '+51', flag: '🇵🇪', placeholder: '912 345 678', minDigits: 9, maxDigits: 9 },
+      { code: 'GB', name: 'United Kingdom', ddi: '+44', flag: '🇬🇧', placeholder: '7700 900077', minDigits: 10, maxDigits: 10 },
+      { code: 'CA', name: 'Canada', ddi: '+1', flag: '🇨🇦', placeholder: '(416) 555-0199', minDigits: 10, maxDigits: 10 },
+      { code: 'DE', name: 'Deutschland', ddi: '+49', flag: '🇩🇪', placeholder: '1512 3456789', minDigits: 10, maxDigits: 11 },
+      { code: 'FR', name: 'France', ddi: '+33', flag: '🇫🇷', placeholder: '6 12 34 56 78', minDigits: 9, maxDigits: 9 },
+      { code: 'IT', name: 'Italia', ddi: '+39', flag: '🇮🇹', placeholder: '312 345 6789', minDigits: 9, maxDigits: 10 },
+      { code: 'AU', name: 'Australia', ddi: '+61', flag: '🇦🇺', placeholder: '412 345 678', minDigits: 9, maxDigits: 9 },
+      { code: 'JP', name: 'Japan', ddi: '+81', flag: '🇯🇵', placeholder: '90-1234-5678', minDigits: 10, maxDigits: 10 }
+    ];
+
+    // Valid Brazilian DDDs
+    const validBrazilDDDs = new Set([
+      11,12,13,14,15,16,17,18,19,
+      21,22,24,27,28,
+      31,32,33,34,35,37,38,
+      41,42,43,44,45,46,47,48,49,
+      51,53,54,55,
+      61,62,63,64,65,66,67,68,69,
+      71,73,74,75,77,79,
+      81,82,83,84,85,86,87,88,89,
+      91,92,93,94,95,96,97,98,99
+    ]);
+
+    let selectedCountry = countriesDDI[0]; // Default Brazil (+55)
+
+    function renderCountriesList(filter = '') {
+      const listEl = document.getElementById('ddi-countries-list');
+      if (!listEl) return;
+      const q = filter.trim().toLowerCase();
+      const filtered = countriesDDI.filter(c => 
+        c.name.toLowerCase().includes(q) || 
+        c.ddi.includes(q) || 
+        c.code.toLowerCase().includes(q)
+      );
+
+      listEl.innerHTML = filtered.map(c => `
+        <button 
+          type="button" 
+          onclick="selectCountry('${c.code}')"
+          class="w-full px-3 py-2 rounded-xl text-left flex items-center justify-between hover:bg-white/10 transition text-xs ${selectedCountry.code === c.code ? 'bg-ttreino-blue/20 text-ttreino-cyan' : 'text-slate-200'}"
+        >
+          <span class="flex items-center gap-2.5">
+            <span class="text-base">${c.flag}</span>
+            <span class="font-medium">${c.name}</span>
+          </span>
+          <span class="font-mono text-slate-400">${c.ddi}</span>
+        </button>
+      `).join('');
+    }
+
+    function toggleDdiDropdown() {
+      const menu = document.getElementById('ddi-dropdown-menu');
+      const searchInput = document.getElementById('ddi-search-input');
+      menu.classList.toggle('hidden');
+      if (!menu.classList.contains('hidden')) {
+        searchInput.value = '';
+        renderCountriesList('');
+        setTimeout(() => searchInput.focus(), 50);
+      }
+    }
+
+    function filterCountries() {
+      const q = document.getElementById('ddi-search-input').value;
+      renderCountriesList(q);
+    }
+
+    function selectCountry(code) {
+      const found = countriesDDI.find(c => c.code === code);
+      if (!found) return;
+      selectedCountry = found;
+      document.getElementById('selected-country-flag').textContent = found.flag;
+      document.getElementById('selected-country-ddi').textContent = found.ddi;
+      const phoneInput = document.getElementById('lead-whatsapp');
+      phoneInput.placeholder = found.placeholder;
+      document.getElementById('ddi-dropdown-menu').classList.add('hidden');
+
+      // Re-format current input value for the newly chosen country
+      phoneInput.value = formatPhoneByCountry(phoneInput.value, selectedCountry);
+      validateWhatsAppLive();
+      phoneInput.focus();
+    }
+
+    // Close DDI dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      const container = document.getElementById('ddi-dropdown-container');
+      const menu = document.getElementById('ddi-dropdown-menu');
+      if (container && menu && !container.contains(e.target)) {
+        menu.classList.add('hidden');
+      }
+    });
+
+    /**
+     * Formats phone numbers dynamically.
+     * For Brazil (+55):
+     * - 10 digits (8-digit number): (21) 9294-2010
+     * - 11 digits (9-digit mobile): (21) 9 9294-2010  <-- Exact requested format!
+     */
+    function formatPhoneByCountry(rawValue, country) {
+      const digits = rawValue.replace(/\D/g, '').slice(0, country.maxDigits);
+      if (!digits) return '';
+
+      if (country.code === 'BR') {
+        const len = digits.length;
+        if (len <= 2) {
+          return `(${digits}`;
+        }
+        if (len <= 6) {
+          return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+        }
+        if (len <= 10) {
+          // 8-digit format: (XX) XXXX-XXXX
+          return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6, 10)}`;
+        }
+        // 11 digits (9-digit mobile): (XX) 9 XXXX-XXXX
+        return `(${digits.slice(0, 2)}) ${digits.slice(2, 3)} ${digits.slice(3, 7)}-${digits.slice(7, 11)}`;
+      }
+
+      if (country.code === 'US' || country.code === 'CA') {
+        const len = digits.length;
+        if (len <= 3) return `(${digits}`;
+        if (len <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+        return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+      }
+
+      if (country.code === 'PT' || country.code === 'ES' || country.code === 'FR') {
+        return digits.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+      }
+
+      // Generic international grouping
+      if (digits.length > 6) {
+        return `${digits.slice(0, 3)} ${digits.slice(3, 6)}-${digits.slice(6)}`;
+      } else if (digits.length > 3) {
+        return `${digits.slice(0, 3)} ${digits.slice(3)}`;
+      }
+      return digits;
+    }
+
+    function handleWhatsAppInput(e) {
+      const input = e.target;
+      const formatted = formatPhoneByCountry(input.value, selectedCountry);
+      input.value = formatted;
+      validateWhatsAppLive();
+    }
+
+    function validateWhatsAppLive() {
+      const input = document.getElementById('lead-whatsapp');
+      const wrapper = document.getElementById('whatsapp-wrapper');
+      const iconValid = document.getElementById('whatsapp-icon-valid');
+      const iconInvalid = document.getElementById('whatsapp-icon-invalid');
+      const feedback = document.getElementById('whatsapp-feedback');
+      const badge = document.getElementById('phone-type-badge');
+
+      const digits = input.value.replace(/\D/g, '');
+      const dict = i18nDictionary[currentLang].form;
+
+      if (digits.length === 0) {
+        wrapper.className = "smart-input-wrapper flex-1 relative flex items-center rounded-xl bg-obsidian-900 border border-white/10 px-3.5 py-3";
+        iconValid.classList.add('hidden');
+        iconInvalid.classList.add('hidden');
+        badge.textContent = '';
+        feedback.textContent = dict.whatsappHelper;
+        feedback.className = "text-[11px] text-slate-400";
+        return false;
+      }
+
+      if (selectedCountry.code === 'BR') {
+        const ddd = parseInt(digits.slice(0, 2), 10);
+        if (digits.length >= 2 && !validBrazilDDDs.has(ddd)) {
+          wrapper.className = "smart-input-wrapper flex-1 relative flex items-center rounded-xl bg-obsidian-900 border border-rose-500/60 px-3.5 py-3";
+          iconValid.classList.add('hidden');
+          iconInvalid.classList.remove('hidden');
+          badge.textContent = '';
+          feedback.textContent = dict.whatsappInvalidDDD;
+          feedback.className = "text-[11px] text-rose-400";
+          return false;
+        }
+
+        // Check 10 digits: (21) 9294-2010 or 11 digits: (21) 9 9294-2010
+        if (digits.length === 11 && digits[2] === '9') {
+          wrapper.className = "smart-input-wrapper flex-1 relative flex items-center rounded-xl bg-obsidian-900 border border-emerald-500/60 px-3.5 py-3";
+          iconValid.classList.remove('hidden');
+          iconInvalid.classList.add('hidden');
+          badge.textContent = dict.whatsappMobile9;
+          feedback.textContent = `${selectedCountry.ddi} ${input.value}`;
+          feedback.className = "text-[11px] text-emerald-400 font-mono";
+          return true;
+        } else if (digits.length === 10) {
+          wrapper.className = "smart-input-wrapper flex-1 relative flex items-center rounded-xl bg-obsidian-900 border border-emerald-500/60 px-3.5 py-3";
+          iconValid.classList.remove('hidden');
+          iconInvalid.classList.add('hidden');
+          badge.textContent = dict.whatsappFixed8;
+          feedback.textContent = `${selectedCountry.ddi} ${input.value}`;
+          feedback.className = "text-[11px] text-emerald-400 font-mono";
+          return true;
+        } else {
+          wrapper.className = "smart-input-wrapper flex-1 relative flex items-center rounded-xl bg-obsidian-900 border border-amber-500/50 px-3.5 py-3";
+          iconValid.classList.add('hidden');
+          iconInvalid.classList.remove('hidden');
+          badge.textContent = `${digits.length}/11`;
+          feedback.textContent = dict.whatsappInvalidBR;
+          feedback.className = "text-[11px] text-amber-400";
+          return false;
+        }
+      } else {
+        // International validation
+        if (digits.length >= selectedCountry.minDigits && digits.length <= selectedCountry.maxDigits) {
+          wrapper.className = "smart-input-wrapper flex-1 relative flex items-center rounded-xl bg-obsidian-900 border border-emerald-500/60 px-3.5 py-3";
+          iconValid.classList.remove('hidden');
+          iconInvalid.classList.add('hidden');
+          badge.textContent = dict.whatsappValidIntl;
+          feedback.textContent = `${selectedCountry.ddi} ${input.value}`;
+          feedback.className = "text-[11px] text-emerald-400 font-mono";
+          return true;
+        } else {
+          wrapper.className = "smart-input-wrapper flex-1 relative flex items-center rounded-xl bg-obsidian-900 border border-amber-500/50 px-3.5 py-3";
+          iconValid.classList.add('hidden');
+          iconInvalid.classList.remove('hidden');
+          badge.textContent = `${digits.length}/${selectedCountry.minDigits}`;
+          feedback.textContent = dict.whatsappInvalidIntl;
+          feedback.className = "text-[11px] text-amber-400";
+          return false;
+        }
+      }
+    }
+
+    /* ==========================================================================
+       3. INTELLIGENT EMAIL VALIDATION + DOMAIN TYPO DETECTOR
+       ========================================================================== */
+    const commonDomainTypos = {
+      'gamil.com': 'gmail.com',
+      'gmial.com': 'gmail.com',
+      'gmail.co': 'gmail.com',
+      'gmail.con': 'gmail.com',
+      'gmail.com.br': 'gmail.com',
+      'gmal.com': 'gmail.com',
+      'hotmial.com': 'hotmail.com',
+      'hotmai.com': 'hotmail.com',
+      'hotmail.con': 'hotmail.com',
+      'outlok.com': 'outlook.com',
+      'oulook.com': 'outlook.com',
+      'icloud.con': 'icloud.com',
+      'iclod.com': 'icloud.com',
+      'yaho.com': 'yahoo.com',
+      'yahooo.com': 'yahoo.com'
+    };
+
+    let suggestedEmailCorrection = '';
+
+    function validateEmailLive() {
+      const input = document.getElementById('lead-email');
+      const wrapper = document.getElementById('email-wrapper');
+      const iconValid = document.getElementById('email-icon-valid');
+      const iconInvalid = document.getElementById('email-icon-invalid');
+      const statusText = document.getElementById('email-status-text');
+      const feedback = document.getElementById('email-feedback');
+      const typoBox = document.getElementById('email-typo-suggestion');
+      const typoText = document.getElementById('email-typo-text');
+
+      const val = input.value.trim().toLowerCase();
+      const dict = i18nDictionary[currentLang].form;
+
+      typoBox.classList.add('hidden');
+      suggestedEmailCorrection = '';
+
+      if (!val) {
+        wrapper.className = "smart-input-wrapper relative flex items-center rounded-xl bg-obsidian-900 border border-white/10 px-3.5 py-3";
+        iconValid.classList.add('hidden');
+        iconInvalid.classList.add('hidden');
+        statusText.textContent = '';
+        feedback.classList.add('hidden');
+        return false;
+      }
+
+      // Check for common domain typo
+      const parts = val.split('@');
+      if (parts.length === 2 && parts[0].length > 0) {
+        const domain = parts[1];
+        if (commonDomainTypos[domain]) {
+          suggestedEmailCorrection = `${parts[0]}@${commonDomainTypos[domain]}`;
+          typoText.innerHTML = `${dict.emailTypoPrompt} <strong>${suggestedEmailCorrection}</strong>? ${dict.emailTypoAction}`;
+          typoBox.classList.remove('hidden');
+        }
+      }
+
+      // Strict RFC-inspired email regex with valid TLD length >= 2
+      const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,12}$/;
+      const isValid = emailRegex.test(val) && !val.includes('..') && !commonDomainTypos[parts[1]];
+
+      if (isValid) {
+        wrapper.className = "smart-input-wrapper relative flex items-center rounded-xl bg-obsidian-900 border border-emerald-500/60 px-3.5 py-3";
+        iconValid.classList.remove('hidden');
+        iconInvalid.classList.add('hidden');
+        statusText.textContent = dict.emailValid;
+        statusText.className = "text-[11px] font-mono text-emerald-400";
+        feedback.classList.add('hidden');
+        return true;
+      } else {
+        wrapper.className = "smart-input-wrapper relative flex items-center rounded-xl bg-obsidian-900 border border-rose-500/60 px-3.5 py-3";
+        iconValid.classList.add('hidden');
+        iconInvalid.classList.remove('hidden');
+        statusText.textContent = '';
+        feedback.textContent = dict.emailInvalid;
+        feedback.className = "text-[11px] mt-1.5 text-rose-400 block";
+        return false;
+      }
+    }
+
+    function applyEmailTypoFix() {
+      if (!suggestedEmailCorrection) return;
+      const input = document.getElementById('lead-email');
+      input.value = suggestedEmailCorrection;
+      validateEmailLive();
+    }
+
+    function validateNameLive() {
+      const input = document.getElementById('lead-name');
+      const wrapper = document.getElementById('name-wrapper');
+      const iconValid = document.getElementById('name-icon-valid');
+      const feedback = document.getElementById('name-feedback');
+      const val = input.value.trim();
+      const dict = i18nDictionary[currentLang].form;
+
+      if (val.length >= 3 && val.includes(' ')) {
+        wrapper.className = "smart-input-wrapper relative flex items-center rounded-xl bg-obsidian-900 border border-emerald-500/60 px-3.5 py-3";
+        iconValid.classList.remove('hidden');
+        feedback.classList.add('hidden');
+        return true;
+      } else if (val.length > 0) {
+        wrapper.className = "smart-input-wrapper relative flex items-center rounded-xl bg-obsidian-900 border border-amber-500/50 px-3.5 py-3";
+        iconValid.classList.add('hidden');
+        feedback.textContent = dict.nameError;
+        feedback.classList.remove('hidden');
+        return false;
+      } else {
+        wrapper.className = "smart-input-wrapper relative flex items-center rounded-xl bg-obsidian-900 border border-white/10 px-3.5 py-3";
+        iconValid.classList.add('hidden');
+        feedback.classList.add('hidden');
+        return false;
+      }
+    }
+
+    /* ==========================================================================
+       4. FORM SUBMISSION & VIP CONFIRMATION STATE
+       ========================================================================== */
+    let selectedTrainerProfile = 'presencial';
+
+    function selectTrainerType(type) {
+      selectedTrainerProfile = type;
+      ['presencial', 'online', 'hibrido'].forEach(t => {
+        const btn = document.getElementById(`type-${t}`);
+        if (t === type) {
+          btn.className = "trainer-type-btn py-2 px-2 rounded-lg text-xs font-semibold transition-all bg-ttreino-blue text-white shadow";
+        } else {
+          btn.className = "trainer-type-btn py-2 px-2 rounded-lg text-xs font-semibold transition-all text-slate-400 hover:text-white";
+        }
+      });
+    }
+
+    // Lista de espera real: as inscricoes vao para php/waitlist/api.php (banco do site + e-mail para o dono).
+    const WAITLIST_API = '/php/waitlist/api.php';
+    const WAITLIST_PRODUCT = 'ttreino';
+    const WAITLIST_PROOF_MIN = 25; // o contador de "Personais na fila" so aparece a partir deste numero de inscritos reais
+    const pageOpenedAt = Date.now();
+
+    function utmSource() {
+      const params = new URLSearchParams(window.location.search);
+      return ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term']
+        .filter(key => params.get(key))
+        .map(key => `${key}=${params.get(key)}`)
+        .join('&')
+        .slice(0, 255);
+    }
+
+    function showSubmitError(key) {
+      const box = document.getElementById('lead-submit-error');
+      box.textContent = i18nDictionary[currentLang].form[key];
+      box.classList.remove('hidden');
+    }
+
+    function hideSubmitError() {
+      document.getElementById('lead-submit-error').classList.add('hidden');
+    }
+
+    function setSubmitting(isSubmitting) {
+      const btn = document.getElementById('submit-lead-btn');
+      const label = btn.querySelector('span');
+      btn.disabled = isSubmitting;
+      btn.classList.toggle('opacity-70', isSubmitting);
+      btn.classList.toggle('cursor-wait', isSubmitting);
+      label.textContent = i18nDictionary[currentLang].form[isSubmitting ? 'sending' : 'submitBtn'];
+    }
+
+    async function refreshWaitlistCount() {
+      try {
+        const res = await fetch(`${WAITLIST_API}?action=count&product=${WAITLIST_PRODUCT}`, { cache: 'no-store' });
+        const data = await res.json();
+        const count = data && data.ok ? Number(data.count) : 0;
+        if (count < WAITLIST_PROOF_MIN) return;
+        document.getElementById('waitlist-count-display').textContent = count.toLocaleString(document.documentElement.lang);
+        document.getElementById('waitlist-proof-more').textContent = `+${Math.max(count - 3, 0)}`;
+        const proof = document.getElementById('waitlist-proof');
+        proof.classList.remove('hidden');
+        proof.classList.add('flex');
+      } catch (err) {
+        // Sem contador: o resto da pagina segue normal.
+      }
+    }
+
+    async function handleLeadSubmit(e) {
+      e.preventDefault();
+      hideSubmitError();
+      const isNameOk = validateNameLive();
+      const isEmailOk = validateEmailLive();
+      const isPhoneOk = validateWhatsAppLive();
+
+      if (!isNameOk || !isEmailOk || !isPhoneOk) {
+        // Shake invalid form subtly using GSAP
+        gsap.fromTo('#lead-form', { x: -6 }, { x: 0, duration: 0.4, ease: 'elastic.out(1, 0.2)' });
+        return;
+      }
+
+      const name = document.getElementById('lead-name').value.trim();
+      const email = document.getElementById('lead-email').value.trim();
+      const phone = `${selectedCountry.ddi} ${document.getElementById('lead-whatsapp').value.trim()}`;
+
+      let result = null;
+      setSubmitting(true);
+      try {
+        const res = await fetch(`${WAITLIST_API}?action=join`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            product: WAITLIST_PRODUCT,
+            name,
+            email,
+            whatsapp: phone,
+            profile: selectedTrainerProfile,
+            lang: currentLang,
+            website: document.getElementById('lead-website').value,
+            elapsed: Date.now() - pageOpenedAt,
+            source: utmSource(),
+            referrer: document.referrer.slice(0, 255)
+          })
+        });
+        result = await res.json().catch(() => null);
+        if (!res.ok || !result || !result.ok) {
+          showSubmitError(res.status === 429 ? 'errorRate' : (res.status === 422 ? 'errorInvalid' : 'errorGeneric'));
+          return;
+        }
+      } catch (err) {
+        showSubmitError('errorGeneric');
+        return;
+      } finally {
+        setSubmitting(false);
+      }
+
+      // Populate VIP confirmation card
+      const firstName = name.split(' ')[0];
+      const dictSuccess = i18nDictionary[currentLang].success;
+      document.getElementById('success-greeting').textContent = `${dictSuccess.greetingPrefix} ${firstName}!`;
+      document.getElementById('badge-holder-name').textContent = name;
+      document.getElementById('badge-holder-contact').textContent = `${email} • ${phone}`;
+      document.getElementById('success-position').textContent = result.position ? `#${String(result.position).padStart(4, '0')}` : '—';
+      const badgeEl = document.getElementById('success-badge');
+      const descEl = document.getElementById('success-desc');
+      badgeEl.setAttribute('data-i18n', result.already ? 'success.alreadyBadge' : 'success.badge');
+      descEl.setAttribute('data-i18n', result.already ? 'success.alreadyDesc' : 'success.desc');
+      badgeEl.textContent = dictSuccess[result.already ? 'alreadyBadge' : 'badge'];
+      descEl.textContent = dictSuccess[result.already ? 'alreadyDesc' : 'desc'];
+
+      // Transition form to VIP Pass card
+      const formEl = document.getElementById('lead-form');
+      const successEl = document.getElementById('vip-success-card');
+      formEl.classList.add('hidden');
+      successEl.classList.remove('hidden');
+      gsap.fromTo(successEl, { opacity: 0, scale: 0.95, y: 12 }, { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'power3.out' });
+      refreshWaitlistCount();
+    }
+
+    function resetLeadForm() {
+      document.getElementById('lead-form').reset();
+      document.getElementById('lead-form').classList.remove('hidden');
+      document.getElementById('vip-success-card').classList.add('hidden');
+      hideSubmitError();
+      validateNameLive();
+      validateEmailLive();
+      validateWhatsAppLive();
+    }
+
+    /* ==========================================================================
+       5. INTERACTIVE PRODUCT PREVIEW TABS & MICRO-INTERACTIONS
+       ========================================================================== */
+    function switchPreviewTab(tab) {
+      const tabs = ['workout', 'videos', 'assessment'];
+      tabs.forEach(t => {
+        const panel = document.getElementById(`trainer-panel-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (t === tab) {
+          panel.classList.remove('hidden');
+          gsap.fromTo(panel, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' });
+          btn.className = "preview-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 bg-gradient-to-r from-ttreino-royal to-ttreino-blue text-white shadow-lg";
+        } else {
+          panel.classList.add('hidden');
+          btn.className = "preview-tab-btn px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all flex items-center gap-2 text-slate-300 hover:text-white hover:bg-white/5";
+        }
+      });
+    }
+
+    function toggleSetComplete(btn) {
+      const span = btn.querySelector('span');
+      const dict = i18nDictionary[currentLang].preview;
+      if (btn.dataset.completed === 'true') {
+        btn.dataset.completed = 'false';
+        span.textContent = dict.mobileCheckBtn;
+        btn.className = "px-3 py-1.5 rounded-lg bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 border border-emerald-500/40 text-xs font-semibold transition flex items-center gap-1";
+      } else {
+        btn.dataset.completed = 'true';
+        span.textContent = dict.mobileCheckDone;
+        btn.className = "px-3 py-1.5 rounded-lg bg-emerald-500 text-obsidian-950 font-bold text-xs transition flex items-center gap-1";
+      }
+    }
+
+    // Live countdown rest timer inside mobile preview
+    let restSeconds = 74;
+    setInterval(() => {
+      restSeconds = restSeconds > 1 ? restSeconds - 1 : 90;
+      const mins = String(Math.floor(restSeconds / 60)).padStart(2, '0');
+      const secs = String(restSeconds % 60).padStart(2, '0');
+      const el = document.getElementById('live-rest-timer');
+      if (el) el.textContent = `${mins}:${secs}`;
+    }, 1000);
+
+    /* ==========================================================================
+       6. MOUSE-REACTIVE SPOTLIGHT CARDS, 3D TILT & MAGNETIC BUTTONS
+       ========================================================================== */
+    function initMouseEffects() {
+      // Spotlight border & surface radial tracking
+      const cards = document.querySelectorAll('.spotlight-card');
+      document.addEventListener('mousemove', (e) => {
+        cards.forEach(card => {
+          const rect = card.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          card.style.setProperty('--mouse-x', `${x}px`);
+          card.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+
+      // Subtle 3D tilt on the interactive stage
+      const stage = document.getElementById('interactive-stage');
+      if (stage && window.innerWidth > 1024) {
+        stage.addEventListener('mousemove', (e) => {
+          const rect = stage.getBoundingClientRect();
+          const relX = (e.clientX - rect.left) / rect.width - 0.5;
+          const relY = (e.clientY - rect.top) / rect.height - 0.5;
+          stage.style.transform = `rotateY(${relX * 4}deg) rotateX(${-relY * 4}deg)`;
+        });
+        stage.addEventListener('mouseleave', () => {
+          stage.style.transform = 'rotateY(0deg) rotateX(0deg)';
+        });
+      }
+
+      // Magnetic hover buttons
+      document.querySelectorAll('.magnetic-btn').forEach(btn => {
+        btn.addEventListener('mousemove', (e) => {
+          const rect = btn.getBoundingClientRect();
+          const x = e.clientX - rect.left - rect.width / 2;
+          const y = e.clientY - rect.top - rect.height / 2;
+          gsap.to(btn, { x: x * 0.18, y: y * 0.18, duration: 0.25, ease: 'power2.out' });
+        });
+        btn.addEventListener('mouseleave', () => {
+          gsap.to(btn, { x: 0, y: 0, duration: 0.4, ease: 'elastic.out(1, 0.4)' });
+        });
+      });
+    }
+
+    /* ==========================================================================
+       7. DYNAMIC AMBIENT AURORA CANVAS (SYNCED TO TTREINO BRAND COLORS)
+       ========================================================================== */
+    function initAuroraCanvas() {
+      const canvas = document.getElementById('aurora-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let pointerX = window.innerWidth * 0.5;
+      let pointerY = window.innerHeight * 0.3;
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      window.addEventListener('mousemove', (e) => {
+        pointerX += (e.clientX - pointerX) * 0.08;
+        pointerY += (e.clientY - pointerY) * 0.08;
+      });
+
+      const orbs = [
+        { x: 0.25, y: 0.2, r: 380, color: 'rgba(0, 102, 204, 0.18)', vx: 0.0003, vy: 0.0002 },
+        { x: 0.75, y: 0.28, r: 340, color: 'rgba(0, 198, 255, 0.13)', vx: -0.00025, vy: 0.0003 },
+        { x: 0.55, y: 0.65, r: 320, color: 'rgba(255, 30, 138, 0.11)', vx: 0.0002, vy: -0.00025 },
+        { x: 0.3, y: 0.75, r: 290, color: 'rgba(255, 153, 0, 0.08)', vx: -0.0002, vy: -0.0002 }
+      ];
+
+      function animateAurora() {
+        ctx.clearRect(0, 0, width, height);
+
+        // Interactive cursor orb
+        const cursorGrad = ctx.createRadialGradient(pointerX, pointerY, 10, pointerX, pointerY, 420);
+        cursorGrad.addColorStop(0, 'rgba(0, 198, 255, 0.10)');
+        cursorGrad.addColorStop(0.5, 'rgba(255, 30, 138, 0.04)');
+        cursorGrad.addColorStop(1, 'rgba(4, 6, 10, 0)');
+        ctx.fillStyle = cursorGrad;
+        ctx.fillRect(0, 0, width, height);
+
+        orbs.forEach(orb => {
+          orb.x += orb.vx;
+          orb.y += orb.vy;
+          if (orb.x < 0.1 || orb.x > 0.9) orb.vx *= -1;
+          if (orb.y < 0.1 || orb.y > 0.9) orb.vy *= -1;
+
+          const cx = orb.x * width;
+          const cy = orb.y * height;
+          const grad = ctx.createRadialGradient(cx, cy, 20, cx, cy, orb.r);
+          grad.addColorStop(0, orb.color);
+          grad.addColorStop(1, 'rgba(4, 6, 10, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, orb.r, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        requestAnimationFrame(animateAurora);
+      }
+      animateAurora();
+    }
+
+    /* ==========================================================================
+       8. GSAP ENTRANCE & SCROLLTRIGGER ANIMATIONS
+       ========================================================================== */
+    function initGSAPAnimations() {
+      gsap.registerPlugin(ScrollTrigger);
+
+      // Staggered Hero Reveal
+      gsap.fromTo('.gsap-hero-reveal', 
+        { y: 28, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.85, stagger: 0.12, ease: 'power3.out', delay: 0.1 }
+      );
+
+      // Interactive Preview Stage Reveal
+      gsap.fromTo('#preview-section',
+        { y: 40, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#preview-section',
+            start: 'top 82%'
+          }
+        }
+      );
+
+      // Bento Grid Cards Stagger
+      gsap.fromTo('#bento-grid .spotlight-card',
+        { y: 36, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.75,
+          stagger: 0.12,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '#bento-grid',
+            start: 'top 80%'
+          }
+        }
+      );
+    }
+
+    /* ==========================================================================
+       INITIALIZE EVERYTHING ON LOAD
+       ========================================================================== */
+    window.onload = function () {
+      renderCountriesList('');
+      detectPreferredLanguage();
+      refreshWaitlistCount();
+      initAuroraCanvas();
+      initMouseEffects();
+      initGSAPAnimations();
+    };
+  </script>
+</body>
+</html>
