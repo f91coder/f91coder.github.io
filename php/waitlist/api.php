@@ -347,6 +347,14 @@ try {
         exit;
     }
 
+    // TEMPORARIO (sai no proximo commit): apaga a inscricao do teste feito em producao.
+    if ($action === 'selftestCleanup' && $method === 'POST'
+        && hash_equals('377f64068bb24b842c1d641b92e9f75b4d6e0dee06249334197f7cef14e03bd8', hash('sha256', (string) ($_SERVER['HTTP_X_SELFTEST'] ?? '')))) {
+        $stmt = wl_pdo()->prepare('DELETE FROM wl_signups WHERE email = :e');
+        $stmt->execute(['e' => 'waitlist-selftest@f91.tech']);
+        wl_json(['ok' => true, 'deleted' => $stmt->rowCount()]);
+    }
+
     wl_json(['ok' => false, 'error' => 'not_found'], 404);
 } catch (Throwable $e) {
     error_log('waitlist/api.php [' . $action . ']: ' . $e->getMessage());
